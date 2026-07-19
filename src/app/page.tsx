@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useAppStore } from '@/store/use-app-store';
+import { CATEGORIES } from '@/lib/constants';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import HeroSection from '@/components/landing/hero-section';
@@ -19,26 +20,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Home() {
   const {
-    currentView, categories, setCategories,
+    currentView, setCategories,
     searchFilters, projects, setProjects, setLoading, isLoading,
   } = useAppStore();
 
-  // Load initial data
+  // Load categories from constants (no DB needed)
   useEffect(() => {
-    async function loadData() {
-      try {
-        const catRes = await fetch('/api/categories');
-        if (catRes.ok) {
-          const data = await catRes.json();
-          setCategories(data);
-        }
-        // Seed the database
-        await fetch('/api/seed', { method: 'POST' });
-      } catch (e) {
-        console.error('Failed to load initial data');
-      }
-    }
-    loadData();
+    setCategories(CATEGORIES.map(c => ({ ...c, _count: { projects: 0 } })));
   }, [setCategories]);
 
   // Fetch projects when on browse view or filters change
