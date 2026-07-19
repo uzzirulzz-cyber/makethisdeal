@@ -2,7 +2,7 @@ import {
   Globe, Building2, Store, ShoppingBag, Laptop, HandCoins,
   Factory, Smartphone, Landmark, Home, Briefcase, Cpu, Shield,
   GraduationCap, HeartPulse, BarChart3, ShoppingCart, Truck,
-  Warehouse, Globe2, Rocket, TrendingUp, CircleDollarSign,
+  Warehouse, Globe2, Rocket, TrendingUp, CircleDollarSign, Star,
   FileText, Palette, Video, Gamepad2, Lightbulb, Database,
   Cloud, Server, Blocks, Bot, Brain, Workflow, PieChart
 } from 'lucide-react';
@@ -28,6 +28,24 @@ export const CATEGORIES: Category[] = [
   { id: '17', name: 'Manufacturing', slug: 'manufacturing', icon: 'Factory', description: 'Production & industrial businesses', order: 18 },
   { id: '18', name: 'Websites', slug: 'websites', icon: 'Globe2', description: 'Established websites & web properties', order: 19 },
 ];
+
+/* Resolve category slug to display name */
+export function getCategoryName(slugOrName: string): string {
+  if (!slugOrName) return '';
+  const found = CATEGORIES.find(
+    (c) => c.slug === slugOrName || c.name === slugOrName
+  );
+  return found ? found.name : slugOrName;
+}
+
+/* Resolve category slug to icon name key */
+export function getCategoryIconKey(slugOrName: string): string {
+  const found = CATEGORIES.find(
+    (c) => c.slug === slugOrName || c.name === slugOrName
+  );
+  if (found && found.icon && CATEGORY_ICONS[found.icon]) return found.icon;
+  return 'PackageOpen';
+}
 
 export const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Laptop, Brain, ShoppingCart, Home, Smartphone, Rocket, Landmark,
@@ -61,10 +79,10 @@ export const SORT_OPTIONS = [
 ];
 
 export const STATS = [
-  { label: 'Projects Listed', value: '12,500+', icon: Briefcase },
-  { label: 'Global Users', value: '85,000+', icon: Globe },
-  { label: 'Deals Closed', value: '$2.4B+', icon: CircleDollarSign },
-  { label: 'Countries', value: '120+', icon: HandCoins },
+  { label: 'Featured Listings', value: '4', icon: Star },
+  { label: 'Growth Stage', value: '3', icon: TrendingUp },
+  { label: 'Startup Stage', value: '3', icon: Rocket },
+  { label: 'Pakistan Based', value: '7', icon: HandCoins },
 ];
 
 export const TECHNOLOGY_STACKS = [

@@ -24,9 +24,31 @@ export default function Home() {
     searchFilters, projects, setProjects, setLoading, isLoading,
   } = useAppStore();
 
-  // Load categories from constants (no DB needed)
+  // Load categories with real project counts from DB
   useEffect(() => {
-    setCategories(CATEGORIES.map(c => ({ ...c, _count: { projects: 0 } })));
+    async function loadCategories() {
+      try {
+        const res = await fetch('/api/categories');
+        if (res.ok) {
+          const apiCategories = await res.json();
+          // Merge API categories (with counts) with static categories (for icons/names)
+          const merged = CATEGORIES.map((c) => {
+            const apiCat = apiCategories.find((ac: any) => ac.slug === c.slug);
+            return {
+              ...c,
+              _count: apiCat?._count || { projects: 0 },
+            };
+          });
+          setCategories(merged);
+        } else {
+          // Fallback to static
+          setCategories(CATEGORIES.map(c => ({ ...c, _count: { projects: 0 } })));
+        }
+      } catch {
+        setCategories(CATEGORIES.map(c => ({ ...c, _count: { projects: 0 } })));
+      }
+    }
+    loadCategories();
   }, [setCategories]);
 
   // Fetch projects when on browse view or filters change

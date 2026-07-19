@@ -86,6 +86,19 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    // Ensure the category exists in DB (FK constraint)
+    if (body.category) {
+      await db.category.upsert({
+        where: { slug: body.category },
+        update: {},
+        create: {
+          name: body.categoryName || body.category,
+          slug: body.category,
+          icon: body.categoryIcon || undefined,
+          description: body.categoryDescription || undefined,
+        },
+      });
+    }
     const project = await db.project.create({
       data: {
         ...body,

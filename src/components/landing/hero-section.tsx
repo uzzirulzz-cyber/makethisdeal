@@ -26,10 +26,10 @@ const itemVariants = {
 };
 
 const statsItems = [
-  { label: 'Projects', value: '12,500+', icon: Briefcase },
-  { label: 'Users', value: '85,000+', icon: Globe },
-  { label: 'Deals', value: '$2.4B+', icon: CircleDollarSign },
-  { label: 'Countries', value: '120+', icon: HandCoins },
+  { label: 'Portfolio Value', value: 'PKR 8.5M', icon: CircleDollarSign },
+  { label: 'Domains Listed', value: '7', icon: Briefcase },
+  { label: 'US$ Equivalent', value: '$30.5K', icon: Globe },
+  { label: 'Categories', value: '2', icon: HandCoins },
 ];
 
 export default function HeroSection() {

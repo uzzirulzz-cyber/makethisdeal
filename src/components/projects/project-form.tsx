@@ -804,9 +804,13 @@ export default function ProjectForm() {
   };
 
   const buildPayload = () => {
+    const catObj = CATEGORIES.find((c) => c.slug === form.category);
     const payload: Record<string, unknown> = {
       name: form.name,
-      category: CATEGORIES.find((c) => c.slug === form.category)?.name || form.category,
+      category: form.category,
+      categoryName: catObj?.name,
+      categoryIcon: catObj?.icon,
+      categoryDescription: catObj?.description,
       industry: form.industry || undefined,
       country: form.country,
       city: form.city || undefined,

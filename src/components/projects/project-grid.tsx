@@ -12,7 +12,7 @@ import {
   PackageOpen,
 } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
-import { CATEGORY_ICONS, CATEGORIES } from '@/lib/constants';
+import { CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import type { Project } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -63,11 +63,7 @@ function getCategoryGradient(category: string): string {
 }
 
 function getCategoryIconName(category: string): string {
-  const cat = CATEGORIES.find((c) => c.name === category);
-  if (cat && cat.icon && CATEGORY_ICONS[cat.icon]) {
-    return cat.icon;
-  }
-  return 'PackageOpen';
+  return getCategoryIconKey(category);
 }
 
 function formatPKR(value: number | undefined): string {
@@ -205,7 +201,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           {/* Badges Row */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-              {project.category}
+              {getCategoryName(project.category)}
             </Badge>
             {project.country && (
               <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5">

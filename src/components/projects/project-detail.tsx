@@ -30,7 +30,7 @@ import {
   Copy,
 } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
-import { CATEGORY_ICONS, CATEGORIES } from '@/lib/constants';
+import { CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import type { Project, Offer } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -69,14 +69,11 @@ function formatNumber(value: number | undefined): string {
 }
 
 function getCategoryIconName(category: string): string {
-  const cat = CATEGORIES.find((c) => c.name === category);
-  if (cat && cat.icon && CATEGORY_ICONS[cat.icon]) {
-    return cat.icon;
-  }
-  return 'Globe';
+  return getCategoryIconKey(category);
 }
 
 function getCategoryGradient(category: string): string {
+  const name = getCategoryName(category);
   const map: Record<string, string> = {
     'SaaS': 'from-emerald-500/30 to-teal-600/30',
     'AI Solutions': 'from-violet-500/30 to-fuchsia-600/30',
@@ -88,8 +85,10 @@ function getCategoryGradient(category: string): string {
     'HealthTech': 'from-red-400/30 to-pink-500/30',
     'EdTech': 'from-yellow-500/30 to-orange-500/30',
     'Cybersecurity': 'from-slate-500/30 to-zinc-600/30',
+    'Domains': 'from-purple-400/30 to-violet-500/30',
+    'Websites': 'from-sky-400/30 to-cyan-500/30',
   };
-  return map[category] || 'from-stone-500/30 to-neutral-600/30';
+  return map[name] || 'from-stone-500/30 to-neutral-600/30';
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -329,7 +328,7 @@ export default function ProjectDetail() {
             <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <IconComp className="size-4" />
-                {project.category}
+                {getCategoryName(project.category)}
               </span>
               {project.country && (
                 <span className="flex items-center gap-1.5">

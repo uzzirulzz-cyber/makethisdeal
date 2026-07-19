@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/store/use-app-store';
-import { CATEGORY_ICONS, CATEGORIES } from '@/lib/constants';
+import { CATEGORY_ICONS, CATEGORIES, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import type { Project } from '@/lib/types';
 
 const containerVariants = {
@@ -47,12 +47,9 @@ function formatPKR(value?: number): string {
 }
 function formatCurrency(value?: number): string { return formatPKR(value); }
 
-function renderCategoryIcon(categoryName: string, className: string) {
-  const cat = CATEGORIES.find(
-    (c) => c.name.toLowerCase() === categoryName.toLowerCase()
-  );
-  if (!cat || !cat.icon) return null;
-  const IconComponent = CATEGORY_ICONS[cat.icon];
+function renderCategoryIcon(categorySlug: string, className: string) {
+  const iconKey = getCategoryIconKey(categorySlug);
+  const IconComponent = CATEGORY_ICONS[iconKey];
   if (!IconComponent) return null;
   return <IconComponent className={className} />;
 }
@@ -97,7 +94,7 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
             variant="secondary"
             className="absolute left-3 top-3 bg-white/90 text-xs font-medium text-foreground backdrop-blur-sm dark:bg-black/60 dark:text-white"
           >
-            {project.category}
+            {getCategoryName(project.category)}
           </Badge>
           {project.status === 'active' && (
             <Badge className="absolute right-3 top-3 bg-emerald-500 text-xs text-white">

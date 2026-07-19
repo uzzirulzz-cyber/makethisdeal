@@ -27,7 +27,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
-import { CATEGORIES, BUSINESS_STAGES, COUNTRIES, TECHNOLOGY_STACKS, CATEGORY_ICONS } from '@/lib/constants';
+import { CATEGORIES, BUSINESS_STAGES, COUNTRIES, TECHNOLOGY_STACKS, CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import type { Project, Offer, ProjectStatus, OfferStatus } from '@/lib/types';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -483,7 +483,8 @@ export default function UserDashboard() {
                   className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
                   {myProjects.map((project) => {
-                    const CatIcon = CATEGORY_ICONS[project.category] ?? Briefcase;
+                    const iconKey = getCategoryIconKey(project.category);
+                    const CatIcon = CATEGORY_ICONS[iconKey] ?? Briefcase;
                     const sc = statusConfig[project.status as ProjectStatus] ?? statusConfig.active;
                     return (
                       <motion.div key={project.id} variants={itemVariants} whileHover={cardHover}>
@@ -519,7 +520,7 @@ export default function UserDashboard() {
                                 {project.name}
                               </h3>
                             </div>
-                            <p className="text-xs text-muted-foreground">{project.category}</p>
+                            <p className="text-xs text-muted-foreground">{getCategoryName(project.category)}</p>
 
                             <div className="mt-auto flex items-center justify-between pt-2 text-xs text-muted-foreground">
                               <span>
@@ -719,7 +720,8 @@ export default function UserDashboard() {
                   className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
                   {favorites.map((project) => {
-                    const CatIcon = CATEGORY_ICONS[project.category] ?? Briefcase;
+                    const iconKey = getCategoryIconKey(project.category);
+                    const CatIcon = CATEGORY_ICONS[iconKey] ?? Briefcase;
                     const sc = statusConfig[project.status as ProjectStatus] ?? statusConfig.active;
                     return (
                       <motion.div key={project.id} variants={itemVariants} whileHover={cardHover}>
@@ -755,7 +757,7 @@ export default function UserDashboard() {
                             <h3 className="line-clamp-1 text-sm font-semibold leading-tight">
                               {project.name}
                             </h3>
-                            <p className="text-xs text-muted-foreground">{project.category}</p>
+                            <p className="text-xs text-muted-foreground">{getCategoryName(project.category)}</p>
                             <div className="mt-auto flex items-center justify-between border-t pt-2 text-xs">
                               <span className="font-semibold text-foreground">
                                 {formatCurrency(
