@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String
+  role          String     @default("buyer")
+  company       String?
+  country       String?
+  city          String?
+  avatar        String?
+  bio           String?
+  verified      Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  projects      Project[]
+  offers        Offer[]
+  favorites     Favorite[]
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  icon        String?
+  description String?
+  parent      String?
+  order       Int       @default(0)
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+}
+
+model Project {
+  id                      String   @id @default(cuid())
+  name                    String
+  category                String
+  categoryRel             Category? @relation(fields: [category], references: [slug])
+  industry                String?
+  country                 String?
+  city                    String?
+  businessStage           String?
+  foundedYear             Int?
+  status                  String   @default("active")
+  visibility              String   @default("public")
+  featured                Boolean  @default(false)
+  overview                String?
+  businessModel           String?
+  targetMarket            String?
+  revenueModel            String?
+  growthOpportunity       String?
+  competitiveAdvantage    String?
+  businessRisks           String?
+  exitOpportunities       String?
+  developmentCost         Float?
+  infrastructureCost      Float?
+  marketingCost           Float?
+  legalCost               Float?
+  operationalCost         Float?
+  technologyCost          Float?
+  maintenanceCost         Float?
+  totalInvestment         Float?
+  expectedROI             Float?
+  monthlyRevenue          Float?
+  annualRevenue           Float?
+  netProfit               Float?
+  ebitda                  Float?
+  breakEvenAnalysis       String?
+  companyValuation        Float?
+  suggestedSellingPrice   Float?
+  reservePrice            Float?
+  minimumOffer            Float?
+  buyNowPrice             Float?
+  auctionEnabled          Boolean  @default(false)
+  websiteUrl              String?
+  demoUrl                 String?
+  githubRepo              String?
+  googlePlayUrl           String?
+  appleStoreUrl           String?
+  adminPanelDemo          String?
+  customerPortalDemo      String?
+  apiDocumentation        String?
+  sourceCodeAvailable     Boolean  @default(false)
+  technologyStack         String?
+  hostingProvider         String?
+  cloudInfrastructure     String?
+  monthlyVisitors         Int?
+  monthlyActiveUsers      Int?
+  registeredUsers         Int?
+  customers               Int?
+  subscribers             Int?
+  conversionRate          Float?
+  trafficSources          String?
+  seoScore                Int?
+  socialMediaLinks        String?
+  aiValuation             Float?
+  investorPrice           Float?
+  wholesalePrice          Float?
+  acquisitionPrice        Float?
+  valuationDetails        String?
+  images                  String?
+  videos                  String?
+  thumbnail               String?
+  tags                    String?
+  sellerId                String
+  seller                  User     @relation(fields: [sellerId], references: [id])
+  offers                  Offer[]
+  favorites               Favorite[]
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model Offer {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  buyerId     String
+  buyer       User     @relation(fields: [buyerId], references: [id])
+  amount      Float
+  message     String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Favorite {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@unique([projectId, userId])
+}
