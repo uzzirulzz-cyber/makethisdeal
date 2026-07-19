@@ -70,12 +70,27 @@ function getCategoryIconName(category: string): string {
   return 'PackageOpen';
 }
 
+function formatPKR(value: number | undefined): string {
+  if (value === undefined || value === null) return '—';
+  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
+  return `PKR ${value.toLocaleString()}`;
+}
+
+function formatUSD(pkr: number | undefined): string {
+  if (pkr === undefined || pkr === null) return '';
+  const usd = Math.round(pkr / 278);
+  if (usd >= 1_000_000) return `US$ ${(usd / 1_000_000).toFixed(1)}M`;
+  if (usd >= 1_000) return `US$ ${(usd / 1_000).toFixed(0)}K`;
+  return `US$ ${usd.toLocaleString()}`;
+}
+
 function formatCurrency(value: number | undefined): string {
   if (value === undefined || value === null) return '—';
-  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
-  return `$${value.toLocaleString()}`;
+  if (value >= 1_000_000_000) return `PKR ${(value / 1_000_000_000).toFixed(1)}B`;
+  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
+  return `PKR ${value.toLocaleString()}`;
 }
 
 function formatROI(value: number | undefined): string {
@@ -219,11 +234,14 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 {formatROI(project.expectedROI)}
               </p>
             </div>
-            <div className="bg-muted/50 rounded-md px-2 py-1.5 text-center">
+            <div className="bg-primary/5 rounded-md px-2 py-1.5 text-center">
               <p className="text-[10px] text-muted-foreground leading-tight">Price</p>
-              <p className="text-xs font-semibold mt-0.5">
-                {formatCurrency(project.suggestedSellingPrice)}
+              <p className="text-xs font-bold mt-0.5 text-primary">
+                {formatPKR(project.suggestedSellingPrice)}
               </p>
+              {project.suggestedSellingPrice && project.suggestedSellingPrice >= 100000 && (
+                <p className="text-[9px] text-muted-foreground">{formatUSD(project.suggestedSellingPrice)}</p>
+              )}
             </div>
           </div>
 
@@ -285,11 +303,43 @@ export default function ProjectGrid({ projects, isLoading = false }: ProjectGrid
     return <EmptyState />;
   }
 
+  // Cumulative portfolio value
+  const totalPKR = projects.reduce((sum, p) => sum + (p.suggestedSellingPrice || 0), 0);
+  const totalUSD = Math.round(totalPKR / 278);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      {projects.map((project, index) => (
-        <ProjectCard key={project.id} project={project} index={index} />
-      ))}
-    </div>
+    <>
+      {/* Cumulative Portfolio Banner */}
+      {totalPKR > 0 && (
+        <div className="mb-6 rounded-xl border bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4 sm:p-5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Cumulative Portfolio Value</p>
+              <p className="text-2xl sm:text-3xl font-bold text-primary mt-0.5">
+                PKR {(totalPKR / 1_000_000).toFixed(1)}M
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">US$ Equivalent</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-0.5">
+                US$ {(totalUSD / 1_000).toFixed(1)}K
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
+            <span>{projects.length} Projects Listed</span>
+            <span className="size-1 rounded-full bg-muted-foreground/30" />
+            <span>All prices in Pakistani Rupee (PKR)</span>
+            <span className="size-1 rounded-full bg-muted-foreground/30" />
+            <span>Rate: 1 US$ ≈ PKR 278</span>
+          </div>
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {projects.map((project, index) => (
+          <ProjectCard key={project.id} project={project} index={index} />
+        ))}
+      </div>
+    </>
   );
 }

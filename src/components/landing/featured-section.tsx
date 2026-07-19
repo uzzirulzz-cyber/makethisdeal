@@ -39,12 +39,13 @@ const GRADIENTS = [
   'from-teal-300/20 to-green-400/20',
 ];
 
-function formatCurrency(value?: number): string {
+function formatPKR(value?: number): string {
   if (value == null) return '—';
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
-  return `$${value.toLocaleString()}`;
+  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
+  return `PKR ${value.toLocaleString()}`;
 }
+function formatCurrency(value?: number): string { return formatPKR(value); }
 
 function renderCategoryIcon(categoryName: string, className: string) {
   const cat = CATEGORIES.find(

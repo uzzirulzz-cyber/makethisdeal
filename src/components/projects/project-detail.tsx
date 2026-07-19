@@ -42,13 +42,24 @@ import { Progress } from '@/components/ui/progress';
 
 /* ---------- Helpers ---------- */
 
-function formatCurrency(value: number | undefined): string {
+function formatPKR(value: number | undefined): string {
   if (value === undefined || value === null) return '—';
-  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
-  return `$${value.toLocaleString()}`;
+  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
+  return `PKR ${value.toLocaleString()}`;
 }
+
+function toUSD(pkr: number): number { return Math.round(pkr / 278); }
+
+function formatUSD(pkr: number | undefined): string {
+  if (pkr === undefined || pkr === null) return '';
+  const u = toUSD(pkr);
+  if (u >= 1_000_000) return `≈ US$ ${(u / 1_000_000).toFixed(1)}M`;
+  if (u >= 1_000) return `≈ US$ ${(u / 1_000).toFixed(1)}K`;
+  return `≈ US$ ${u.toLocaleString()}`;
+}
+
+function formatCurrency(value: number | undefined): string { return formatPKR(value); }
 
 function formatNumber(value: number | undefined): string {
   if (value === undefined || value === null) return '—';
@@ -620,7 +631,10 @@ export default function ProjectDetail() {
             <CardContent className="space-y-3">
               <div className="text-center py-2">
                 <p className="text-xs text-muted-foreground mb-1">Selling Price</p>
-                <p className="text-3xl font-bold">{formatCurrency(project.suggestedSellingPrice)}</p>
+                <p className="text-3xl font-bold text-primary">{formatPKR(project.suggestedSellingPrice)}</p>
+                {project.suggestedSellingPrice && project.suggestedSellingPrice >= 100000 && (
+                  <p className="text-sm text-muted-foreground">{formatUSD(project.suggestedSellingPrice)}</p>
+                )}
               </div>
               <Separator />
               <div className="space-y-2.5">
