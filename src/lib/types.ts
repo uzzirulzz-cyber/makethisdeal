@@ -1,4 +1,4 @@
-export type ViewType = 'landing' | 'browse' | 'detail' | 'create' | 'dashboard' | 'auth';
+export type ViewType = 'landing' | 'browse' | 'detail' | 'create' | 'dashboard' | 'auth' | 'storefront';
 
 export type UserRole = 'buyer' | 'seller' | 'investor' | 'broker' | 'admin';
 

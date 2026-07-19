@@ -1,4 +1,27 @@
 ---
+Task ID: 8
+Agent: Main Orchestrator
+Task: Add Storefront Preview feature inspired by reference designs
+
+Work Log:
+- Analyzed two reference URLs: zxc-bixx.vercel.app/storefront (Vercel storefront template) and a generated "Onestop Cash & Carry" storefront
+- Created storefront-preview.tsx (~880 lines) with dark gradient theme, 9 sections: Header, Location bar, Hero, Use Cases, Why Choose (4 feature cards), How to Buy (3 steps), Pricing (PKR/US$ with trust badges), CTA section, Footer
+- Added 'storefront' to ViewType union in types.ts
+- Added "Preview Storefront" button (with Store icon) to project-detail.tsx sidebar
+- Fixed missing setCurrentView destructure in project-detail component
+- Wired storefront into SPA router in page.tsx with conditional header/footer hiding
+- Browser-verified: dark theme, hero with domain name, nav links, PKR/US$ pricing, AI Valuation, CTA buttons, trust badges, back navigation
+
+Stage Summary:
+- New Storefront Preview view for every project listing
+- Dark gradient design (near-black to dark emerald) matching reference aesthetic
+- Dynamic content from project data (name, overview, tags, pricing, advantages)
+- PKR 1.2M + US$ 4.3K pricing displayed with "Make an Offer" CTA
+- Navigation: Use Cases, Why Choose, How to Buy, Pricing anchor links
+- Trust badges: Secure Transactions, Fast Transfer, Verified Listing, Verified Seller
+- Full back-navigation to marketplace
+
+---
 Task ID: 7
 Agent: Main Orchestrator
 Task: Add 7 real domain listings with full descriptions, PKR/US$ pricing, and cumulative total

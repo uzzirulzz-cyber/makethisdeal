@@ -19,6 +19,7 @@ import {
   MessageSquare,
   Gavel,
   Sparkles,
+  Store,
   MapPin,
   Building2,
   Calendar,
@@ -238,7 +239,7 @@ function MetricBar({ label, value, max, suffix = '' }: { label: string; value?: 
 /* ---------- Main Component ---------- */
 
 export default function ProjectDetail() {
-  const { selectedProjectId, goBack, currentUser } = useAppStore();
+  const { selectedProjectId, goBack, setCurrentView, currentUser } = useAppStore();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -755,6 +756,17 @@ export default function ProjectDetail() {
               </CardContent>
             </Card>
           )}
+
+          {/* Preview Storefront */}
+          <Button
+            variant="outline"
+            className="w-full gap-2 border-primary/30 hover:bg-primary/5"
+            size="sm"
+            onClick={() => setCurrentView('storefront')}
+          >
+            <Store className="size-4 text-primary" />
+            Preview Storefront
+          </Button>
 
           {/* Quick Actions */}
           {!isOwner && (
