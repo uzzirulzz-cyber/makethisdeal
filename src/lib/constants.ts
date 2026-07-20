@@ -79,10 +79,10 @@ export const SORT_OPTIONS = [
 ];
 
 export const STATS = [
-  { label: 'Featured Listings', value: '4', icon: Star },
-  { label: 'Growth Stage', value: '3', icon: TrendingUp },
-  { label: 'Startup Stage', value: '3', icon: Rocket },
-  { label: 'Pakistan Based', value: '7', icon: HandCoins },
+  { label: 'Featured Listings', value: '6', icon: Star },
+  { label: 'Growth Stage', value: '7', icon: TrendingUp },
+  { label: 'Startup Stage', value: '4', icon: Rocket },
+  { label: 'Pakistan Based', value: '12', icon: HandCoins },
 ];
 
 export const TECHNOLOGY_STACKS = [

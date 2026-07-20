@@ -11,6 +11,7 @@ import CategoriesSection from '@/components/landing/categories-section';
 import FeaturedSection from '@/components/landing/featured-section';
 import HowItWorksSection from '@/components/landing/how-it-works-section';
 import CtaSection from '@/components/landing/cta-section';
+import CustomerSupportSection from '@/components/landing/customer-support-section';
 import ProjectFilters from '@/components/projects/project-filters';
 import ProjectGrid from '@/components/projects/project-grid';
 import ProjectDetail from '@/components/projects/project-detail';
@@ -103,6 +104,7 @@ export default function Home() {
             <FeaturedSection />
             <HowItWorksSection />
             <CtaSection />
+            <CustomerSupportSection />
           </>
         );
       case 'browse':
