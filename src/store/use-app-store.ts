@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ViewType, SearchFilters, Project, User, Category } from '@/lib/types';
+import type { ViewType, SearchFilters, Project, User, Category, CartItem } from '@/lib/types';
 import type { CurrencyMode } from '@/lib/currency';
 import { detectRegion } from '@/lib/currency';
 
@@ -37,6 +37,19 @@ interface AppState {
   toggleCurrency: () => void;
   pkrToUsd: number;
   setExchangeRate: (pkrToUsd: number) => void;
+
+  // Cart
+  cartItems: CartItem[];
+  cartTotalPkr: number;
+  cartLoading: boolean;
+  fetchCart: () => Promise<void>;
+  addToCart: (projectId: string, pricePkr: number, priceType: string) => Promise<boolean>;
+  removeFromCart: (cartItemId: string) => Promise<void>;
+  clearCart: () => void;
+
+  // Admin
+  isAdminAuthenticated: boolean;
+  setAdminAuthenticated: (auth: boolean) => void;
 }
 
 const defaultFilters: SearchFilters = {
@@ -54,7 +67,17 @@ const defaultFilters: SearchFilters = {
   limit: 12,
 };
 
-export const useAppStore = create<AppState>((set) => ({
+function getCartSessionId(): string {
+  if (typeof window === 'undefined') return '';
+  let sid = localStorage.getItem('mtd_cart_session');
+  if (!sid) {
+    sid = `sess_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem('mtd_cart_session', sid);
+  }
+  return sid;
+}
+
+export const useAppStore = create<AppState>((set, get) => ({
   currentView: 'landing',
   previousView: 'landing',
   selectedProjectId: null,
@@ -97,6 +120,60 @@ export const useAppStore = create<AppState>((set) => ({
   toggleCurrency: () => set((state) => ({
     currencyMode: state.currencyMode === 'PKR' ? 'USD' : 'PKR',
   })),
-  pkrToUsd: 1 / 278, // fallback ~0.0036
+  pkrToUsd: 1 / 278,
   setExchangeRate: (pkrToUsd) => set({ pkrToUsd }),
+
+  // Cart
+  cartItems: [],
+  cartTotalPkr: 0,
+  cartLoading: false,
+  fetchCart: async () => {
+    const sessionId = getCartSessionId();
+    if (!sessionId) return;
+    set({ cartLoading: true });
+    try {
+      const res = await fetch(`/api/cart?sessionId=${sessionId}`);
+      if (res.ok) {
+        const data = await res.json();
+        const items = data.items || [];
+        const total = items.reduce((sum: number, item: CartItem) => sum + item.pricePkr, 0);
+        set({ cartItems: items, cartTotalPkr: total });
+      }
+    } catch {
+      // silent
+    } finally {
+      set({ cartLoading: false });
+    }
+  },
+  addToCart: async (projectId: string, pricePkr: number, priceType: string) => {
+    const sessionId = getCartSessionId();
+    if (!sessionId) return false;
+    try {
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, projectId, pricePkr, priceType }),
+      });
+      if (res.ok) {
+        await get().fetchCart();
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  },
+  removeFromCart: async (cartItemId: string) => {
+    try {
+      await fetch(`/api/cart?itemId=${cartItemId}`, { method: 'DELETE' });
+      await get().fetchCart();
+    } catch {
+      // silent
+    }
+  },
+  clearCart: () => set({ cartItems: [], cartTotalPkr: 0 }),
+
+  // Admin
+  isAdminAuthenticated: false,
+  setAdminAuthenticated: (auth) => set({ isAdminAuthenticated: auth }),
 }));

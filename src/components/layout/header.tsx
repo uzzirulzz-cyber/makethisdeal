@@ -1,20 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/use-app-store';
 import { useCurrency } from '@/hooks/use-currency';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
 import {
-  Menu, Search, Plus, LayoutDashboard, Heart, LogIn, Repeat
+  Menu, Search, Plus, LayoutDashboard, Heart, LogIn, Repeat, ShoppingCart, Shield
 } from 'lucide-react';
 
 export function Header() {
-  const { currentView, setCurrentView, currentUser, setCurrentUser, searchFilters, setSearchFilters, toggleCurrency } = useAppStore();
+  const { currentView, setCurrentView, currentUser, setCurrentUser, searchFilters, setSearchFilters, toggleCurrency, cartItems, fetchCart } = useAppStore();
   const { mode, symbol, rateDisplay } = useCurrency();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // Fetch cart on mount
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
 
   if (typeof window !== 'undefined') {
     window.addEventListener('scroll', () => setScrolled(window.scrollY > 10));
@@ -23,7 +28,9 @@ export function Header() {
   const navItems = [
     { label: 'Browse Projects', view: 'browse' as const, icon: Search },
     { label: 'List a Project', view: 'create' as const, icon: Plus },
+    { label: 'Shopping Cart', view: 'cart' as const, icon: ShoppingCart },
     { label: 'Dashboard', view: 'dashboard' as const, icon: LayoutDashboard },
+    { label: 'Admin', view: 'admin' as const, icon: Shield },
   ];
 
   return (
@@ -109,6 +116,27 @@ export function Header() {
             >
               <Repeat className="size-3" />
               <span>{symbol}</span>
+            </button>
+
+            {/* Cart Button */}
+            <button
+              onClick={() => setCurrentView('cart')}
+              className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+              style={{
+                backgroundColor: currentView === 'cart' ? 'rgba(138, 43, 226, 0.15)' : 'rgba(138, 43, 226, 0.08)',
+                color: '#8A2BE2',
+              }}
+              title="Shopping Cart"
+            >
+              <ShoppingCart className="size-4" />
+              {cartItems.length > 0 && (
+                <span
+                  className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+                  style={{ backgroundColor: '#8A2BE2' }}
+                >
+                  {cartItems.length}
+                </span>
+              )}
             </button>
 
             {/* Search bar on browse */}

@@ -18,6 +18,10 @@ import ProjectDetail from '@/components/projects/project-detail';
 import ProjectForm from '@/components/projects/project-form';
 import UserDashboard from '@/components/dashboard/user-dashboard';
 import StorefrontPreview from '@/components/storefront/storefront-preview';
+import CartView from '@/components/storefront/cart-view';
+import CheckoutView from '@/components/storefront/checkout-view';
+import PaymentSuccess from '@/components/storefront/payment-success';
+import { AdminPanel } from '@/components/admin/admin-panel';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Home() {
@@ -134,6 +138,12 @@ export default function Home() {
         );
       case 'storefront':
         return <StorefrontPreview />;
+      case 'cart':
+        return <CartView />;
+      case 'checkout':
+        return <CheckoutView />;
+      case 'admin':
+        return <AdminPanel />;
       default:
         return null;
     }
@@ -141,7 +151,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {currentView !== 'storefront' && <Header />}
+      {currentView !== 'storefront' && currentView !== 'admin' && <Header />}
       <main className="flex-1">
         <AnimatePresence mode="wait">
           <motion.div
@@ -150,13 +160,13 @@ export default function Home() {
             initial="initial"
             animate="animate"
             exit="exit"
-            className={currentView === 'storefront' ? '' : 'min-h-[calc(100vh-4rem)]'}
+            className={currentView === 'storefront' || currentView === 'admin' ? '' : 'min-h-[calc(100vh-4rem)]'}
           >
             {renderView()}
           </motion.div>
         </AnimatePresence>
       </main>
-      {currentView !== 'storefront' && <Footer />}
+      {currentView !== 'storefront' && currentView !== 'admin' && <Footer />}
     </div>
   );
 }

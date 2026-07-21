@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Star,
@@ -10,7 +10,10 @@ import {
   MapPin,
   Users,
   PackageOpen,
+  ShoppingCart,
+  Check,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAppStore } from '@/store/use-app-store';
 import { CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import { formatCompact } from '@/lib/currency';
@@ -137,10 +140,29 @@ function CategoryIconDisplay({ iconName, className }: { iconName: string; classN
 }
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const { goToProject } = useAppStore();
+  const { goToProject, addToCart } = useAppStore();
   const { formatPrice, mode, symbol, convert } = useCurrency();
   const iconKey = getCategoryIconName(project.category);
   const gradient = getCategoryGradient(project.category);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const [adding, setAdding] = useState(false);
+
+  const hasPrice = !!project.suggestedSellingPrice && project.suggestedSellingPrice > 0;
+
+  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!hasPrice || adding) return;
+    setAdding(true);
+    const success = await addToCart(project.id, project.suggestedSellingPrice!, 'suggestedSellingPrice');
+    setAdding(false);
+    if (success) {
+      setAddedToCart(true);
+      toast.success(`Added "${project.name}" to cart`);
+      setTimeout(() => setAddedToCart(false), 2000);
+    } else {
+      toast.error('Failed to add to cart');
+    }
+  }, [hasPrice, adding, addToCart, project.id, project.suggestedSellingPrice, project.name]);
 
   return (
     <motion.div
@@ -244,16 +266,37 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </div>
           )}
 
-          {/* View Details Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full gap-1.5 text-xs mt-1 border-[#8A2BE2] text-[#8A2BE2] hover:bg-[#8A2BE2] hover:text-white"
-            onClick={() => goToProject(project.id)}
-          >
-            <Eye className="size-3.5" />
-            View Details
-          </Button>
+          {/* Actions Row */}
+          <div className="flex items-center gap-2 mt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 gap-1.5 text-xs border-[#8A2BE2] text-[#8A2BE2] hover:bg-[#8A2BE2] hover:text-white"
+              onClick={() => goToProject(project.id)}
+            >
+              <Eye className="size-3.5" />
+              View Details
+            </Button>
+            <button
+              onClick={handleAddToCart}
+              disabled={!hasPrice || adding}
+              className="p-2 rounded-lg border border-[#F0F0F0] transition-all duration-200 shrink-0"
+              style={{
+                backgroundColor: addedToCart ? 'rgba(138,43,226,0.1)' : '#fff',
+                borderColor: addedToCart ? '#8A2BE2' : '#F0F0F0',
+                color: addedToCart ? '#8A2BE2' : !hasPrice ? '#D1D5DB' : '#8A2BE2',
+                cursor: hasPrice ? 'pointer' : 'not-allowed',
+              }}
+              title={hasPrice ? 'Add to Cart' : 'No price set'}
+              aria-label={hasPrice ? 'Add to cart' : 'No price available'}
+            >
+              {addedToCart ? (
+                <Check className="size-4" />
+              ) : (
+                <ShoppingCart className="size-4" />
+              )}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </motion.div>
