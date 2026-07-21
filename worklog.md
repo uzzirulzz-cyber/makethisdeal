@@ -104,3 +104,31 @@ Stage Summary:
 - Hero: clean white background with subtle violet/pink accent blobs
 - CTA: dark navy gradient section with violet/pink decorative elements
 - All F5 Studio theme changes verified working
+---
+Task ID: 1
+Agent: Main
+Task: Implement region-based currency display (PKR default for Pakistan, US$ for international) with auto-conversion
+
+Work Log:
+- Created `/src/app/api/exchange-rate/route.ts` - live PKR→USD exchange rate API with 10-min cache
+- Created `/src/lib/currency.ts` - currency utilities: detectRegion(), formatCompact(), convertValue(), currencySymbol(), filterCurrencyLabel()
+- Created `/src/hooks/use-currency.ts` - useCurrency hook with auto-detect via timezone, live rate fetching, and formatPrice/convert/symbol/rateDisplay/toggleCurrency
+- Updated `/src/store/use-app-store.ts` - added currencyMode (auto-detected PKR/USD), pkrToUsd rate, setCurrencyMode, toggleCurrency, setExchangeRate
+- Updated `/src/components/layout/header.tsx` - added currency toggle button (PKR/US$ with Repeat icon) in navbar
+- Updated `/src/components/projects/project-grid.tsx` - removed local formatPKR/formatUSD/formatCurrency, now uses useCurrency hook. Portfolio banner shows primary currency + secondary conversion
+- Updated `/src/components/projects/project-detail.tsx` - removed local helpers, FinancialTable + main component use formatPrice. Selling price shows ≈ secondary currency
+- Updated `/src/components/landing/featured-section.tsx` - removed local formatPKR/formatCurrency, uses useCurrency hook
+- Updated `/src/components/landing/hero-section.tsx` - dynamic stats with formatCompact for secondary currency
+- Updated `/src/components/storefront/storefront-preview.tsx` - removed local formatPKR/toUSD/formatUSD, uses useCurrency + formatCompact
+- Updated `/src/components/dashboard/user-dashboard.tsx` - removed Intl.NumberFormat USD, uses useCurrency.formatPrice
+- Updated `/src/components/projects/project-filters.tsx` - filter inputs show PKR/US$ prefix dynamically
+- Updated `/src/components/projects/project-form.tsx` - CurrencyInput shows "PKR" prefix, review section uses dynamic symbol
+- Fixed exchange rate API inversion bug (was returning usdToPkr instead of pkrToUsd)
+
+Stage Summary:
+- Auto-detection: Users in Asia/Karachi timezone see PKR by default, all others see US$
+- Live exchange rate from open.er-api.com with 10-minute server-side cache
+- Manual toggle button in header navbar (PKR ↔ US$)
+- All 8+ components updated to use centralized currency system
+- Conversion rate displayed on hover over toggle button
+- Lint passes cleanly, no errors in dev log

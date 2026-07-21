@@ -6,6 +6,7 @@ import { MapPin, TrendingUp, BadgeCheck, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/store/use-app-store';
+import { useCurrency } from '@/hooks/use-currency';
 import { CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import type { Project } from '@/lib/types';
 
@@ -38,14 +39,6 @@ const GRADIENTS = [
   'from-[#8A2BE2]/15 to-[#4DABF7]/15',
 ];
 
-function formatPKR(value?: number): string {
-  if (value == null) return '—';
-  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
-  return `PKR ${value.toLocaleString()}`;
-}
-function formatCurrency(value?: number): string { return formatPKR(value); }
-
 function renderCategoryIcon(categorySlug: string, className: string) {
   const iconKey = getCategoryIconKey(categorySlug);
   const IconComponent = CATEGORY_ICONS[iconKey];
@@ -76,6 +69,7 @@ function ProjectCardSkeleton() {
 
 function FeaturedProjectCard({ project, index }: { project: Project; index: number }) {
   const goToProject = useAppStore((s) => s.goToProject);
+  const { formatPrice } = useCurrency();
   const gradient = GRADIENTS[index % GRADIENTS.length];
 
   return (
@@ -125,11 +119,11 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
           {/* Key Metrics */}
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <span className="font-bold text-[#8A2BE2]">
-              {formatCurrency(project.suggestedSellingPrice ?? project.companyValuation)}
+              {formatPrice(project.suggestedSellingPrice ?? project.companyValuation)}
             </span>
             {project.annualRevenue != null && project.annualRevenue > 0 && (
               <span className="text-[#6B7280]">
-                Rev: {formatCurrency(project.annualRevenue)}
+                Rev: {formatPrice(project.annualRevenue)}
               </span>
             )}
             {project.expectedROI != null && project.expectedROI > 0 && (

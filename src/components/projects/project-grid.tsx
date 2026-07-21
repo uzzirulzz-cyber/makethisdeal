@@ -13,11 +13,13 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
 import { CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
+import { formatCompact } from '@/lib/currency';
 import type { Project } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCurrency } from '@/hooks/use-currency';
 
 interface ProjectGridProps {
   projects: Project[];
@@ -65,29 +67,6 @@ function getCategoryGradient(category: string): string {
 
 function getCategoryIconName(category: string): string {
   return getCategoryIconKey(category);
-}
-
-function formatPKR(value: number | undefined): string {
-  if (value === undefined || value === null) return '—';
-  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
-  return `PKR ${value.toLocaleString()}`;
-}
-
-function formatUSD(pkr: number | undefined): string {
-  if (pkr === undefined || pkr === null) return '';
-  const usd = Math.round(pkr / 278);
-  if (usd >= 1_000_000) return `US$ ${(usd / 1_000_000).toFixed(1)}M`;
-  if (usd >= 1_000) return `US$ ${(usd / 1_000).toFixed(0)}K`;
-  return `US$ ${usd.toLocaleString()}`;
-}
-
-function formatCurrency(value: number | undefined): string {
-  if (value === undefined || value === null) return '—';
-  if (value >= 1_000_000_000) return `PKR ${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
-  return `PKR ${value.toLocaleString()}`;
 }
 
 function formatROI(value: number | undefined): string {
@@ -159,6 +138,7 @@ function CategoryIconDisplay({ iconName, className }: { iconName: string; classN
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const { goToProject } = useAppStore();
+  const { formatPrice, mode, symbol, convert } = useCurrency();
   const iconKey = getCategoryIconName(project.category);
   const gradient = getCategoryGradient(project.category);
 
@@ -222,7 +202,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             <div className="bg-muted/50 rounded-md px-2 py-1.5 text-center">
               <p className="text-[10px] text-muted-foreground leading-tight">Revenue</p>
               <p className="text-xs font-semibold mt-0.5">
-                {formatCurrency(project.annualRevenue)}
+                {formatPrice(project.annualRevenue)}
               </p>
             </div>
             <div className="bg-muted/50 rounded-md px-2 py-1.5 text-center">
@@ -234,11 +214,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             <div className="rounded-md px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(138,43,226,0.05)' }}>
               <p className="text-[10px] text-muted-foreground leading-tight">Price</p>
               <p className="text-xs font-bold mt-0.5 text-[#8A2BE2]">
-                {formatPKR(project.suggestedSellingPrice)}
+                {formatPrice(project.suggestedSellingPrice)}
               </p>
-              {project.suggestedSellingPrice && project.suggestedSellingPrice >= 100000 && (
-                <p className="text-[9px] text-muted-foreground">{formatUSD(project.suggestedSellingPrice)}</p>
-              )}
             </div>
           </div>
 
@@ -286,6 +263,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 /* ---------- Main Grid ---------- */
 
 export default function ProjectGrid({ projects, isLoading = false }: ProjectGridProps) {
+  const { formatPrice, mode, symbol, convert, rateDisplay } = useCurrency();
+  const pkrToUsd = useAppStore((s) => s.pkrToUsd);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -302,7 +282,8 @@ export default function ProjectGrid({ projects, isLoading = false }: ProjectGrid
 
   // Cumulative portfolio value
   const totalPKR = projects.reduce((sum, p) => sum + (p.suggestedSellingPrice || 0), 0);
-  const totalUSD = Math.round(totalPKR / 278);
+  const oppositeMode = mode === 'PKR' ? 'USD' as const : 'PKR' as const;
+  const secondaryFormatted = formatCompact(totalPKR, oppositeMode, pkrToUsd);
 
   return (
     <>
@@ -313,22 +294,22 @@ export default function ProjectGrid({ projects, isLoading = false }: ProjectGrid
             <div>
               <p className="text-sm font-medium text-muted-foreground">Cumulative Portfolio Value</p>
               <p className="text-2xl sm:text-3xl font-bold text-[#8A2BE2] mt-0.5">
-                PKR {(totalPKR / 1_000_000).toFixed(1)}M
+                {formatPrice(totalPKR)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">US$ Equivalent</p>
+              <p className="text-sm text-muted-foreground">{mode === 'PKR' ? 'US$ Equivalent' : 'PKR Equivalent'}</p>
               <p className="text-2xl sm:text-3xl font-bold mt-0.5">
-                US$ {(totalUSD / 1_000).toFixed(1)}K
+                ≈ {secondaryFormatted}
               </p>
             </div>
           </div>
           <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
             <span>{projects.length} Projects Listed</span>
             <span className="size-1 rounded-full bg-[#8A2BE2]/20" />
-            <span>All prices in Pakistani Rupee (PKR)</span>
+            <span>All prices in {symbol}</span>
             <span className="size-1 rounded-full bg-[#8A2BE2]/20" />
-            <span>Rate: 1 US$ ≈ PKR 278</span>
+            <span>Rate: {rateDisplay}</span>
           </div>
         </div>
       )}

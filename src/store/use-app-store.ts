@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import type { ViewType, SearchFilters, Project, User, Category } from '@/lib/types';
+import type { CurrencyMode } from '@/lib/currency';
+import { detectRegion } from '@/lib/currency';
 
 interface AppState {
   currentView: ViewType;
@@ -28,6 +30,13 @@ interface AppState {
   setSidebarOpen: (open: boolean) => void;
   isLoading: boolean;
   setLoading: (loading: boolean) => void;
+
+  // Currency
+  currencyMode: CurrencyMode;
+  setCurrencyMode: (mode: CurrencyMode) => void;
+  toggleCurrency: () => void;
+  pkrToUsd: number;
+  setExchangeRate: (pkrToUsd: number) => void;
 }
 
 const defaultFilters: SearchFilters = {
@@ -81,4 +90,13 @@ export const useAppStore = create<AppState>((set) => ({
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
   isLoading: false,
   setLoading: (loading) => set({ isLoading: loading }),
+
+  // Currency - auto-detect region
+  currencyMode: detectRegion(),
+  setCurrencyMode: (mode) => set({ currencyMode: mode }),
+  toggleCurrency: () => set((state) => ({
+    currencyMode: state.currencyMode === 'PKR' ? 'USD' : 'PKR',
+  })),
+  pkrToUsd: 1 / 278, // fallback ~0.0036
+  setExchangeRate: (pkrToUsd) => set({ pkrToUsd }),
 }));

@@ -33,6 +33,8 @@ import {
 import { useAppStore } from '@/store/use-app-store';
 import { CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import type { Project, Offer } from '@/lib/types';
+import { useCurrency } from '@/hooks/use-currency';
+import { formatCompact, type CurrencyMode } from '@/lib/currency';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,25 +44,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 
 /* ---------- Helpers ---------- */
-
-function formatPKR(value: number | undefined): string {
-  if (value === undefined || value === null) return '—';
-  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
-  return `PKR ${value.toLocaleString()}`;
-}
-
-function toUSD(pkr: number): number { return Math.round(pkr / 278); }
-
-function formatUSD(pkr: number | undefined): string {
-  if (pkr === undefined || pkr === null) return '';
-  const u = toUSD(pkr);
-  if (u >= 1_000_000) return `≈ US$ ${(u / 1_000_000).toFixed(1)}M`;
-  if (u >= 1_000) return `≈ US$ ${(u / 1_000).toFixed(1)}K`;
-  return `≈ US$ ${u.toLocaleString()}`;
-}
-
-function formatCurrency(value: number | undefined): string { return formatPKR(value); }
 
 function formatNumber(value: number | undefined): string {
   if (value === undefined || value === null) return '—';
@@ -138,6 +121,7 @@ function DetailSkeleton() {
 /* ---------- Financial Table ---------- */
 
 function FinancialTable({ project }: { project: Project }) {
+  const { formatPrice } = useCurrency();
   const rows = [
     { label: 'Development Cost', value: project.developmentCost },
     { label: 'Infrastructure Cost', value: project.infrastructureCost },
@@ -178,7 +162,7 @@ function FinancialTable({ project }: { project: Project }) {
                   ? row.value !== undefined && row.value !== null
                     ? `${row.value}%`
                     : '—'
-                  : formatCurrency(row.value)}
+                  : formatPrice(row.value)}
               </td>
             </tr>
           ))}
@@ -239,7 +223,8 @@ function MetricBar({ label, value, max, suffix = '' }: { label: string; value?: 
 /* ---------- Main Component ---------- */
 
 export default function ProjectDetail() {
-  const { selectedProjectId, goBack, setCurrentView, currentUser } = useAppStore();
+  const { selectedProjectId, goBack, setCurrentView, currentUser, pkrToUsd } = useAppStore();
+  const { formatPrice, mode, symbol } = useCurrency();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -631,9 +616,9 @@ export default function ProjectDetail() {
             <CardContent className="space-y-3">
               <div className="text-center py-2">
                 <p className="text-xs text-muted-foreground mb-1">Selling Price</p>
-                <p className="text-3xl font-bold text-primary">{formatPKR(project.suggestedSellingPrice)}</p>
+                <p className="text-3xl font-bold text-primary">{formatPrice(project.suggestedSellingPrice)}</p>
                 {project.suggestedSellingPrice && project.suggestedSellingPrice >= 100000 && (
-                  <p className="text-sm text-muted-foreground">{formatUSD(project.suggestedSellingPrice)}</p>
+                  <p className="text-sm text-muted-foreground">≈ {formatCompact(project.suggestedSellingPrice, mode === 'PKR' ? 'USD' : 'PKR', pkrToUsd)}</p>
                 )}
               </div>
               <Separator />
@@ -641,19 +626,19 @@ export default function ProjectDetail() {
                 {project.buyNowPrice !== undefined && project.buyNowPrice !== null && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Buy Now Price</span>
-                    <span className="font-medium">{formatCurrency(project.buyNowPrice)}</span>
+                    <span className="font-medium">{formatPrice(project.buyNowPrice)}</span>
                   </div>
                 )}
                 {project.reservePrice !== undefined && project.reservePrice !== null && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Reserve Price</span>
-                    <span className="font-medium">{formatCurrency(project.reservePrice)}</span>
+                    <span className="font-medium">{formatPrice(project.reservePrice)}</span>
                   </div>
                 )}
                 {project.minimumOffer !== undefined && project.minimumOffer !== null && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Min Offer</span>
-                    <span className="font-medium">{formatCurrency(project.minimumOffer)}</span>
+                    <span className="font-medium">{formatPrice(project.minimumOffer)}</span>
                   </div>
                 )}
                 {project.auctionEnabled && (
@@ -684,7 +669,7 @@ export default function ProjectDetail() {
                   <div className="text-center py-1">
                     <p className="text-xs text-muted-foreground mb-1">Estimated Value</p>
                     <p className="text-2xl font-bold text-violet-700 dark:text-violet-400">
-                      {formatCurrency(project.aiValuation)}
+                      {formatPrice(project.aiValuation)}
                     </p>
                   </div>
                   <Separator />
@@ -692,19 +677,19 @@ export default function ProjectDetail() {
                     {project.investorPrice !== undefined && project.investorPrice !== null && (
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Investor Price</span>
-                        <span className="font-medium">{formatCurrency(project.investorPrice)}</span>
+                        <span className="font-medium">{formatPrice(project.investorPrice)}</span>
                       </div>
                     )}
                     {project.wholesalePrice !== undefined && project.wholesalePrice !== null && (
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Wholesale Price</span>
-                        <span className="font-medium">{formatCurrency(project.wholesalePrice)}</span>
+                        <span className="font-medium">{formatPrice(project.wholesalePrice)}</span>
                       </div>
                     )}
                     {project.acquisitionPrice !== undefined && project.acquisitionPrice !== null && (
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Acquisition Price</span>
-                        <span className="font-medium">{formatCurrency(project.acquisitionPrice)}</span>
+                        <span className="font-medium">{formatPrice(project.acquisitionPrice)}</span>
                       </div>
                     )}
                   </div>
@@ -818,7 +803,7 @@ export default function ProjectDetail() {
                         </div>
                       </div>
                       <div className="text-right shrink-0 ml-2">
-                        <p className="text-xs font-semibold">{formatCurrency(offer.amount)}</p>
+                        <p className="text-xs font-semibold">{formatPrice(offer.amount)}</p>
                         <Badge
                           variant={
                             offer.status === 'accepted'

@@ -9,6 +9,8 @@ import {
   Award, Heart, ArrowLeft,
 } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
+import { useCurrency } from '@/hooks/use-currency';
+import { formatCompact } from '@/lib/currency';
 import { getCategoryName } from '@/lib/constants';
 import type { Project } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -20,27 +22,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
-
-const PKR_TO_USD = 278;
-
-function formatPKR(value: number | undefined): string {
-  if (value === undefined || value === null) return '—';
-  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
-  return `PKR ${value.toLocaleString()}`;
-}
-
-function toUSD(pkr: number): number {
-  return Math.round(pkr / PKR_TO_USD);
-}
-
-function formatUSD(pkr: number | undefined): string {
-  if (pkr === undefined || pkr === null) return '';
-  const u = toUSD(pkr);
-  if (u >= 1_000_000) return `≈ US$ ${(u / 1_000_000).toFixed(1)}M`;
-  if (u >= 1_000) return `≈ US$ ${(u / 1_000).toFixed(1)}K`;
-  return `≈ US$ ${u.toLocaleString()}`;
-}
 
 function getFirstLine(text: string | undefined, fallback: string): string {
   if (!text) return fallback;
@@ -94,7 +75,7 @@ interface FeatureCard {
   accent: string;
 }
 
-function getFeatureCards(project: Project): FeatureCard[] {
+function getFeatureCards(project: Project, fmt: (v?: number) => string): FeatureCard[] {
   const cards: FeatureCard[] = [];
 
   // 1. Competitive Advantage
@@ -149,7 +130,7 @@ function getFeatureCards(project: Project): FeatureCard[] {
       cards.push({
         icon: DollarSign,
         title: 'Revenue Generating',
-        description: `This listing shows active revenue with ${project.monthlyRevenue ? formatPKR(project.monthlyRevenue) + '/mo' : formatPKR(project.annualRevenue) + '/yr'}`,
+        description: `This listing shows active revenue with ${project.monthlyRevenue ? fmt(project.monthlyRevenue) + '/mo' : fmt(project.annualRevenue) + '/yr'}`,
         accent: 'from-emerald-400 to-teal-500',
       });
     }
@@ -274,7 +255,8 @@ function StepBadge({ num }: { num: number }) {
 /* ------------------------------------------------------------------ */
 
 export default function StorefrontPreview() {
-  const { selectedProjectId, setCurrentView } = useAppStore();
+  const { selectedProjectId, setCurrentView, pkrToUsd } = useAppStore();
+  const { formatPrice, mode } = useCurrency();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -321,7 +303,7 @@ export default function StorefrontPreview() {
 
   const tagline = generateTagline(project);
   const tags = getTags(project);
-  const features = getFeatureCards(project);
+  const features = getFeatureCards(project, formatPrice);
   const brandName = project.name;
   const category = getCategoryName(project.category);
   const country = project.country || 'Pakistan';
@@ -481,7 +463,7 @@ export default function StorefrontPreview() {
               {project.annualRevenue && (
                 <span className="flex items-center gap-1.5">
                   <BarChart3 className="size-3.5 text-emerald-500" />
-                  {formatPKR(project.annualRevenue)} revenue
+                  {formatPrice(project.annualRevenue)} revenue
                 </span>
               )}
               {project.expectedROI && (
@@ -686,10 +668,10 @@ export default function StorefrontPreview() {
                     {project.suggestedSellingPrice ? (
                       <>
                         <p className="text-3xl sm:text-4xl font-extrabold text-white mb-1">
-                          {formatPKR(project.suggestedSellingPrice)}
+                          {formatPrice(project.suggestedSellingPrice)}
                         </p>
                         <p className="text-sm text-emerald-400 font-medium">
-                          {formatUSD(project.suggestedSellingPrice)}
+                          ≈ {formatCompact(project.suggestedSellingPrice, mode === 'PKR' ? 'USD' : 'PKR', pkrToUsd)}
                         </p>
                       </>
                     ) : (
@@ -709,10 +691,10 @@ export default function StorefrontPreview() {
                         Buy Now
                       </p>
                       <p className="text-3xl sm:text-4xl font-extrabold text-white mb-1">
-                        {formatPKR(project.buyNowPrice)}
+                        {formatPrice(project.buyNowPrice)}
                       </p>
                       <p className="text-sm text-emerald-400 font-medium">
-                        {formatUSD(project.buyNowPrice)}
+                        ≈ {formatCompact(project.buyNowPrice, mode === 'PKR' ? 'USD' : 'PKR', pkrToUsd)}
                       </p>
                     </div>
                   )}
@@ -724,10 +706,10 @@ export default function StorefrontPreview() {
                         Minimum Offer
                       </p>
                       <p className="text-3xl sm:text-4xl font-extrabold text-white mb-1">
-                        {formatPKR(project.minimumOffer)}
+                        {formatPrice(project.minimumOffer)}
                       </p>
                       <p className="text-sm text-white/40 font-medium">
-                        {formatUSD(project.minimumOffer)}
+                        ≈ {formatCompact(project.minimumOffer, mode === 'PKR' ? 'USD' : 'PKR', pkrToUsd)}
                       </p>
                     </div>
                   )}
@@ -736,7 +718,7 @@ export default function StorefrontPreview() {
                 {/* Additional pricing info */}
                 {project.aiValuation && (
                   <p className="text-sm text-white/30 mb-8">
-                    AI Valuation: <span className="text-white/50 font-medium">{formatPKR(project.aiValuation)}</span>
+                    AI Valuation: <span className="text-white/50 font-medium">{formatPrice(project.aiValuation)}</span>
                     {project.expectedROI && (
                       <> • Expected ROI: <span className="text-emerald-400 font-medium">{project.expectedROI}%</span></>
                     )}

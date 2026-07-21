@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowRight, PlusCircle, Briefcase, Globe, CircleDollarSign, HandCoins } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
+import { useCurrency } from '@/hooks/use-currency';
+import { formatCompact } from '@/lib/currency';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -25,15 +27,23 @@ const itemVariants = {
   },
 };
 
-const statsItems = [
-  { label: 'Portfolio Value', value: 'PKR 12.3M', icon: CircleDollarSign },
-  { label: 'Listings', value: '12', icon: Briefcase },
-  { label: 'US$ Equivalent', value: '$44K', icon: Globe },
-  { label: 'Categories', value: '6', icon: HandCoins },
-];
+const PORTFOLIO_PKR = 12_300_000;
+
 
 export default function HeroSection() {
   const setCurrentView = useAppStore((s) => s.setCurrentView);
+  const pkrToUsd = useAppStore((s) => s.pkrToUsd);
+  const { formatPrice, mode } = useCurrency();
+
+  const secondaryMode = mode === 'PKR' ? 'USD' : 'PKR';
+  const secondaryValue = pkrToUsd ? formatCompact(PORTFOLIO_PKR, secondaryMode, pkrToUsd) : '';
+
+  const statsItems = [
+    { label: 'Portfolio Value', value: formatPrice(PORTFOLIO_PKR), icon: CircleDollarSign },
+    { label: 'Listings', value: '12', icon: Briefcase },
+    { label: mode === 'PKR' ? 'US$ Equivalent' : 'PKR Equivalent', value: secondaryValue, icon: Globe },
+    { label: 'Categories', value: '6', icon: HandCoins },
+  ];
 
   return (
     <section className="relative bg-white overflow-hidden">

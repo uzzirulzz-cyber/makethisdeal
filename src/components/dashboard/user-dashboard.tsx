@@ -27,6 +27,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
+import { useCurrency } from '@/hooks/use-currency';
 import { CATEGORIES, BUSINESS_STAGES, COUNTRIES, TECHNOLOGY_STACKS, CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import type { Project, Offer, ProjectStatus, OfferStatus } from '@/lib/types';
 
@@ -97,12 +98,7 @@ interface ValuationForm {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value);
+// formatCurrency is replaced by useCurrency().formatPrice()
 
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
@@ -211,6 +207,7 @@ export default function UserDashboard() {
     goToProject,
     setCurrentView,
   } = useAppStore();
+  const { formatPrice } = useCurrency();
 
   // ---- local state ----
   const [myOffers, setMyOffers] = useState<Offer[]>([]);
@@ -390,7 +387,7 @@ export default function UserDashboard() {
             },
             {
               label: 'Portfolio Value',
-              value: formatCurrency(totalPortfolioValue),
+              value: formatPrice(totalPortfolioValue),
               icon: TrendingUp,
               color: 'text-violet-600 dark:text-violet-400',
               bg: 'bg-violet-50 dark:bg-violet-950/40',
@@ -534,14 +531,14 @@ export default function UserDashboard() {
                             <div className="flex items-center gap-3 border-t pt-2 text-xs">
                               <div className="flex items-center gap-1 font-semibold text-foreground">
                                 <DollarSign className="size-3" />
-                                {formatCurrency(
+                                {formatPrice(
                                   project.suggestedSellingPrice ?? project.companyValuation ?? 0,
                                 )}
                               </div>
                               {project.annualRevenue != null && project.annualRevenue > 0 && (
                                 <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                                   <TrendingUp className="size-3" />
-                                  {formatCurrency(project.annualRevenue)}/yr
+                                  {formatPrice(project.annualRevenue)}/yr
                                 </div>
                               )}
                             </div>
@@ -659,7 +656,7 @@ export default function UserDashboard() {
                             <div className="flex items-center gap-3">
                               <div className="text-right">
                                 <p className="text-sm font-bold">
-                                  {formatCurrency(offer.amount)}
+                                  {formatPrice(offer.amount)}
                                 </p>
                                 <p className="text-[11px] text-muted-foreground">Offer Amount</p>
                               </div>
@@ -760,7 +757,7 @@ export default function UserDashboard() {
                             <p className="text-xs text-muted-foreground">{getCategoryName(project.category)}</p>
                             <div className="mt-auto flex items-center justify-between border-t pt-2 text-xs">
                               <span className="font-semibold text-foreground">
-                                {formatCurrency(
+                                {formatPrice(
                                   project.suggestedSellingPrice ?? project.companyValuation ?? 0,
                                 )}
                               </span>
@@ -1100,7 +1097,7 @@ export default function UserDashboard() {
                               Estimated Value
                             </p>
                             <p className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-                              {formatCurrency(vResult.estimatedValue)}
+                              {formatPrice(vResult.estimatedValue)}
                             </p>
                             <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                               <Star className="size-3.5 fill-amber-400 text-amber-400" />
@@ -1147,7 +1144,7 @@ export default function UserDashboard() {
                                   {p.label}
                                 </p>
                                 <p className={`mt-1 text-lg font-bold ${p.color}`}>
-                                  {formatCurrency(p.value)}
+                                  {formatPrice(p.value)}
                                 </p>
                               </div>
                             ))}

@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
+import { useCurrency } from '@/hooks/use-currency';
 import { CATEGORIES, COUNTRIES, BUSINESS_STAGES, TECHNOLOGY_STACKS } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -197,13 +198,13 @@ function CurrencyInput({
     <div>
       <FieldLabel optional={optional}>{label}</FieldLabel>
       <div className="relative mt-1">
-        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">PKR</span>
         <Input
           type="number"
           placeholder="0"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="pl-6"
+          className="pl-12"
         />
       </div>
     </div>
@@ -667,13 +668,13 @@ function StepMetrics({ form, setForm }: { form: FormData; setForm: (f: FormData)
 
 /* ---------- Step: Review ---------- */
 
-function formatCurrency(value: string): string {
+function formatCurrency(value: string, symbol: string): string {
   const num = parseFloat(value);
   if (isNaN(num)) return '—';
-  if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`;
-  if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`;
-  if (num >= 1_000) return `$${(num / 1_000).toFixed(0)}K`;
-  return `$${num.toLocaleString()}`;
+  if (num >= 1_000_000_000) return `${symbol} ${(num / 1_000_000_000).toFixed(2)}B`;
+  if (num >= 1_000_000) return `${symbol} ${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${symbol} ${(num / 1_000).toFixed(0)}K`;
+  return `${symbol} ${num.toLocaleString()}`;
 }
 
 function ReviewSection({ title, children }: { title: string; children: React.ReactNode }) {
@@ -716,6 +717,7 @@ function ReviewRow({ label, value }: { label: string; value: string | boolean | 
 }
 
 function StepReview({ form }: { form: FormData }) {
+  const { symbol } = useCurrency();
   const catName = CATEGORIES.find((c) => c.slug === form.category)?.name || form.category;
   const stageName = BUSINESS_STAGES.find((s) => s.value === form.businessStage)?.label || form.businessStage;
 
@@ -740,12 +742,12 @@ function StepReview({ form }: { form: FormData }) {
 
       <ReviewSection title="Financials">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          <ReviewRow label="Annual Revenue" value={formatCurrency(form.annualRevenue)} />
-          <ReviewRow label="Net Profit" value={formatCurrency(form.netProfit)} />
+          <ReviewRow label="Annual Revenue" value={formatCurrency(form.annualRevenue, symbol)} />
+          <ReviewRow label="Net Profit" value={formatCurrency(form.netProfit, symbol)} />
           <ReviewRow label="Expected ROI" value={form.expectedROI ? `${form.expectedROI}%` : '—'} />
-          <ReviewRow label="Selling Price" value={formatCurrency(form.suggestedSellingPrice)} />
-          <ReviewRow label="Buy Now Price" value={formatCurrency(form.buyNowPrice)} />
-          <ReviewRow label="Company Valuation" value={formatCurrency(form.companyValuation)} />
+          <ReviewRow label="Selling Price" value={formatCurrency(form.suggestedSellingPrice, symbol)} />
+          <ReviewRow label="Buy Now Price" value={formatCurrency(form.buyNowPrice, symbol)} />
+          <ReviewRow label="Company Valuation" value={formatCurrency(form.companyValuation, symbol)} />
         </div>
       </ReviewSection>
 

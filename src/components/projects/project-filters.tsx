@@ -11,6 +11,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { useAppStore } from '@/store/use-app-store';
+import { useCurrency } from '@/hooks/use-currency';
 import { CATEGORIES, COUNTRIES, BUSINESS_STAGES, SORT_OPTIONS } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,7 @@ interface ProjectFiltersProps {
 
 function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMobileClose?: () => void }) {
   const { searchFilters, setSearchFilters, resetFilters } = useAppStore();
+  const { filterLabel } = useCurrency();
 
   const [localFilters, setLocalFilters] = useState(searchFilters);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -210,7 +212,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                   <Label className="text-xs text-muted-foreground">Min Price</Label>
                   <div className="relative">
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                      $
+                      {filterLabel}
                     </span>
                     <Input
                       type="number"
@@ -219,7 +221,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('priceMin', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-6 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -227,7 +229,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                   <Label className="text-xs text-muted-foreground">Max Price</Label>
                   <div className="relative">
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                      $
+                      {filterLabel}
                     </span>
                     <Input
                       type="number"
@@ -236,7 +238,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('priceMax', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-6 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -247,7 +249,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                   <Label className="text-xs text-muted-foreground">Min Revenue</Label>
                   <div className="relative">
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                      $
+                      {filterLabel}
                     </span>
                     <Input
                       type="number"
@@ -256,7 +258,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('revenueMin', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-6 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -264,7 +266,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                   <Label className="text-xs text-muted-foreground">Max Revenue</Label>
                   <div className="relative">
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                      $
+                      {filterLabel}
                     </span>
                     <Input
                       type="number"
@@ -273,7 +275,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('revenueMax', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-6 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>

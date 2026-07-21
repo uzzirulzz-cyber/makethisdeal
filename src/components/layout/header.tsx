@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/store/use-app-store';
+import { useCurrency } from '@/hooks/use-currency';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
 import {
-  Menu, Search, Plus, LayoutDashboard, Heart, LogIn
+  Menu, Search, Plus, LayoutDashboard, Heart, LogIn, Repeat
 } from 'lucide-react';
 
 export function Header() {
-  const { currentView, setCurrentView, currentUser, setCurrentUser, searchFilters, setSearchFilters } = useAppStore();
+  const { currentView, setCurrentView, currentUser, setCurrentUser, searchFilters, setSearchFilters, toggleCurrency } = useAppStore();
+  const { mode, symbol, rateDisplay } = useCurrency();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -89,6 +91,26 @@ export function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* Currency Toggle */}
+            <button
+              onClick={toggleCurrency}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+              style={{
+                backgroundColor: 'rgba(138, 43, 226, 0.08)',
+                color: '#8A2BE2',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(138, 43, 226, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(138, 43, 226, 0.08)';
+              }}
+              title={rateDisplay}
+            >
+              <Repeat className="size-3" />
+              <span>{symbol}</span>
+            </button>
+
             {/* Search bar on browse */}
             {currentView === 'browse' && (
               <div className="hidden lg:flex items-center relative">
