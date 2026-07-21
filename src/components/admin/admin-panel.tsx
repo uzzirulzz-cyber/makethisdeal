@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Fragment } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
@@ -510,7 +510,7 @@ export function AdminPanel() {
                         {orders.map((order, idx) => {
                           const isExpanded = expandedOrder === order.id;
                           return (
-                            <tbody key={order.id}>
+                            <Fragment key={order.id}>
                               <tr
                                 style={{
                                   background: isExpanded ? '#F5F3FF' : idx % 2 === 0 ? '#FFFFFF' : '#FAFAFA',
@@ -652,7 +652,7 @@ export function AdminPanel() {
                                   </td>
                                 </tr>
                               )}
-                            </tbody>
+                            </Fragment>
                           );
                         })}
                       </tbody>

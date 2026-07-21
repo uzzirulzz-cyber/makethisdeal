@@ -10,11 +10,13 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = request.nextUrl;
-    const status = searchParams.get('status') || 'pending';
+    const statusParam = searchParams.get('status') || 'pending';
     const limit = parseInt(searchParams.get('limit') || '50', 10);
 
+    const where = statusParam === 'all' ? {} : { status: statusParam };
+
     const payments = await db.paymentSubmission.findMany({
-      where: { status },
+      where,
       orderBy: { createdAt: 'desc' },
       take: limit,
     });
