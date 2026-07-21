@@ -27,37 +27,38 @@ interface ProjectGridProps {
 /* ---------- Helpers ---------- */
 
 const CATEGORY_GRADIENTS: Record<string, string> = {
-  'SaaS': 'from-emerald-500/20 to-teal-600/20',
-  'AI Solutions': 'from-violet-500/20 to-fuchsia-600/20',
-  'E-commerce': 'from-orange-500/20 to-amber-600/20',
-  'Real Estate': 'from-cyan-500/20 to-sky-600/20',
-  'Mobile Apps': 'from-pink-500/20 to-rose-600/20',
-  'Startups': 'from-lime-500/20 to-green-600/20',
-  'FinTech': 'from-emerald-600/20 to-green-700/20',
-  'HealthTech': 'from-red-400/20 to-pink-500/20',
-  'EdTech': 'from-yellow-500/20 to-orange-500/20',
-  'Cybersecurity': 'from-slate-500/20 to-zinc-600/20',
-  'CRM/ERP': 'from-teal-500/20 to-cyan-600/20',
-  'Retail': 'from-amber-500/20 to-yellow-600/20',
-  'Wholesale': 'from-stone-500/20 to-neutral-600/20',
-  'Investments': 'from-green-500/20 to-emerald-600/20',
-  'Domains': 'from-purple-400/20 to-violet-500/20',
-  'Digital Products': 'from-rose-400/20 to-pink-500/20',
-  'Manufacturing': 'from-zinc-500/20 to-stone-600/20',
-  'Websites': 'from-sky-400/20 to-cyan-500/20',
+  'SaaS': 'from-[#8A2BE2]/15 to-[#A855F7]/15',
+  'AI Solutions': 'from-[#A855F7]/15 to-[#EC4899]/15',
+  'E-commerce': 'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+  'Real Estate': 'from-[#EC4899]/15 to-[#FF6B9D]/15',
+  'Mobile Apps': 'from-[#8A2BE2]/15 to-[#4DABF7]/15',
+  'Startups': 'from-[#A855F7]/15 to-[#8A2BE2]/15',
+  'FinTech': 'from-[#4DABF7]/15 to-[#A855F7]/15',
+  'HealthTech': 'from-[#EC4899]/15 to-[#8A2BE2]/15',
+  'EdTech': 'from-[#FF6B9D]/15 to-[#4DABF7]/15',
+  'Cybersecurity': 'from-[#8A2BE2]/15 to-[#EC4899]/15',
+  'CRM/ERP': 'from-[#A855F7]/15 to-[#4DABF7]/15',
+  'Retail': 'from-[#EC4899]/15 to-[#A855F7]/15',
+  'Wholesale': 'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+  'Investments': 'from-[#8A2BE2]/15 to-[#FF6B9D]/15',
+  'Domains': 'from-[#A855F7]/15 to-[#EC4899]/15',
+  'Digital Products': 'from-[#EC4899]/15 to-[#A855F7]/15',
+  'Manufacturing': 'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+  'Websites': 'from-[#8A2BE2]/15 to-[#4DABF7]/15',
 };
 
 function getCategoryGradient(category: string): string {
   if (CATEGORY_GRADIENTS[category]) return CATEGORY_GRADIENTS[category];
-  // Deterministic hash-based gradient for unknown categories
+  // Deterministic hash-based gradient for unknown categories (violet/pink/blue tones)
   const hash = category.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const gradients = [
-    'from-emerald-500/20 to-teal-600/20',
-    'from-orange-500/20 to-amber-600/20',
-    'from-violet-500/20 to-fuchsia-600/20',
-    'from-rose-400/20 to-pink-500/20',
-    'from-cyan-500/20 to-sky-600/20',
-    'from-lime-500/20 to-green-600/20',
+    'from-[#8A2BE2]/15 to-[#A855F7]/15',
+    'from-[#A855F7]/15 to-[#EC4899]/15',
+    'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+    'from-[#EC4899]/15 to-[#FF6B9D]/15',
+    'from-[#8A2BE2]/15 to-[#4DABF7]/15',
+    'from-[#A855F7]/15 to-[#8A2BE2]/15',
+    'from-[#4DABF7]/15 to-[#A855F7]/15',
   ];
   return gradients[hash % gradients.length];
 }
@@ -106,7 +107,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 function SkeletonCard() {
   return (
-    <Card className="overflow-hidden border shadow-sm">
+    <Card className="overflow-hidden border border-[#F0F0F0] rounded-lg shadow-sm">
       <Skeleton className="h-40 w-full" />
       <CardContent className="p-4 space-y-3">
         <Skeleton className="h-5 w-3/4" />
@@ -138,8 +139,8 @@ function EmptyState() {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center py-20 px-4 text-center"
     >
-      <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-6">
-        <PackageOpen className="size-10 text-muted-foreground" />
+      <div className="w-24 h-24 rounded-full bg-[#F3E8FF] flex items-center justify-center mb-6">
+        <PackageOpen className="size-10 text-[#8A2BE2]" />
       </div>
       <h3 className="text-lg font-semibold mb-2">No projects found</h3>
       <p className="text-sm text-muted-foreground max-w-sm">
@@ -167,7 +168,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.06, ease: 'easeOut' }}
     >
-      <Card className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow group">
+      <Card className="overflow-hidden border border-[#F0F0F0] rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
         {/* Thumbnail */}
         <div
           className={`relative h-40 bg-gradient-to-br ${gradient} flex items-center justify-center`}
@@ -200,11 +201,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
           {/* Badges Row */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-[#F0F0F0]">
               {getCategoryName(project.category)}
             </Badge>
             {project.country && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 border-[#F0F0F0]">
                 <MapPin className="size-2.5" />
                 {project.country.length > 12 ? project.country.slice(0, 12) + '…' : project.country}
               </Badge>
@@ -230,9 +231,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 {formatROI(project.expectedROI)}
               </p>
             </div>
-            <div className="bg-primary/5 rounded-md px-2 py-1.5 text-center">
+            <div className="rounded-md px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(138,43,226,0.05)' }}>
               <p className="text-[10px] text-muted-foreground leading-tight">Price</p>
-              <p className="text-xs font-bold mt-0.5 text-primary">
+              <p className="text-xs font-bold mt-0.5 text-[#8A2BE2]">
                 {formatPKR(project.suggestedSellingPrice)}
               </p>
               {project.suggestedSellingPrice && project.suggestedSellingPrice >= 100000 && (
@@ -245,7 +246,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           {project.seller && (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <div className="size-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium">
+                <div className="size-5 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[10px] font-medium text-[#8A2BE2]">
                   {project.seller.name.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-xs text-muted-foreground truncate max-w-[120px]">
@@ -270,7 +271,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           <Button
             variant="outline"
             size="sm"
-            className="w-full gap-1.5 text-xs mt-1"
+            className="w-full gap-1.5 text-xs mt-1 border-[#8A2BE2] text-[#8A2BE2] hover:bg-[#8A2BE2] hover:text-white"
             onClick={() => goToProject(project.id)}
           >
             <Eye className="size-3.5" />
@@ -307,11 +308,11 @@ export default function ProjectGrid({ projects, isLoading = false }: ProjectGrid
     <>
       {/* Cumulative Portfolio Banner */}
       {totalPKR > 0 && (
-        <div className="mb-6 rounded-xl border bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4 sm:p-5">
+        <div className="mb-6 rounded-lg border border-[#F0F0F0] bg-gradient-to-r from-[#8A2BE2]/5 via-[#EC4899]/5 to-[#4DABF7]/5 p-4 sm:p-5 shadow-sm">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Cumulative Portfolio Value</p>
-              <p className="text-2xl sm:text-3xl font-bold text-primary mt-0.5">
+              <p className="text-2xl sm:text-3xl font-bold text-[#8A2BE2] mt-0.5">
                 PKR {(totalPKR / 1_000_000).toFixed(1)}M
               </p>
             </div>
@@ -324,9 +325,9 @@ export default function ProjectGrid({ projects, isLoading = false }: ProjectGrid
           </div>
           <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
             <span>{projects.length} Projects Listed</span>
-            <span className="size-1 rounded-full bg-muted-foreground/30" />
+            <span className="size-1 rounded-full bg-[#8A2BE2]/20" />
             <span>All prices in Pakistani Rupee (PKR)</span>
-            <span className="size-1 rounded-full bg-muted-foreground/30" />
+            <span className="size-1 rounded-full bg-[#8A2BE2]/20" />
             <span>Rate: 1 US$ ≈ PKR 278</span>
           </div>
         </div>

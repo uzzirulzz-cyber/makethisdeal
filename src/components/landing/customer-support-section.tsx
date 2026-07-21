@@ -94,10 +94,9 @@ export default function CustomerSupportSection() {
   };
 
   return (
-    <section className="relative py-20 sm:py-28 bg-muted/30 overflow-hidden">
+    <section className="f5-light-section relative py-20 sm:py-28 bg-white overflow-hidden">
       {/* Background decorations */}
-      <div className="pointer-events-none absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+      <div className="f5-light-blob" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -199,7 +198,8 @@ export default function CustomerSupportSection() {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Your name"
-                        className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                        className="h-10 w-full rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8A2BE2]/20 focus:border-[#8A2BE2] transition-all"
+                        style={{ border: '1px solid #F0F0F0', backgroundColor: '#FFFFFF', color: '#333333' }}
                         required
                       />
                     </div>

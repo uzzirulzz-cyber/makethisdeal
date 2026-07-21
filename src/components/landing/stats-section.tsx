@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { STATS } from '@/lib/constants';
-import { Card, CardContent } from '@/components/ui/card';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,6 +27,14 @@ export default function StatsSection() {
   return (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        {/* Section Heading */}
+        <div className="mb-10 text-center sm:mb-12">
+          <h2 className="f5-section-heading">Platform Highlights</h2>
+          <p className="mt-3 text-muted-foreground sm:text-lg">
+            Key metrics that define our marketplace
+          </p>
+        </div>
+
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -39,21 +46,22 @@ export default function StatsSection() {
             const Icon = stat.icon;
             return (
               <motion.div key={stat.label} variants={cardVariants}>
-                <Card className="border-0 bg-secondary/40 shadow-none transition-colors hover:bg-secondary/70">
-                  <CardContent className="flex flex-col items-center gap-3 py-6 text-center">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10">
-                      <Icon className="size-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold tracking-tight sm:text-3xl">
-                        {stat.value}
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {stat.label}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="f5-card flex flex-col items-center py-6 text-center">
+                  <div
+                    className="mb-3 flex size-12 items-center justify-center rounded-xl"
+                    style={{ background: 'rgba(138, 43, 226, 0.1)' }}
+                  >
+                    <Icon className="size-6" style={{ color: '#8A2BE2' }} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold tracking-tight text-[#333333] sm:text-3xl">
+                      {stat.value}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {stat.label}
+                    </p>
+                  </div>
+                </div>
               </motion.div>
             );
           })}

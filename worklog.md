@@ -67,3 +67,40 @@ Stage Summary:
 - Customer support section features: 3 contact channel cards (Email, WhatsApp, Response Time), full contact form with mailto integration, location info bar
 - Footer updated with email link, WhatsApp link, location, and bottom bar with contact links
 
+
+---
+Task ID: 6
+Agent: Main Agent
+Task: Update Featured Section and How-It-Works Section to F5 Studio theme
+
+Work Log:
+- Read worklog.md for context and existing files for current implementation
+- Updated featured-section.tsx: replaced emerald/teal gradients with violet/pink/blue F5 tones, switched Card to f5-card div, added white bg section, changed heading to f5-section-heading with #333333, price text to #8A2BE2 violet bold, project name hover to violet, seller verified icon to violet, country to muted #6B7280, category badge kept bg-white/90, added featured badge (amber-500) with Star icon, kept green Active badge
+- Updated how-it-works-section.tsx: changed bg to #F9FAFB, heading to f5-section-heading #333333, Card replaced with f5-card div, step number circle to #8A2BE2 bg with white text and #8A2BE2/10 ring, icon box to #8A2BE2/10 bg with #8A2BE2 icon, connector line to #8A2BE2/20, arrows to #8A2BE2, arrow circles to white bg
+- Ran lint: 0 errors
+- Verified dev log: successful compilation, API calls returning 200
+
+Stage Summary:
+- Both sections updated to F5 Studio design system with violet (#8A2BE2) as primary accent
+- Featured section: white background, violet/pink/blue card gradients, violet price text, violet hover states
+- How-It-Works section: #F9FAFB background, violet step circles, violet connector lines and arrows
+- All existing data fetching, animations, and functionality preserved
+- Zero lint errors, clean compilation
+---
+Task ID: 7a-7b
+Agent: Main Agent
+Task: Apply uploaded logo + remove hero dark background + fix CTA/support sections
+
+Work Log:
+- Used image-edit SDK to remove background from uploaded logo, saved as /public/logo-mtd.png
+- Updated header.tsx: replaced MTD text box with Next.js Image component (36x36) in both desktop and mobile nav
+- Rewrote hero-section.tsx: removed f5-hero dark gradient, made bg white, added logo image (80x80), dark text (#333333), violet/pink gradient on heading, secondary button uses f5-btn-secondary outline, very faint decorative blobs
+- Rewrote cta-section.tsx: f5-cta-section dark navy gradient, white text, gradient-text on heading, f5-btn-white primary CTA, outline white secondary CTA, decorative violet/pink blurred blobs
+- Customer support section already updated by subagent with f5-light-section and f5-light-blob
+- Verified: logo loads (48x48), hero bg is white (#FFFFFF), 12 project cards render with white bg, zero console errors, clean lint
+
+Stage Summary:
+- Logo: uploaded image applied in header (desktop + mobile) and hero section
+- Hero: clean white background with subtle violet/pink accent blobs
+- CTA: dark navy gradient section with violet/pink decorative elements
+- All F5 Studio theme changes verified working

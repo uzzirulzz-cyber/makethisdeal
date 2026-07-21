@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { CATEGORIES, CATEGORY_ICONS } from '@/lib/constants';
-import { Card, CardContent } from '@/components/ui/card';
 import { useAppStore } from '@/store/use-app-store';
 
 const containerVariants = {
@@ -43,13 +42,14 @@ export default function CategoriesSection() {
   };
 
   return (
-    <section className="py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        {/* Header */}
+    <section className="f5-light-section py-16 sm:py-20">
+      {/* Decorative gradient blob — top-right */}
+      <div className="f5-light-blob" />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        {/* Section Heading */}
         <div className="mb-10 text-center sm:mb-12">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
-            Browse by Category
-          </h2>
+          <h2 className="f5-section-heading">Browse by Category</h2>
           <p className="mt-3 text-muted-foreground sm:text-lg">
             Explore projects across every industry
           </p>
@@ -67,24 +67,27 @@ export default function CategoriesSection() {
             const Icon = CATEGORY_ICONS[cat.icon || ''] || null;
             return (
               <motion.div key={cat.id} variants={cardVariants}>
-                <Card
-                  className="group cursor-pointer border-0 bg-secondary/30 py-4 shadow-none transition-all hover:bg-primary/5 hover:shadow-md"
+                <div
+                  className="f5-card group cursor-pointer py-4 text-center"
                   onClick={() => handleCategoryClick(cat.slug)}
                 >
-                  <CardContent className="flex flex-col items-center gap-2.5 p-3 text-center">
-                    <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-                      {Icon && <Icon className="size-5 text-primary" />}
+                  <div className="flex flex-col items-center gap-2.5">
+                    <div
+                      className="f5-icon-box"
+                      style={{ width: 44, height: 44, borderRadius: 12 }}
+                    >
+                      {Icon && <Icon className="size-5" />}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">
+                      <p className="truncate text-sm font-semibold text-[#333333]">
                         {cat.name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-[#6B7280]">
                         {cat._count?.projects ?? '—'} projects
                       </p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </motion.div>
             );
           })}

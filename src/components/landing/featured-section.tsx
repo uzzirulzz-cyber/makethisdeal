@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, TrendingUp, BadgeCheck } from 'lucide-react';
+import { MapPin, TrendingUp, BadgeCheck, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/store/use-app-store';
-import { CATEGORY_ICONS, CATEGORIES, getCategoryName, getCategoryIconKey } from '@/lib/constants';
+import { CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
 import type { Project } from '@/lib/types';
 
 const containerVariants = {
@@ -31,12 +30,12 @@ const cardVariants = {
 };
 
 const GRADIENTS = [
-  'from-emerald-400/20 to-teal-500/20',
-  'from-teal-400/20 to-cyan-500/20',
-  'from-green-400/20 to-emerald-500/20',
-  'from-lime-400/20 to-green-500/20',
-  'from-emerald-300/20 to-teal-400/20',
-  'from-teal-300/20 to-green-400/20',
+  'from-[#8A2BE2]/15 to-[#EC4899]/15',
+  'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+  'from-[#A855F7]/15 to-[#EC4899]/15',
+  'from-[#EC4899]/15 to-[#FF6B9D]/15',
+  'from-[#4DABF7]/15 to-[#A855F7]/15',
+  'from-[#8A2BE2]/15 to-[#4DABF7]/15',
 ];
 
 function formatPKR(value?: number): string {
@@ -56,9 +55,9 @@ function renderCategoryIcon(categorySlug: string, className: string) {
 
 function ProjectCardSkeleton() {
   return (
-    <Card className="overflow-hidden border-0 py-0 shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-[#F0F0F0] bg-white shadow-sm">
       <Skeleton className="h-40 w-full rounded-none" />
-      <CardContent className="space-y-3 p-4">
+      <div className="space-y-3 p-4">
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
@@ -70,8 +69,8 @@ function ProjectCardSkeleton() {
           <Skeleton className="size-6 rounded-full" />
           <Skeleton className="h-4 w-24" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -81,37 +80,43 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
   return (
     <motion.div variants={cardVariants}>
-      <Card
-        className="group cursor-pointer overflow-hidden border-0 py-0 shadow-sm transition-shadow hover:shadow-lg"
+      <div
+        className="f5-card group cursor-pointer overflow-hidden"
         onClick={() => goToProject(project.id)}
       >
         {/* Thumbnail placeholder */}
         <div
           className={`relative flex h-40 items-center justify-center bg-gradient-to-br ${gradient}`}
         >
-          {renderCategoryIcon(project.category, 'size-12 text-primary/40 transition-transform group-hover:scale-110')}
+          {renderCategoryIcon(project.category, 'size-12 text-[#8A2BE2]/40 transition-transform group-hover:scale-110')}
           <Badge
             variant="secondary"
-            className="absolute left-3 top-3 bg-white/90 text-xs font-medium text-foreground backdrop-blur-sm dark:bg-black/60 dark:text-white"
+            className="absolute left-3 top-3 bg-white/90 text-xs font-medium text-foreground backdrop-blur-sm"
           >
             {getCategoryName(project.category)}
           </Badge>
-          {project.status === 'active' && (
-            <Badge className="absolute right-3 top-3 bg-emerald-500 text-xs text-white">
+          {project.featured && (
+            <Badge className="absolute right-3 top-3 gap-1 border-0 bg-amber-500 text-xs text-white">
+              <Star className="size-3" />
+              Featured
+            </Badge>
+          )}
+          {project.status === 'active' && !project.featured && (
+            <Badge className="absolute right-3 top-3 border-0 bg-emerald-500 text-xs text-white">
               Active
             </Badge>
           )}
         </div>
 
-        <CardContent className="p-4">
+        <div className="p-4">
           {/* Project Name */}
-          <h3 className="truncate text-base font-semibold leading-snug group-hover:text-primary">
+          <h3 className="truncate text-base font-semibold leading-snug text-[#333333] transition-colors group-hover:text-[#8A2BE2]">
             {project.name}
           </h3>
 
           {/* Country */}
           {project.country && (
-            <div className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="mt-1.5 flex items-center gap-1 text-xs text-[#6B7280]">
               <MapPin className="size-3" />
               <span>{project.country}</span>
             </div>
@@ -119,16 +124,16 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
           {/* Key Metrics */}
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <span className="font-semibold text-primary">
+            <span className="font-bold text-[#8A2BE2]">
               {formatCurrency(project.suggestedSellingPrice ?? project.companyValuation)}
             </span>
             {project.annualRevenue != null && project.annualRevenue > 0 && (
-              <span className="text-muted-foreground">
+              <span className="text-[#6B7280]">
                 Rev: {formatCurrency(project.annualRevenue)}
               </span>
             )}
             {project.expectedROI != null && project.expectedROI > 0 && (
-              <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+              <span className="flex items-center gap-1 text-emerald-600">
                 <TrendingUp className="size-3" />
                 {project.expectedROI}%
               </span>
@@ -137,20 +142,20 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
           {/* Seller */}
           {project.seller && (
-            <div className="mt-3 flex items-center gap-2 border-t pt-3">
-              <div className="flex size-6 items-center justify-center rounded-full bg-secondary text-xs font-bold">
+            <div className="mt-3 flex items-center gap-2 border-t border-[#F0F0F0] pt-3">
+              <div className="flex size-6 items-center justify-center rounded-full bg-[#8A2BE2]/10 text-xs font-bold text-[#8A2BE2]">
                 {project.seller.name.charAt(0).toUpperCase()}
               </div>
-              <span className="truncate text-xs text-muted-foreground">
+              <span className="truncate text-xs text-[#6B7280]">
                 {project.seller.name}
               </span>
               {project.seller.verified && (
-                <BadgeCheck className="size-3.5 text-primary" />
+                <BadgeCheck className="size-3.5 text-[#8A2BE2]" />
               )}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -177,14 +182,14 @@ export default function FeaturedSection() {
   }, []);
 
   return (
-    <section className="py-16 sm:py-20">
+    <section className="bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="mb-10 text-center sm:mb-12">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+          <h2 className="f5-section-heading text-2xl font-semibold tracking-tight text-[#333333] sm:text-3xl lg:text-4xl">
             Featured Opportunities
           </h2>
-          <p className="mt-3 text-muted-foreground sm:text-lg">
+          <p className="mt-3 text-[#6B7280] sm:text-lg">
             Hand-picked projects from verified sellers
           </p>
         </div>
@@ -213,8 +218,8 @@ export default function FeaturedSection() {
             ))}
           </motion.div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
-            <p className="text-muted-foreground">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#F0F0F0] py-16 text-center">
+            <p className="text-[#6B7280]">
               Featured projects are loading&hellip;
             </p>
           </div>

@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { ArrowRight, PlusCircle, Briefcase, Globe, CircleDollarSign, HandCoins } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/store/use-app-store';
 
 const containerVariants = {
@@ -36,40 +36,51 @@ export default function HeroSection() {
   const setCurrentView = useAppStore((s) => s.setCurrentView);
 
   return (
-    <section className="relative hero-gradient overflow-hidden">
-      {/* Subtle dot pattern overlay */}
+    <section className="relative bg-white overflow-hidden">
+      {/* Subtle decorative gradient blobs (very faint) */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle, oklch(0.45 0.15 160) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
+        className="pointer-events-none absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full opacity-[0.04]"
+        style={{ background: 'radial-gradient(circle, #8A2BE2 0%, transparent 70%)' }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full opacity-[0.04]"
+        style={{ background: 'radial-gradient(circle, #EC4899 0%, transparent 70%)' }}
       />
 
-      {/* Decorative gradient orbs */}
-      <div className="pointer-events-none absolute -top-40 right-0 h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -left-20 h-[400px] w-[400px] rounded-full bg-primary/5 blur-3xl" />
-
-      <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:py-36">
+      {/* Content */}
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="flex flex-col items-center text-center"
         >
+          {/* Logo */}
+          <motion.div variants={itemVariants} className="mb-6">
+            <Image
+              src="/logo-mtd.png"
+              alt="MakeThisDeal Logo"
+              width={80}
+              height={80}
+              className="object-contain"
+              priority
+            />
+          </motion.div>
+
           {/* Heading */}
           <motion.h1
             variants={itemVariants}
-            className="gradient-text max-w-4xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
+            className="max-w-4xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl"
+            style={{ color: '#333333' }}
           >
-            Buy, Sell &amp; Invest in Businesses Worldwide
+            <span className="gradient-text">Buy, Sell &amp; Invest</span> in Businesses Worldwide
           </motion.h1>
 
           {/* Subheading */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg md:text-xl"
+            className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl"
+            style={{ color: '#6B7280' }}
           >
             The global enterprise marketplace for SaaS, Real Estate, Startups,
             E-commerce, AI Solutions, and 50+ business categories
@@ -80,23 +91,20 @@ export default function HeroSection() {
             variants={itemVariants}
             className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4"
           >
-            <Button
-              size="lg"
-              className="h-12 px-8 text-base font-semibold sm:h-14 sm:px-10 sm:text-lg"
+            <button
+              className="f5-btn-primary inline-flex h-12 items-center gap-2 px-8 text-base font-semibold sm:h-14 sm:px-10 sm:text-lg"
               onClick={() => setCurrentView('browse')}
             >
               <ArrowRight className="size-5" />
               Explore Projects
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-12 px-8 text-base font-semibold sm:h-14 sm:px-10 sm:text-lg"
+            </button>
+            <button
+              className="f5-btn-secondary inline-flex h-12 items-center gap-2 px-8 text-base font-semibold sm:h-14 sm:px-10 sm:text-lg"
               onClick={() => setCurrentView('create')}
             >
               <PlusCircle className="size-5" />
               List Your Business
-            </Button>
+            </button>
           </motion.div>
 
           {/* Stats Bar */}
@@ -112,12 +120,15 @@ export default function HeroSection() {
                   className="flex flex-col items-center gap-1"
                 >
                   <div className="flex items-center gap-2">
-                    <Icon className="size-4 text-primary" />
-                    <span className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
+                    <Icon className="size-4" style={{ color: '#8A2BE2' }} />
+                    <span
+                      className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl"
+                      style={{ color: '#333333' }}
+                    >
                       {stat.value}
                     </span>
                   </div>
-                  <span className="text-xs text-muted-foreground sm:text-sm">
+                  <span className="text-xs sm:text-sm" style={{ color: '#6B7280' }}>
                     {stat.label}
                   </span>
                 </div>

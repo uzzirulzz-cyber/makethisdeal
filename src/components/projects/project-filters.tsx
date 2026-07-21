@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Search,
   SlidersHorizontal,
@@ -103,7 +103,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
           placeholder="Search projects..."
           value={localFilters.query || ''}
           onChange={(e) => updateFilter('query', e.target.value)}
-          className="pl-9 w-full"
+          className="pl-9 w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
         />
       </div>
 
@@ -116,12 +116,12 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-2 mb-3"
         >
-          <Badge variant="secondary" className="text-xs">
+          <Badge className="text-xs bg-[rgba(138,43,226,0.1)] text-[#8A2BE2] border-0">
             {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active
           </Badge>
           <button
             onClick={handleReset}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs text-muted-foreground hover:text-[#8A2BE2] transition-colors"
           >
             Clear all
           </button>
@@ -131,7 +131,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
       <div className="space-y-1 max-h-[calc(100vh-320px)] overflow-y-auto pr-1 custom-scrollbar">
         {/* Category Filter */}
         <Collapsible open={openSections.category} onOpenChange={() => toggleSection('category')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-foreground transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
             <span>Category</span>
             <ChevronDown
               className={`size-4 text-muted-foreground transition-transform ${
@@ -144,7 +144,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.category || ''}
               onValueChange={(v) => updateFilter('category', v)}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -163,7 +163,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
         {/* Country Filter */}
         <Collapsible open={openSections.location} onOpenChange={() => toggleSection('location')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-foreground transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
             <span>Location</span>
             <ChevronDown
               className={`size-4 text-muted-foreground transition-transform ${
@@ -176,7 +176,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.country || ''}
               onValueChange={(v) => updateFilter('country', v)}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
                 <SelectValue placeholder="All Countries" />
               </SelectTrigger>
               <SelectContent>
@@ -195,7 +195,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
         {/* Price Range */}
         <Collapsible open={openSections.pricing} onOpenChange={() => toggleSection('pricing')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-foreground transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
             <span>Price Range</span>
             <ChevronDown
               className={`size-4 text-muted-foreground transition-transform ${
@@ -219,7 +219,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('priceMin', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-6 h-8 text-sm"
+                      className="pl-6 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -236,7 +236,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('priceMax', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-6 h-8 text-sm"
+                      className="pl-6 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -256,7 +256,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('revenueMin', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-6 h-8 text-sm"
+                      className="pl-6 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -273,7 +273,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('revenueMax', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-6 h-8 text-sm"
+                      className="pl-6 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -288,7 +288,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                   onChange={(e) =>
                     updateFilter('roiMin', e.target.value ? Number(e.target.value) : undefined)
                   }
-                  className="h-8 text-sm"
+                  className="h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                 />
               </div>
             </div>
@@ -299,7 +299,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
         {/* Business Stage */}
         <Collapsible open={openSections.business} onOpenChange={() => toggleSection('business')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-foreground transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
             <span>Business Stage</span>
             <ChevronDown
               className={`size-4 text-muted-foreground transition-transform ${
@@ -312,7 +312,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.businessStage || ''}
               onValueChange={(v) => updateFilter('businessStage', v)}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
                 <SelectValue placeholder="All Stages" />
               </SelectTrigger>
               <SelectContent>
@@ -331,7 +331,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
         {/* Sort By */}
         <Collapsible open={openSections.sort} onOpenChange={() => toggleSection('sort')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-foreground transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
             <span>Sort By</span>
             <ChevronDown
               className={`size-4 text-muted-foreground transition-transform ${
@@ -344,7 +344,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.sortBy || 'newest'}
               onValueChange={(v) => updateFilter('sortBy', v)}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -363,10 +363,19 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
       {/* Action Buttons */}
       <div className="flex gap-2">
-        <Button onClick={applyFilters} className="flex-1" size="sm">
+        <Button
+          onClick={applyFilters}
+          className="flex-1 bg-[#8A2BE2] hover:bg-[#7A1FE0] text-white border-0"
+          size="sm"
+        >
           Apply Filters
         </Button>
-        <Button onClick={handleReset} variant="outline" size="sm" className="gap-1.5">
+        <Button
+          onClick={handleReset}
+          variant="outline"
+          size="sm"
+          className="gap-1.5 border-[#8A2BE2] text-[#8A2BE2] hover:bg-[#8A2BE2] hover:text-white"
+        >
           <RotateCcw className="size-3.5" />
           Reset
         </Button>
@@ -383,10 +392,10 @@ export default function ProjectFilters({ onApply }: ProjectFiltersProps) {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block w-72 shrink-0">
         <div className="sticky top-24">
-          <div className="bg-card border rounded-xl p-4 shadow-sm">
+          <div className="bg-white border border-[#F0F0F0] rounded-lg p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <SlidersHorizontal className="size-4 text-muted-foreground" />
-              <h3 className="font-semibold text-sm">Filters</h3>
+              <h3 className="font-semibold text-sm text-[#333333]">Filters</h3>
             </div>
             <FilterContent onApply={onApply} />
           </div>
@@ -397,14 +406,14 @@ export default function ProjectFilters({ onApply }: ProjectFiltersProps) {
       <div className="lg:hidden">
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2 border-[#8A2BE2] text-[#8A2BE2] hover:bg-[#8A2BE2] hover:text-white">
               <Filter className="size-4" />
               Filters
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80 overflow-y-auto">
+          <SheetContent side="left" className="w-80 overflow-y-auto bg-white">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
+              <SheetTitle className="flex items-center gap-2 text-[#333333]">
                 <SlidersHorizontal className="size-4" />
                 Filters
               </SheetTitle>

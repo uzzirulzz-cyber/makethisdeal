@@ -2,7 +2,7 @@
 
 import { useAppStore } from '@/store/use-app-store';
 import {
-  Globe, Mail, Phone, MapPin,
+  Globe, Mail, MapPin,
   Twitter, Linkedin, Github, Youtube, MessageCircle
 } from 'lucide-react';
 
@@ -37,20 +37,23 @@ export function Footer() {
   const { setCurrentView } = useAppStore();
 
   return (
-    <footer className="border-t bg-muted/30 mt-auto">
+    <footer className="f5-footer mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-4 lg:mb-0">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+              <div
+                className="flex h-9 w-9 items-center justify-center rounded-lg font-bold text-sm text-white"
+                style={{ backgroundColor: '#8A2BE2' }}
+              >
                 MTD
               </div>
-              <span className="text-lg font-bold tracking-tight">
-                Make<span className="text-primary">This</span>Deal
+              <span className="text-lg font-bold tracking-tight text-white">
+                Make<span style={{ color: '#A855F7' }}>This</span>Deal
               </span>
             </div>
-            <p className="text-sm text-muted-foreground mb-5 max-w-xs">
+            <p className="text-sm mb-5 max-w-xs" style={{ color: '#A8B2D1' }}>
               The global enterprise marketplace where businesses connect, invest, and grow together.
             </p>
 
@@ -58,10 +61,20 @@ export function Footer() {
             <div className="space-y-3 mb-5">
               <a
                 href="mailto:playbeatdigital@proton.me"
-                className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                className="flex items-center gap-2.5 text-sm transition-colors group"
+                style={{ color: '#A8B2D1' }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = '#A855F7';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                }}
               >
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Mail className="h-4 w-4 text-primary" />
+                <div
+                  className="h-8 w-8 rounded-full flex items-center justify-center transition-colors"
+                  style={{ backgroundColor: 'rgba(138, 43, 226, 0.2)' }}
+                >
+                  <Mail className="h-4 w-4" style={{ color: '#A855F7' }} />
                 </div>
                 <span className="truncate">playbeatdigital@proton.me</span>
               </a>
@@ -69,16 +82,32 @@ export function Footer() {
                 href="https://wa.me/923318333368"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 text-sm text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
+                className="flex items-center gap-2.5 text-sm transition-colors group"
+                style={{ color: '#A8B2D1' }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = '#34D399';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                }}
               >
-                <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
-                  <MessageCircle className="h-4 w-4 text-emerald-500" />
+                <div
+                  className="h-8 w-8 rounded-full flex items-center justify-center transition-colors"
+                  style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
+                >
+                  <MessageCircle className="h-4 w-4" style={{ color: '#34D399' }} />
                 </div>
                 <span>+92 331 8333368</span>
               </a>
-              <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-                  <MapPin className="h-4 w-4" />
+              <div
+                className="flex items-center gap-2.5 text-sm"
+                style={{ color: '#A8B2D1' }}
+              >
+                <div
+                  className="h-8 w-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                >
+                  <MapPin className="h-4 w-4" style={{ color: '#6B7280' }} />
                 </div>
                 <span>Karachi, Pakistan</span>
               </div>
@@ -89,7 +118,16 @@ export function Footer() {
               {[Twitter, Linkedin, Github, Youtube].map((Icon, i) => (
                 <button
                   key={i}
-                  className="h-9 w-9 rounded-lg bg-muted hover:bg-primary/10 hover:text-primary flex items-center justify-center transition-colors"
+                  className="h-9 w-9 rounded-lg flex items-center justify-center transition-all duration-200"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', color: '#A8B2D1' }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(168, 85, 247, 0.2)';
+                    (e.currentTarget as HTMLElement).style.color = '#A855F7';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                    (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                  }}
                 >
                   <Icon className="h-4 w-4" />
                 </button>
@@ -100,13 +138,20 @@ export function Footer() {
           {/* Link Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4 className="font-semibold text-sm mb-4">{title}</h4>
+              <h4 className="font-semibold text-sm mb-4 text-white">{title}</h4>
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
                     <button
                       onClick={() => setCurrentView(link.action)}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      className="text-sm transition-colors duration-200"
+                      style={{ color: '#A8B2D1' }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = '#A855F7';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                      }}
                     >
                       {link.label}
                     </button>
@@ -118,14 +163,24 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
+        <div
+          className="mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
+          style={{ borderTop: '1px solid #1A2342' }}
+        >
+          <p className="text-sm" style={{ color: '#A8B2D1' }}>
             © {new Date().getFullYear()} MakeThisDeal. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <a
               href="mailto:playbeatdigital@proton.me"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5"
+              className="text-sm flex items-center gap-1.5 transition-colors duration-200"
+              style={{ color: '#A8B2D1' }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.color = '#A855F7';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+              }}
             >
               <Mail className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">playbeatdigital@proton.me</span>
@@ -134,13 +189,20 @@ export function Footer() {
               href="https://wa.me/923318333368"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors flex items-center gap-1.5"
+              className="text-sm flex items-center gap-1.5 transition-colors duration-200"
+              style={{ color: '#34D399' }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.color = '#6EE7B7';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.color = '#34D399';
+              }}
             >
               <MessageCircle className="h-3.5 w-3.5" />
               <span>WhatsApp</span>
             </a>
           </div>
-          <p className="text-sm text-muted-foreground flex items-center gap-1">
+          <p className="text-sm flex items-center gap-1" style={{ color: '#A8B2D1' }}>
             <Globe className="h-3.5 w-3.5" />
             Trusted by businesses in 120+ countries
           </p>

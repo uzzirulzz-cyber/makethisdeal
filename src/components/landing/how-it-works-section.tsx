@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { UserPlus, Search, MessageSquare, Handshake } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 
 const steps = [
   {
@@ -57,14 +56,14 @@ const stepVariants = {
 
 export default function HowItWorksSection() {
   return (
-    <section className="bg-secondary/30 py-16 sm:py-20">
+    <section className="bg-[#F9FAFB] py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="mb-12 text-center sm:mb-16">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+          <h2 className="f5-section-heading text-2xl font-semibold tracking-tight text-[#333333] sm:text-3xl lg:text-4xl">
             How It Works
           </h2>
-          <p className="mt-3 text-muted-foreground sm:text-lg">
+          <p className="mt-3 text-[#6B7280] sm:text-lg">
             Get started in four simple steps
           </p>
         </div>
@@ -78,7 +77,7 @@ export default function HowItWorksSection() {
         >
           {/* Connector line (horizontal on desktop, vertical on mobile) */}
           <div
-            className="absolute left-6 top-0 hidden h-full w-px bg-border md:left-1/2 md:block md:h-px md:w-[calc(100%-3rem)] md:-translate-x-1/2"
+            className="absolute left-6 top-0 hidden h-full w-px bg-[#8A2BE2]/20 md:left-1/2 md:block md:h-px md:w-[calc(100%-3rem)] md:-translate-x-1/2"
             aria-hidden="true"
           />
 
@@ -91,36 +90,38 @@ export default function HowItWorksSection() {
                   variants={stepVariants}
                   className="relative"
                 >
-                  <Card className="border-0 bg-background shadow-sm transition-shadow hover:shadow-md">
-                    <CardContent className="flex flex-col items-center gap-4 p-6 text-center">
+                  <div className="f5-card">
+                    <div className="flex flex-col items-center gap-4 p-6 text-center">
                       {/* Step number badge */}
                       <div className="relative">
-                        <div className="absolute -inset-1.5 rounded-full bg-primary/10" />
-                        <div className="relative flex size-14 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
+                        <div className="absolute -inset-1.5 rounded-full bg-[#8A2BE2]/10" />
+                        <div className="relative flex size-14 items-center justify-center rounded-full bg-[#8A2BE2] text-lg font-bold text-white">
                           {step.number}
                         </div>
                       </div>
 
                       {/* Icon */}
-                      <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10">
-                        <Icon className="size-5 text-primary" />
+                      <div className="f5-icon-box flex size-11 items-center justify-center rounded-xl bg-[#8A2BE2]/10">
+                        <Icon className="size-5 text-[#8A2BE2]" />
                       </div>
 
                       {/* Text */}
                       <div>
-                        <h3 className="text-base font-semibold">{step.title}</h3>
-                        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                        <h3 className="text-base font-semibold text-[#333333]">
+                          {step.title}
+                        </h3>
+                        <p className="mt-1.5 text-sm leading-relaxed text-[#6B7280]">
                           {step.description}
                         </p>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
 
                   {/* Arrow between steps on mobile (vertical) */}
                   <div className="absolute -bottom-8 left-1/2 z-10 flex -translate-x-1/2 items-center justify-center md:hidden">
-                    <div className="flex size-6 items-center justify-center rounded-full bg-background shadow-sm">
+                    <div className="flex size-6 items-center justify-center rounded-full bg-white shadow-sm">
                       <svg
-                        className="size-3 text-primary"
+                        className="size-3 text-[#8A2BE2]"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -137,9 +138,9 @@ export default function HowItWorksSection() {
 
                   {/* Arrow between steps on desktop (horizontal) */}
                   <div className="absolute -right-3 top-1/2 z-10 hidden -translate-y-1/2 md:flex">
-                    <div className="flex size-6 items-center justify-center rounded-full bg-background shadow-sm">
+                    <div className="flex size-6 items-center justify-center rounded-full bg-white shadow-sm">
                       <svg
-                        className="size-3 text-primary"
+                        className="size-3 text-[#8A2BE2]"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
