@@ -1,0 +1,1058 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useCallback, Fragment } from 'react';
+     4→import { motion, AnimatePresence } from 'framer-motion';
+     5→import {
+     6→  Shield,
+     7→  Lock,
+     8→  ShoppingCart,
+     9→  CreditCard,
+    10→  Server,
+    11→  Package,
+    12→  CheckCircle2,
+    13→  XCircle,
+    14→  Clock,
+    15→  AlertTriangle,
+    16→  RefreshCw,
+    17→  ChevronDown,
+    18→  ChevronUp,
+    19→  Landmark,
+    20→  Wallet,
+    21→  Smartphone,
+    22→  Eye,
+    23→  Loader2,
+    24→  ArrowLeft,
+    25→  Search,
+    26→} from 'lucide-react';
+    27→import { Button } from '@/components/ui/button';
+    28→import { Input } from '@/components/ui/input';
+    29→import { Label } from '@/components/ui/label';
+    30→import { Textarea } from '@/components/ui/textarea';
+    31→import { Badge } from '@/components/ui/badge';
+    32→import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+    33→import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+    34→import { Separator } from '@/components/ui/separator';
+    35→import { ScrollArea } from '@/components/ui/scroll-area';
+    36→import { useAppStore } from '@/store/use-app-store';
+    37→import { useCurrency } from '@/hooks/use-currency';
+    38→import { toast } from 'sonner';
+    39→import type { Order, PaymentSubmission, PaymentMethodConfig, PaymentStatus } from '@/lib/types';
+    40→
+    41→// ─── F5 Studio Theme Constants ───────────────────────────────────────
+    42→const F5 = {
+    43→  navy: '#0A1128',
+    44→  violet: '#8A2BE2',
+    45→  pink: '#EC4899',
+    46→  blue: '#4DABF7',
+    47→  green: '#22C55E',
+    48→  red: '#EF4444',
+    49→  amber: '#F59E0B',
+    50→};
+    51→
+    52→// ─── Status Badge Helper ─────────────────────────────────────────────
+    53→function StatusBadge({ status }: { status: string }) {
+    54→  const map: Record<string, { bg: string; color: string; label: string }> = {
+    55→    pending: { bg: '#FEF3C7', color: '#D97706', label: 'Pending' },
+    56→    confirmed: { bg: '#DCFCE7', color: '#16A34A', label: 'Confirmed' },
+    57→    rejected: { bg: '#FEE2E2', color: '#DC2626', label: 'Rejected' },
+    58→    paid: { bg: '#DBEAFE', color: '#2563EB', label: 'Paid' },
+    59→    refunded: { bg: '#F3E8FF', color: '#9333EA', label: 'Refunded' },
+    60→  };
+    61→  const s = map[status] || map.pending;
+    62→  return (
+    63→    <span
+    64→      style={{ backgroundColor: s.bg, color: s.color, fontWeight: 600, fontSize: '0.75rem', padding: '2px 10px', borderRadius: '9999px' }}
+    65→    >
+    66→      {s.label}
+    67→    </span>
+    68→  );
+    69→}
+    70→
+    71→// ─── Payment Method Icon ─────────────────────────────────────────────
+    72→function PaymentMethodIcon({ method }: { method: string }) {
+    73→  switch (method) {
+    74→    case 'bankalfalah': return <Landmark size={18} style={{ color: F5.green }} />;
+    75→    case 'easypaisa': return <Wallet size={18} style={{ color: F5.green }} />;
+    76→    case 'jazzcash': return <Smartphone size={18} style={{ color: F5.red }} />;
+    77→    case 'payrails': return <CreditCard size={18} style={{ color: F5.blue }} />;
+    78→    default: return <CreditCard size={18} style={{ color: '#6B7280' }} />;
+    79→  }
+    80→}
+    81→
+    82→// ─── Stat Card ────────────────────────────────────────────────────────
+    83→function StatCard({ label, value, icon: Icon, color }: { label: string; value: number; icon: React.ElementType; color: string }) {
+    84→  return (
+    85→    <motion.div
+    86→      initial={{ opacity: 0, y: 12 }}
+    87→      animate={{ opacity: 1, y: 0 }}
+    88→      className="rounded-xl border p-4 shadow-sm"
+    89→      style={{ borderColor: '#E5E7EB', background: '#FFFFFF' }}
+    90→    >
+    91→      <div className="flex items-center gap-3">
+    92→        <div
+    93→          className="flex items-center justify-center rounded-lg"
+    94→          style={{ backgroundColor: `${color}15`, width: 44, height: 44 }}
+    95→        >
+    96→          <Icon size={22} style={{ color }} />
+    97→        </div>
+    98→        <div>
+    99→          <p style={{ color: '#6B7280', fontSize: '0.8rem', fontWeight: 500 }}>{label}</p>
+   100→          <p style={{ color: '#111827', fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.2 }}>{value}</p>
+   101→        </div>
+   102→      </div>
+   103→    </motion.div>
+   104→  );
+   105→}
+   106→
+   107→// ─── Loading Spinner ──────────────────────────────────────────────────
+   108→function LoadingSpinner({ label }: { label?: string }) {
+   109→  return (
+   110→    <div className="flex flex-col items-center justify-center py-16 gap-3">
+   111→      <Loader2 size={32} className="animate-spin" style={{ color: F5.violet }} />
+   112→      {label && <p style={{ color: '#6B7280', fontSize: '0.9rem' }}>{label}</p>}
+   113→    </div>
+   114→  );
+   115→}
+   116→
+   117→// ─── Empty State ──────────────────────────────────────────────────────
+   118→function EmptyState({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
+   119→  return (
+   120→    <div className="flex flex-col items-center justify-center py-16 gap-3">
+   121→      <Icon size={48} style={{ color: '#D1D5DB' }} />
+   122→      <p style={{ color: '#9CA3AF', fontSize: '0.95rem' }}>{message}</p>
+   123→    </div>
+   124→  );
+   125→}
+   126→
+   127→// ═══════════════════════════════════════════════════════════════════════
+   128→//  MAIN ADMIN PANEL COMPONENT
+   129→// ═══════════════════════════════════════════════════════════════════════
+   130→
+   131→export function AdminPanel() {
+   132→  const { isAdminAuthenticated, setAdminAuthenticated, setCurrentView } = useAppStore();
+   133→  const { formatPrice } = useCurrency();
+   134→
+   135→  // ─── Auth State ──────────────────────────────────────────────────
+   136→  const [password, setPassword] = useState('');
+   137→  const [adminSecret, setAdminSecret] = useState('');
+   138→
+   139→  // ─── Data State ──────────────────────────────────────────────────
+   140→  const [activeTab, setActiveTab] = useState('orders');
+   141→  const [orders, setOrders] = useState<Order[]>([]);
+   142→  const [payments, setPayments] = useState<PaymentSubmission[]>([]);
+   143→  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodConfig[]>([]);
+   144→  const [paymentFilter, setPaymentFilter] = useState<string>('pending');
+   145→
+   146→  // ─── UI State ────────────────────────────────────────────────────
+   147→  const [ordersLoading, setOrdersLoading] = useState(false);
+   148→  const [paymentsLoading, setPaymentsLoading] = useState(false);
+   149→  const [methodsLoading, setMethodsLoading] = useState(false);
+   150→  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+   151→
+   152→  // ─── Dialog State ────────────────────────────────────────────────
+   153→  const [dialogOpen, setDialogOpen] = useState(false);
+   154→  const [dialogAction, setDialogAction] = useState<'confirm' | 'reject'>('confirm');
+   155→  const [dialogTarget, setDialogTarget] = useState<{ id: string; type: 'payment' | 'order' }>({ id: '', type: 'payment' });
+   156→  const [adminNote, setAdminNote] = useState('');
+   157→  const [actionLoading, setActionLoading] = useState(false);
+   158→
+   159→  // ─── Auth Handler ────────────────────────────────────────────────
+   160→  const handleLogin = (e: React.FormEvent) => {
+   161→    e.preventDefault();
+   162→    if (!password.trim()) return;
+   163→    setAdminSecret(password.trim());
+   164→    setAdminAuthenticated(true);
+   165→    toast.success('Admin access granted');
+   166→  };
+   167→
+   168→  // ─── Fetch Orders ────────────────────────────────────────────────
+   169→  const fetchOrders = useCallback(async () => {
+   170→    setOrdersLoading(true);
+   171→    try {
+   172→      const res = await fetch('/api/orders?limit=50', {
+   173→        headers: { 'x-admin-secret': adminSecret },
+   174→      });
+   175→      if (res.status === 401) {
+   176→        toast.error('Invalid admin secret');
+   177→        return;
+   178→      }
+   179→      if (res.ok) {
+   180→        const data = await res.json();
+   181→        setOrders(data.orders || []);
+   182→      } else {
+   183→        toast.error('Failed to fetch orders');
+   184→      }
+   185→    } catch {
+   186→      toast.error('Network error fetching orders');
+   187→    } finally {
+   188→      setOrdersLoading(false);
+   189→    }
+   190→  }, [adminSecret]);
+   191→
+   192→  // ─── Fetch Payments ──────────────────────────────────────────────
+   193→  const fetchPayments = useCallback(async (status?: string) => {
+   194→    setPaymentsLoading(true);
+   195→    try {
+   196→      const params = new URLSearchParams();
+   197→      if (status && status !== 'all') params.set('status', status);
+   198→      params.set('limit', '50');
+   199→      const res = await fetch(`/api/payment/list?${params.toString()}`, {
+   200→        headers: { 'x-admin-secret': adminSecret },
+   201→      });
+   202→      if (res.status === 401) {
+   203→        toast.error('Invalid admin secret');
+   204→        return;
+   205→      }
+   206→      if (res.ok) {
+   207→        const data = await res.json();
+   208→        setPayments(data.payments || []);
+   209→      } else {
+   210→        toast.error('Failed to fetch payments');
+   211→      }
+   212→    } catch {
+   213→      toast.error('Network error fetching payments');
+   214→    } finally {
+   215→      setPaymentsLoading(false);
+   216→    }
+   217→  }, [adminSecret]);
+   218→
+   219→  // ─── Fetch Payment Methods ───────────────────────────────────────
+   220→  const fetchMethods = useCallback(async () => {
+   221→    setMethodsLoading(true);
+   222→    try {
+   223→      const res = await fetch('/api/payment-methods');
+   224→      if (res.ok) {
+   225→        const data = await res.json();
+   226→        setPaymentMethods(data.methods || []);
+   227→      }
+   228→    } catch {
+   229→      // silent
+   230→    } finally {
+   231→      setMethodsLoading(false);
+   232→    }
+   233→  }, []);
+   234→
+   235→  // ─── Load on Tab Change ──────────────────────────────────────────
+   236→  useEffect(() => {
+   237→    if (!isAdminAuthenticated) return;
+   238→    if (activeTab === 'orders') fetchOrders();
+   239→    if (activeTab === 'payments') fetchPayments(paymentFilter);
+   240→    if (activeTab === 'gateways') fetchMethods();
+   241→  }, [activeTab, isAdminAuthenticated, fetchOrders, fetchPayments, fetchMethods, paymentFilter]);
+   242→
+   243→  // ─── Open Action Dialog ──────────────────────────────────────────
+   244→  const openActionDialog = (id: string, action: 'confirm' | 'reject', type: 'payment' | 'order' = 'payment') => {
+   245→    setDialogTarget({ id, type });
+   246→    setDialogAction(action);
+   247→    setAdminNote('');
+   248→    setDialogOpen(true);
+   249→  };
+   250→
+   251→  // ─── Submit Action ───────────────────────────────────────────────
+   252→  const handleAction = async () => {
+   253→    setActionLoading(true);
+   254→    try {
+   255→      const res = await fetch('/api/payment/verify', {
+   256→        method: 'POST',
+   257→        headers: {
+   258→          'Content-Type': 'application/json',
+   259→          'x-admin-secret': adminSecret,
+   260→        },
+   261→        body: JSON.stringify({
+   262→          id: dialogTarget.id,
+   263→          action: dialogAction,
+   264→          adminNote: adminNote.trim() || undefined,
+   265→        }),
+   266→      });
+   267→      if (res.ok) {
+   268→        const data = await res.json();
+   269→        toast.success(`Payment ${dialogAction === 'confirm' ? 'confirmed' : 'rejected'} successfully`);
+   270→        setDialogOpen(false);
+   271→        // Refresh data
+   272→        fetchPayments(paymentFilter);
+   273→        fetchOrders();
+   274→      } else {
+   275→        const data = await res.json();
+   276→        toast.error(data.error || 'Action failed');
+   277→      }
+   278→    } catch {
+   279→      toast.error('Network error');
+   280→    } finally {
+   281→      setActionLoading(false);
+   282→    }
+   283→  };
+   284→
+   285→  // ─── Order Stats ─────────────────────────────────────────────────
+   286→  const orderStats = {
+   287→    total: orders.length,
+   288→    pending: orders.filter((o) => o.status === 'pending' || o.paymentStatus === 'pending').length,
+   289→    confirmed: orders.filter((o) => o.status === 'confirmed' || o.status === 'paid').length,
+   290→    rejected: orders.filter((o) => o.status === 'rejected').length,
+   291→  };
+   292→
+   293→  // ─── Format Date ─────────────────────────────────────────────────
+   294→  const formatDate = (dateStr: string) => {
+   295→    const d = new Date(dateStr);
+   296→    return d.toLocaleDateString('en-PK', {
+   297→      day: '2-digit',
+   298→      month: 'short',
+   299→      year: 'numeric',
+   300→      hour: '2-digit',
+   301→      minute: '2-digit',
+   302→    });
+   303→  };
+   304→
+   305→  // ═══════════════════════════════════════════════════════════════════
+   306→  //  AUTHENTICATION GATE
+   307→  // ═══════════════════════════════════════════════════════════════════
+   308→  if (!isAdminAuthenticated) {
+   309→    return (
+   310→      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: `linear-gradient(135deg, ${F5.navy} 0%, #1a1a3e 100%)` }}>
+   311→        <motion.div
+   312→          initial={{ opacity: 0, scale: 0.95 }}
+   313→          animate={{ opacity: 1, scale: 1 }}
+   314→          transition={{ duration: 0.4 }}
+   315→          className="w-full max-w-md rounded-2xl p-8 shadow-2xl"
+   316→          style={{ background: '#FFFFFF', border: `1px solid #E5E7EB` }}
+   317→        >
+   318→          <div className="flex flex-col items-center gap-4 mb-8">
+   319→            <div
+   320→              className="flex items-center justify-center rounded-full"
+   321→              style={{ width: 64, height: 64, background: `${F5.violet}15` }}
+   322→            >
+   323→              <Shield size={32} style={{ color: F5.violet }} />
+   324→            </div>
+   325→            <div className="text-center">
+   326→              <h1 style={{ color: F5.navy, fontSize: '1.5rem', fontWeight: 800 }}>Admin Access</h1>
+   327→              <p style={{ color: '#6B7280', fontSize: '0.9rem', marginTop: 4 }}>
+   328→                Enter your admin password to continue
+   329→              </p>
+   330→            </div>
+   331→          </div>
+   332→
+   333→          <form onSubmit={handleLogin} className="flex flex-col gap-4">
+   334→            <div className="flex flex-col gap-2">
+   335→              <Label htmlFor="admin-password" style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>
+   336→                Password
+   337→              </Label>
+   338→              <div className="relative">
+   339→                <Lock size={16} style={{ color: '#9CA3AF' }} className="absolute left-3 top-1/2 -translate-y-1/2" />
+   340→                <Input
+   341→                  id="admin-password"
+   342→                  type="password"
+   343→                  placeholder="Enter admin secret"
+   344→                  value={password}
+   345→                  onChange={(e) => setPassword(e.target.value)}
+   346→                  className="pl-10"
+   347→                  style={{ borderColor: '#D1D5DB' }}
+   348→                />
+   349→              </div>
+   350→            </div>
+   351→            <Button
+   352→              type="submit"
+   353→              disabled={!password.trim()}
+   354→              className="w-full text-white font-semibold py-5"
+   355→              style={{ background: password.trim() ? F5.violet : '#D1D5DB' }}
+   356→            >
+   357→              <Shield size={18} className="mr-2" />
+   358→              Unlock Admin Panel
+   359→            </Button>
+   360→          </form>
+   361→
+   362→          <div className="mt-6 text-center">
+   363→            <button
+   364→              onClick={() => setCurrentView('landing')}
+   365→              className="flex items-center gap-1 mx-auto text-sm font-medium hover:opacity-80 transition-opacity"
+   366→              style={{ color: '#6B7280' }}
+   367→            >
+   368→              <ArrowLeft size={14} />
+   369→              Back to Marketplace
+   370→            </button>
+   371→          </div>
+   372→        </motion.div>
+   373→      </div>
+   374→    );
+   375→  }
+   376→
+   377→  // ═══════════════════════════════════════════════════════════════════
+   378→  //  DASHBOARD
+   379→  // ═══════════════════════════════════════════════════════════════════
+   380→
+   381→  return (
+   382→    <div className="min-h-screen" style={{ background: '#F9FAFB' }}>
+   383→      {/* ─── Top Bar ──────────────────────────────────────────────── */}
+   384→      <div
+   385→        className="sticky top-0 z-30 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm"
+   386→        style={{ background: '#FFFFFF', borderBottom: `2px solid ${F5.violet}` }}
+   387→      >
+   388→        <div className="flex items-center gap-3">
+   389→          <button
+   390→            onClick={() => setCurrentView('landing')}
+   391→            className="flex items-center gap-1 text-sm font-medium hover:opacity-80 transition-opacity"
+   392→            style={{ color: '#6B7280' }}
+   393→          >
+   394→            <ArrowLeft size={16} />
+   395→            <span className="hidden sm:inline">Back</span>
+   396→          </button>
+   397→          <Separator orientation="vertical" className="h-5 hidden sm:block" style={{ borderColor: '#E5E7EB' }} />
+   398→          <div className="flex items-center gap-2">
+   399→            <Shield size={20} style={{ color: F5.violet }} />
+   400→            <h1 style={{ color: F5.navy, fontSize: '1.1rem', fontWeight: 700 }}>Admin Panel</h1>
+   401→          </div>
+   402→        </div>
+   403→        <Button
+   404→          variant="outline"
+   405→          size="sm"
+   406→          onClick={() => { setAdminAuthenticated(false); setAdminSecret(''); setCurrentView('landing'); }}
+   407→          style={{ borderColor: '#E5E7EB', color: '#6B7280' }}
+   408→        >
+   409→          <Lock size={14} className="mr-1" />
+   410→          <span className="hidden sm:inline">Logout</span>
+   411→        </Button>
+   412→      </div>
+   413→
+   414→      {/* ─── Main Content ─────────────────────────────────────────── */}
+   415→      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+   416→        <Tabs value={activeTab} onValueChange={setActiveTab}>
+   417→          <TabsList
+   418→            className="w-full sm:w-auto mb-6"
+   419→            style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '12px', padding: 4 }}
+   420→          >
+   421→            <TabsTrigger
+   422→              value="orders"
+   423→              className="flex-1 sm:flex-none data-[state=active]:text-white"
+   424→              style={{
+   425→                borderRadius: '8px',
+   426→                fontWeight: 600,
+   427→                fontSize: '0.875rem',
+   428→              }}
+   429→            >
+   430→              <ShoppingCart size={16} className="mr-1.5" />
+   431→              Orders
+   432→            </TabsTrigger>
+   433→            <TabsTrigger
+   434→              value="payments"
+   435→              className="flex-1 sm:flex-none data-[state=active]:text-white"
+   436→              style={{
+   437→                borderRadius: '8px',
+   438→                fontWeight: 600,
+   439→                fontSize: '0.875rem',
+   440→              }}
+   441→            >
+   442→              <CreditCard size={16} className="mr-1.5" />
+   443→              Payments
+   444→            </TabsTrigger>
+   445→            <TabsTrigger
+   446→              value="gateways"
+   447→              className="flex-1 sm:flex-none data-[state=active]:text-white"
+   448→              style={{
+   449→                borderRadius: '8px',
+   450→                fontWeight: 600,
+   451→                fontSize: '0.875rem',
+   452→              }}
+   453→            >
+   454→              <Server size={16} className="mr-1.5" />
+   455→              Gateways
+   456→            </TabsTrigger>
+   457→          </TabsList>
+   458→
+   459→          {/* ═══════════════════════════════════════════════════════════
+   460→              TAB 1: ORDERS
+   461→          ═══════════════════════════════════════════════════════════ */}
+   462→          <TabsContent value="orders">
+   463→            {/* Stats Cards */}
+   464→            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+   465→              <StatCard label="Total Orders" value={orderStats.total} icon={Package} color={F5.violet} />
+   466→              <StatCard label="Pending" value={orderStats.pending} icon={Clock} color={F5.amber} />
+   467→              <StatCard label="Confirmed" value={orderStats.confirmed} icon={CheckCircle2} color={F5.green} />
+   468→              <StatCard label="Rejected" value={orderStats.rejected} icon={XCircle} color={F5.red} />
+   469→            </div>
+   470→
+   471→            {/* Refresh */}
+   472→            <div className="flex items-center justify-between mb-4">
+   473→              <h2 style={{ color: F5.navy, fontSize: '1.1rem', fontWeight: 700 }}>All Orders</h2>
+   474→              <Button
+   475→                variant="outline"
+   476→                size="sm"
+   477→                onClick={fetchOrders}
+   478→                disabled={ordersLoading}
+   479→                style={{ borderColor: '#E5E7EB', color: '#6B7280' }}
+   480→              >
+   481→                <RefreshCw size={14} className={`mr-1.5 ${ordersLoading ? 'animate-spin' : ''}`} />
+   482→                Refresh
+   483→              </Button>
+   484→            </div>
+   485→
+   486→            {ordersLoading ? (
+   487→              <LoadingSpinner label="Loading orders..." />
+   488→            ) : orders.length === 0 ? (
+   489→              <EmptyState icon={Package} message="No orders found" />
+   490→            ) : (
+   491→              <>
+   492→                {/* Desktop Table */}
+   493→                <div className="hidden md:block rounded-xl border overflow-hidden" style={{ borderColor: '#E5E7EB', background: '#FFFFFF' }}>
+   494→                  <div className="overflow-x-auto">
+   495→                    <table className="w-full text-sm" style={{ minWidth: 800 }}>
+   496→                      <thead>
+   497→                        <tr style={{ background: '#F9FAFB', borderBottom: `2px solid #E5E7EB` }}>
+   498→                          {['Order #', 'Buyer', 'Items', 'Amount', 'Payment', 'Status', 'Date', 'Actions'].map((h) => (
+   499→                            <th
+   500→                              key={h}
+   501→                              className="text-left px-4 py-3 font-semibold"
+   502→                              style={{ color: '#374151', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+   503→                            >
+   504→                              {h}
+   505→                            </th>
+   506→                          ))}
+   507→                        </tr>
+   508→                      </thead>
+   509→                      <tbody>
+   510→                        {orders.map((order, idx) => {
+   511→                          const isExpanded = expandedOrder === order.id;
+   512→                          return (
+   513→                            <Fragment key={order.id}>
+   514→                              <tr
+   515→                                style={{
+   516→                                  background: isExpanded ? '#F5F3FF' : idx % 2 === 0 ? '#FFFFFF' : '#FAFAFA',
+   517→                                  borderBottom: '1px solid #F3F4F6',
+   518→                                }}
+   519→                              >
+   520→                                <td className="px-4 py-3">
+   521→                                  <span style={{ color: F5.violet, fontWeight: 600, fontSize: '0.85rem' }}>
+   522→                                    #{order.orderNumber}
+   523→                                  </span>
+   524→                                </td>
+   525→                                <td className="px-4 py-3">
+   526→                                  <div>
+   527→                                    <p style={{ color: '#111827', fontWeight: 500 }}>{order.buyerName}</p>
+   528→                                    <p style={{ color: '#9CA3AF', fontSize: '0.75rem' }}>{order.buyerEmail}</p>
+   529→                                  </div>
+   530→                                </td>
+   531→                                <td className="px-4 py-3">
+   532→                                  <span style={{ color: '#374151' }}>{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
+   533→                                </td>
+   534→                                <td className="px-4 py-3">
+   535→                                  <span style={{ color: '#111827', fontWeight: 700 }}>{formatPrice(order.totalPkr)}</span>
+   536→                                </td>
+   537→                                <td className="px-4 py-3">
+   538→                                  <div className="flex items-center gap-1.5">
+   539→                                    <PaymentMethodIcon method={order.paymentMethod || 'payrails'} />
+   540→                                    <span style={{ color: '#374151', textTransform: 'capitalize', fontSize: '0.8rem' }}>
+   541→                                      {order.paymentMethod || 'N/A'}
+   542→                                    </span>
+   543→                                  </div>
+   544→                                </td>
+   545→                                <td className="px-4 py-3">
+   546→                                  <StatusBadge status={order.status} />
+   547→                                </td>
+   548→                                <td className="px-4 py-3">
+   549→                                  <span style={{ color: '#6B7280', fontSize: '0.8rem' }}>
+   550→                                    {new Date(order.createdAt).toLocaleDateString('en-PK', { day: '2-digit', month: 'short' })}
+   551→                                  </span>
+   552→                                </td>
+   553→                                <td className="px-4 py-3">
+   554→                                  <div className="flex items-center gap-1">
+   555→                                    <Button
+   556→                                      variant="ghost"
+   557→                                      size="sm"
+   558→                                      onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+   559→                                      style={{ color: '#6B7280', padding: '4px 8px' }}
+   560→                                    >
+   561→                                      <Eye size={14} />
+   562→                                    </Button>
+   563→                                    {order.payments.some((p) => p.status === 'pending') && (
+   564→                                      <>
+   565→                                        <Button
+   566→                                          size="sm"
+   567→                                          onClick={() => {
+   568→                                            const pendingPayment = order.payments.find((p) => p.status === 'pending');
+   569→                                            if (pendingPayment) openActionDialog(pendingPayment.id, 'confirm');
+   570→                                          }}
+   571→                                          style={{ background: F5.green, color: '#FFFFFF', padding: '4px 10px', fontSize: '0.75rem' }}
+   572→                                        >
+   573→                                          <CheckCircle2 size={13} />
+   574→                                        </Button>
+   575→                                        <Button
+   576→                                          size="sm"
+   577→                                          onClick={() => {
+   578→                                            const pendingPayment = order.payments.find((p) => p.status === 'pending');
+   579→                                            if (pendingPayment) openActionDialog(pendingPayment.id, 'reject');
+   580→                                          }}
+   581→                                          style={{ background: F5.red, color: '#FFFFFF', padding: '4px 10px', fontSize: '0.75rem' }}
+   582→                                        >
+   583→                                          <XCircle size={13} />
+   584→                                        </Button>
+   585→                                      </>
+   586→                                    )}
+   587→                                  </div>
+   588→                                </td>
+   589→                              </tr>
+   590→                              {/* Expanded Details */}
+   591→                              {isExpanded && (
+   592→                                <tr style={{ background: '#F5F3FF' }}>
+   593→                                  <td colSpan={8} className="px-4 py-4">
+   594→                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+   595→                                      {/* Order Items */}
+   596→                                      <div>
+   597→                                        <h4 style={{ color: '#374151', fontWeight: 700, fontSize: '0.85rem', marginBottom: 8 }}>Order Items</h4>
+   598→                                        <div className="flex flex-col gap-2">
+   599→                                          {order.items.map((item) => (
+   600→                                            <div
+   601→                                              key={item.id}
+   602→                                              className="flex items-center justify-between rounded-lg p-3"
+   603→                                              style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}
+   604→                                            >
+   605→                                              <div>
+   606→                                                <p style={{ color: '#111827', fontWeight: 600, fontSize: '0.85rem' }}>{item.projectName}</p>
+   607→                                                <p style={{ color: '#9CA3AF', fontSize: '0.75rem' }}>Project ID: {item.projectId.slice(0, 8)}...</p>
+   608→                                              </div>
+   609→                                              <span style={{ color: F5.violet, fontWeight: 700, fontSize: '0.9rem' }}>{formatPrice(item.pricePkr)}</span>
+   610→                                            </div>
+   611→                                          ))}
+   612→                                        </div>
+   613→                                      </div>
+   614→                                      {/* Payment Details */}
+   615→                                      <div>
+   616→                                        <h4 style={{ color: '#374151', fontWeight: 700, fontSize: '0.85rem', marginBottom: 8 }}>Payments</h4>
+   617→                                        {order.payments.length === 0 ? (
+   618→                                          <p style={{ color: '#9CA3AF', fontSize: '0.85rem' }}>No payments recorded</p>
+   619→                                        ) : (
+   620→                                          <div className="flex flex-col gap-2">
+   621→                                            {order.payments.map((p) => (
+   622→                                              <div
+   623→                                                key={p.id}
+   624→                                                className="rounded-lg p-3"
+   625→                                                style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}
+   626→                                              >
+   627→                                                <div className="flex items-center justify-between mb-2">
+   628→                                                  <div className="flex items-center gap-2">
+   629→                                                    <PaymentMethodIcon method={p.method} />
+   630→                                                    <span style={{ color: '#374151', fontWeight: 600, textTransform: 'capitalize', fontSize: '0.85rem' }}>{p.method}</span>
+   631→                                                  </div>
+   632→                                                  <StatusBadge status={p.status} />
+   633→                                                </div>
+   634→                                                <div className="grid grid-cols-2 gap-1 text-xs" style={{ color: '#6B7280' }}>
+   635→                                                  <span>Amount: <b style={{ color: '#111827' }}>{formatPrice(p.amountPkr)}</b></span>
+   636→                                                  <span>Ref: <b style={{ color: '#111827' }}>{p.transactionRef || 'N/A'}</b></span>
+   637→                                                  <span>Email: <b style={{ color: '#111827' }}>{p.email}</b></span>
+   638→                                                  <span>Date: <b style={{ color: '#111827' }}>{formatDate(p.createdAt)}</b></span>
+   639→                                                </div>
+   640→                                                {p.adminNote && (
+   641→                                                  <p className="mt-2 text-xs" style={{ color: F5.amber }}>
+   642→                                                    <AlertTriangle size={12} className="inline mr-1" />
+   643→                                                    Admin: {p.adminNote}
+   644→                                                  </p>
+   645→                                                )}
+   646→                                              </div>
+   647→                                            ))}
+   648→                                          </div>
+   649→                                        )}
+   650→                                      </div>
+   651→                                    </div>
+   652→                                  </td>
+   653→                                </tr>
+   654→                              )}
+   655→                            </Fragment>
+   656→                          );
+   657→                        })}
+   658→                      </tbody>
+   659→                    </table>
+   660→                  </div>
+   661→                </div>
+   662→
+   663→                {/* Mobile Cards */}
+   664→                <div className="md:hidden flex flex-col gap-3">
+   665→                  {orders.map((order) => (
+   666→                    <motion.div
+   667→                      key={order.id}
+   668→                      layout
+   669→                      className="rounded-xl p-4 shadow-sm"
+   670→                      style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}
+   671→                    >
+   672→                      <div className="flex items-center justify-between mb-3">
+   673→                        <span style={{ color: F5.violet, fontWeight: 700, fontSize: '0.9rem' }}>#{order.orderNumber}</span>
+   674→                        <StatusBadge status={order.status} />
+   675→                      </div>
+   676→                      <div className="flex flex-col gap-1.5 text-sm mb-3">
+   677→                        <div className="flex justify-between">
+   678→                          <span style={{ color: '#6B7280' }}>Buyer</span>
+   679→                          <span style={{ color: '#111827', fontWeight: 500 }}>{order.buyerName}</span>
+   680→                        </div>
+   681→                        <div className="flex justify-between">
+   682→                          <span style={{ color: '#6B7280' }}>Items</span>
+   683→                          <span style={{ color: '#111827' }}>{order.items.length}</span>
+   684→                        </div>
+   685→                        <div className="flex justify-between">
+   686→                          <span style={{ color: '#6B7280' }}>Amount</span>
+   687→                          <span style={{ color: '#111827', fontWeight: 700 }}>{formatPrice(order.totalPkr)}</span>
+   688→                        </div>
+   689→                        <div className="flex justify-between items-center">
+   690→                          <span style={{ color: '#6B7280' }}>Method</span>
+   691→                          <div className="flex items-center gap-1.5">
+   692→                            <PaymentMethodIcon method={order.paymentMethod || 'payrails'} />
+   693→                            <span style={{ color: '#374151', textTransform: 'capitalize', fontSize: '0.8rem' }}>
+   694→                              {order.paymentMethod || 'N/A'}
+   695→                            </span>
+   696→                          </div>
+   697→                        </div>
+   698→                        <div className="flex justify-between">
+   699→                          <span style={{ color: '#6B7280' }}>Date</span>
+   700→                          <span style={{ color: '#6B7280', fontSize: '0.8rem' }}>
+   701→                            {new Date(order.createdAt).toLocaleDateString('en-PK', { day: '2-digit', month: 'short' })}
+   702→                          </span>
+   703→                        </div>
+   704→                      </div>
+   705→                      {order.payments.some((p) => p.status === 'pending') && (
+   706→                        <div className="flex gap-2 pt-2" style={{ borderTop: '1px solid #F3F4F6' }}>
+   707→                          <Button
+   708→                            size="sm"
+   709→                            className="flex-1 text-white"
+   710→                            onClick={() => {
+   711→                              const pp = order.payments.find((p) => p.status === 'pending');
+   712→                              if (pp) openActionDialog(pp.id, 'confirm');
+   713→                            }}
+   714→                            style={{ background: F5.green, fontSize: '0.8rem' }}
+   715→                          >
+   716→                            <CheckCircle2 size={14} className="mr-1" /> Confirm
+   717→                          </Button>
+   718→                          <Button
+   719→                            size="sm"
+   720→                            className="flex-1 text-white"
+   721→                            onClick={() => {
+   722→                              const pp = order.payments.find((p) => p.status === 'pending');
+   723→                              if (pp) openActionDialog(pp.id, 'reject');
+   724→                            }}
+   725→                            style={{ background: F5.red, fontSize: '0.8rem' }}
+   726→                          >
+   727→                            <XCircle size={14} className="mr-1" /> Reject
+   728→                          </Button>
+   729→                        </div>
+   730→                      )}
+   731→                    </motion.div>
+   732→                  ))}
+   733→                </div>
+   734→              </>
+   735→            )}
+   736→          </TabsContent>
+   737→
+   738→          {/* ═══════════════════════════════════════════════════════════
+   739→              TAB 2: PAYMENTS
+   740→          ═══════════════════════════════════════════════════════════ */}
+   741→          <TabsContent value="payments">
+   742→            {/* Filter Buttons */}
+   743→            <div className="flex items-center gap-2 mb-6 flex-wrap">
+   744→              {[
+   745→                { key: 'all', label: 'All' },
+   746→                { key: 'pending', label: 'Pending' },
+   747→                { key: 'confirmed', label: 'Confirmed' },
+   748→                { key: 'rejected', label: 'Rejected' },
+   749→              ].map((f) => (
+   750→                <Button
+   751→                  key={f.key}
+   752→                  variant={paymentFilter === f.key ? 'default' : 'outline'}
+   753→                  size="sm"
+   754→                  onClick={() => setPaymentFilter(f.key)}
+   755→                  style={
+   756→                    paymentFilter === f.key
+   757→                      ? { background: F5.violet, color: '#FFFFFF', fontWeight: 600, fontSize: '0.8rem' }
+   758→                      : { borderColor: '#E5E7EB', color: '#6B7280', fontSize: '0.8rem' }
+   759→                  }
+   760→                >
+   761→                  {f.label}
+   762→                </Button>
+   763→              ))}
+   764→              <div className="flex-1" />
+   765→              <Button
+   766→                variant="outline"
+   767→                size="sm"
+   768→                onClick={() => fetchPayments(paymentFilter)}
+   769→                disabled={paymentsLoading}
+   770→                style={{ borderColor: '#E5E7EB', color: '#6B7280' }}
+   771→              >
+   772→                <RefreshCw size={14} className={`mr-1.5 ${paymentsLoading ? 'animate-spin' : ''}`} />
+   773→                Refresh
+   774→              </Button>
+   775→            </div>
+   776→
+   777→            {paymentsLoading ? (
+   778→              <LoadingSpinner label="Loading payments..." />
+   779→            ) : payments.length === 0 ? (
+   780→              <EmptyState icon={CreditCard} message="No payments found" />
+   781→            ) : (
+   782→              <ScrollArea className="max-h-[600px] overflow-y-auto">
+   783→                <div className="flex flex-col gap-3 pr-3">
+   784→                  {payments.map((payment) => (
+   785→                    <motion.div
+   786→                      key={payment.id}
+   787→                      initial={{ opacity: 0, y: 8 }}
+   788→                      animate={{ opacity: 1, y: 0 }}
+   789→                      className="rounded-xl p-4 shadow-sm"
+   790→                      style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}
+   791→                    >
+   792→                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+   793→                        {/* Left: Info */}
+   794→                        <div className="flex-1 min-w-0">
+   795→                          <div className="flex items-center gap-2 mb-2">
+   796→                            <div
+   797→                              className="flex items-center justify-center rounded-lg"
+   798→                              style={{ width: 36, height: 36, background: `${F5.violet}10` }}
+   799→                            >
+   800→                              <PaymentMethodIcon method={payment.method} />
+   801→                            </div>
+   802→                            <div className="min-w-0">
+   803→                              <p style={{ color: '#111827', fontWeight: 700, fontSize: '0.9rem', textTransform: 'capitalize' }}>
+   804→                                {payment.method}
+   805→                              </p>
+   806→                              <p style={{ color: '#9CA3AF', fontSize: '0.75rem' }}>
+   807→                                ID: {payment.id.slice(0, 8)}...
+   808→                              </p>
+   809→                            </div>
+   810→                            <div className="ml-auto sm:ml-3">
+   811→                              <StatusBadge status={payment.status} />
+   812→                            </div>
+   813→                          </div>
+   814→
+   815→                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm mt-3">
+   816→                            <div>
+   817→                              <p style={{ color: '#9CA3AF', fontSize: '0.7rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amount</p>
+   818→                              <p style={{ color: '#111827', fontWeight: 700 }}>{formatPrice(payment.amountPkr)}</p>
+   819→                            </div>
+   820→                            <div>
+   821→                              <p style={{ color: '#9CA3AF', fontSize: '0.7rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</p>
+   822→                              <p style={{ color: '#374151', fontSize: '0.8rem' }} className="truncate">{payment.email}</p>
+   823→                            </div>
+   824→                            <div>
+   825→                              <p style={{ color: '#9CA3AF', fontSize: '0.7rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Transaction Ref</p>
+   826→                              <p style={{ color: '#374151', fontSize: '0.8rem' }}>{payment.transactionRef || 'N/A'}</p>
+   827→                            </div>
+   828→                            <div>
+   829→                              <p style={{ color: '#9CA3AF', fontSize: '0.7rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</p>
+   830→                              <p style={{ color: '#374151', fontSize: '0.8rem' }}>
+   831→                                {new Date(payment.createdAt).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' })}
+   832→                              </p>
+   833→                            </div>
+   834→                          </div>
+   835→
+   836→                          {payment.name && (
+   837→                            <p className="mt-2 text-sm" style={{ color: '#6B7280' }}>
+   838→                              From: <b style={{ color: '#111827' }}>{payment.name}</b>
+   839→                            </p>
+   840→                          )}
+   841→                          {payment.note && (
+   842→                            <p className="mt-1 text-sm" style={{ color: '#6B7280' }}>
+   843→                              Note: {payment.note}
+   844→                            </p>
+   845→                          )}
+   846→                          {payment.adminNote && (
+   847→                            <p className="mt-1 text-sm" style={{ color: F5.amber }}>
+   848→                              <AlertTriangle size={12} className="inline mr-1" />
+   849→                              Admin: {payment.adminNote}
+   850→                            </p>
+   851→                          )}
+   852→                        </div>
+   853→
+   854→                        {/* Right: Actions */}
+   855→                        {payment.status === 'pending' && (
+   856→                          <div className="flex sm:flex-col gap-2 sm:ml-4 shrink-0">
+   857→                            <Button
+   858→                              size="sm"
+   859→                              className="text-white"
+   860→                              onClick={() => openActionDialog(payment.id, 'confirm')}
+   861→                              style={{ background: F5.green, fontWeight: 600, fontSize: '0.8rem' }}
+   862→                            >
+   863→                              <CheckCircle2 size={14} className="mr-1" />
+   864→                              Confirm
+   865→                            </Button>
+   866→                            <Button
+   867→                              size="sm"
+   868→                              className="text-white"
+   869→                              onClick={() => openActionDialog(payment.id, 'reject')}
+   870→                              style={{ background: F5.red, fontWeight: 600, fontSize: '0.8rem' }}
+   871→                            >
+   872→                              <XCircle size={14} className="mr-1" />
+   873→                              Reject
+   874→                            </Button>
+   875→                          </div>
+   876→                        )}
+   877→                      </div>
+   878→                    </motion.div>
+   879→                  ))}
+   880→                </div>
+   881→              </ScrollArea>
+   882→            )}
+   883→          </TabsContent>
+   884→
+   885→          {/* ═══════════════════════════════════════════════════════════
+   886→              TAB 3: GATEWAYS
+   887→          ═══════════════════════════════════════════════════════════ */}
+   888→          <TabsContent value="gateways">
+   889→            <div className="flex items-center justify-between mb-6">
+   890→              <h2 style={{ color: F5.navy, fontSize: '1.1rem', fontWeight: 700 }}>Payment Gateways</h2>
+   891→              <Button
+   892→                variant="outline"
+   893→                size="sm"
+   894→                onClick={fetchMethods}
+   895→                disabled={methodsLoading}
+   896→                style={{ borderColor: '#E5E7EB', color: '#6B7280' }}
+   897→              >
+   898→                <RefreshCw size={14} className={`mr-1.5 ${methodsLoading ? 'animate-spin' : ''}`} />
+   899→                Refresh
+   900→              </Button>
+   901→            </div>
+   902→
+   903→            {methodsLoading ? (
+   904→              <LoadingSpinner label="Loading gateways..." />
+   905→            ) : paymentMethods.length === 0 ? (
+   906→              <EmptyState icon={Server} message="No payment gateways configured" />
+   907→            ) : (
+   908→              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+   909→                {paymentMethods.map((method) => (
+   910→                  <motion.div
+   911→                    key={method.id}
+   912→                    initial={{ opacity: 0, y: 12 }}
+   913→                    animate={{ opacity: 1, y: 0 }}
+   914→                    className="rounded-xl p-5 shadow-sm"
+   915→                    style={{
+   916→                      background: '#FFFFFF',
+   917→                      border: `1px solid ${method.enabled ? '#E5E7EB' : '#FCA5A5'}`,
+   918→                      opacity: method.enabled ? 1 : 0.7,
+   919→                    }}
+   920→                  >
+   921→                    <div className="flex items-center justify-between mb-3">
+   922→                      <div
+   923→                        className="flex items-center justify-center rounded-lg"
+   924→                        style={{ width: 44, height: 44, background: `${F5.violet}10` }}
+   925→                      >
+   926→                        <PaymentMethodIcon method={method.id} />
+   927→                      </div>
+   928→                      <span
+   929→                        className="text-xs font-semibold px-2.5 py-1 rounded-full"
+   930→                        style={{
+   931→                          background: method.enabled ? '#DCFCE7' : '#FEE2E2',
+   932→                          color: method.enabled ? '#16A34A' : '#DC2626',
+   933→                        }}
+   934→                      >
+   935→                        {method.enabled ? 'Enabled' : 'Disabled'}
+   936→                      </span>
+   937→                    </div>
+   938→
+   939→                    <h3 style={{ color: '#111827', fontWeight: 700, fontSize: '1rem' }}>{method.name}</h3>
+   940→                    <p style={{ color: '#6B7280', fontSize: '0.8rem', marginTop: 2 }}>{method.description}</p>
+   941→
+   942→                    <div className="mt-3 flex items-center gap-2">
+   943→                      <span
+   944→                        className="text-xs font-medium px-2 py-0.5 rounded-full"
+   945→                        style={{
+   946→                          background: method.mode === 'api' ? '#DBEAFE' : '#FEF3C7',
+   947→                          color: method.mode === 'api' ? '#2563EB' : '#D97706',
+   948→                        }}
+   949→                      >
+   950→                        {method.mode === 'api' ? 'API' : 'Manual'}
+   951→                      </span>
+   952→                    </div>
+   953→
+   954→                    {method.mode === 'manual' && method.accountDetails && (
+   955→                      <div className="mt-4 pt-3" style={{ borderTop: '1px solid #F3F4F6' }}>
+   956→                        <div className="flex flex-col gap-1.5 text-xs">
+   957→                          {method.accountDetails.bank && (
+   958→                            <div className="flex justify-between">
+   959→                              <span style={{ color: '#9CA3AF' }}>Bank</span>
+   960→                              <span style={{ color: '#374151', fontWeight: 500 }}>{method.accountDetails.bank}</span>
+   961→                            </div>
+   962→                          )}
+   963→                          {method.accountDetails.title && (
+   964→                            <div className="flex justify-between">
+   965→                              <span style={{ color: '#9CA3AF' }}>Title</span>
+   966→                              <span style={{ color: '#374151', fontWeight: 500 }}>{method.accountDetails.title}</span>
+   967→                            </div>
+   968→                          )}
+   969→                          {method.accountDetails.number && (
+   970→                            <div className="flex justify-between">
+   971→                              <span style={{ color: '#9CA3AF' }}>Account #</span>
+   972→                              <span style={{ color: '#374151', fontWeight: 600 }}>{method.accountDetails.number}</span>
+   973→                            </div>
+   974→                          )}
+   975→                          {method.accountDetails.iban && (
+   976→                            <div className="flex justify-between">
+   977→                              <span style={{ color: '#9CA3AF' }}>IBAN</span>
+   978→                              <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.7rem' }}>{method.accountDetails.iban}</span>
+   979→                            </div>
+   980→                          )}
+   981→                        </div>
+   982→                      </div>
+   983→                    )}
+   984→                  </motion.div>
+   985→                ))}
+   986→              </div>
+   987→            )}
+   988→          </TabsContent>
+   989→        </Tabs>
+   990→      </div>
+   991→
+   992→      {/* ═══════════════════════════════════════════════════════════════
+   993→          ACTION DIALOG (Confirm/Reject Payment)
+   994→      ═════════════════════════════════════════════════════════════════ */}
+   995→      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+   996→        <DialogContent style={{ borderColor: '#E5E7EB' }}>
+   997→          <DialogHeader>
+   998→            <DialogTitle className="flex items-center gap-2" style={{ color: F5.navy }}>
+   999→              {dialogAction === 'confirm' ? (
+  1000→                <CheckCircle2 size={20} style={{ color: F5.green }} />
+  1001→              ) : (
+  1002→                <XCircle size={20} style={{ color: F5.red }} />
+  1003→              )}
+  1004→              {dialogAction === 'confirm' ? 'Confirm Payment' : 'Reject Payment'}
+  1005→            </DialogTitle>
+  1006→            <DialogDescription style={{ color: '#6B7280' }}>
+  1007→              {dialogAction === 'confirm'
+  1008→                ? 'Are you sure you want to confirm this payment? The order will be marked as confirmed.'
+  1009→                : 'Are you sure you want to reject this payment? The order will be marked as rejected.'}
+  1010→            </DialogDescription>
+  1011→          </DialogHeader>
+  1012→
+  1013→          <div className="flex flex-col gap-3 py-2">
+  1014→            <div>
+  1015→              <Label style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>Admin Note (Optional)</Label>
+  1016→              <Textarea
+  1017→                value={adminNote}
+  1018→                onChange={(e) => setAdminNote(e.target.value)}
+  1019→                placeholder="Add a note for this action..."
+  1020→                className="mt-1.5"
+  1021→                rows={3}
+  1022→                style={{ borderColor: '#D1D5DB' }}
+  1023→              />
+  1024→            </div>
+  1025→          </div>
+  1026→
+  1027→          <DialogFooter className="gap-2 sm:gap-0">
+  1028→            <Button
+  1029→              variant="outline"
+  1030→              onClick={() => setDialogOpen(false)}
+  1031→              disabled={actionLoading}
+  1032→              style={{ borderColor: '#E5E7EB', color: '#6B7280' }}
+  1033→            >
+  1034→              Cancel
+  1035→            </Button>
+  1036→            <Button
+  1037→              onClick={handleAction}
+  1038→              disabled={actionLoading}
+  1039→              className="text-white"
+  1040→              style={{ background: dialogAction === 'confirm' ? F5.green : F5.red }}
+  1041→            >
+  1042→              {actionLoading ? (
+  1043→                <Loader2 size={14} className="animate-spin mr-1.5" />
+  1044→              ) : dialogAction === 'confirm' ? (
+  1045→                <CheckCircle2 size={14} className="mr-1.5" />
+  1046→              ) : (
+  1047→                <XCircle size={14} className="mr-1.5" />
+  1048→              )}
+  1049→              {dialogAction === 'confirm' ? 'Confirm Payment' : 'Reject Payment'}
+  1050→            </Button>
+  1051→          </DialogFooter>
+  1052→        </DialogContent>
+  1053→      </Dialog>
+  1054→    </div>
+  1055→  );
+  1056→}
+  1057→
+  1058→export default AdminPanel;
