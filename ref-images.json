@@ -1,0 +1,43 @@
+{
+  "success": true,
+  "query": "modern clean SaaS landing page design with white background, blue gradient hero section, rounded cards, professional UI UX",
+  "count": 5,
+  "ranked": true,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/b8d43000748a.jpg",
+      "caption": "A dark blue gradient background features nine colorful buttons with text: Clarity, Simplicity, Hierarchy, Relevance, Trust, Focus, Value, Guidance, Modularity. suitable for background image",
+      "source": "Veza Digital",
+      "original_width": "1920px",
+      "original_height": "1080px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/64151c6a3a41.png",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Creative Fabrica",
+      "original_width": "1600px",
+      "original_height": "1200px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/0fe17ba24821.jpg",
+      "caption": "SAAS Hero Section: Build a better business and software solution. suitable for background image",
+      "source": "Creative Fabrica",
+      "original_width": "1200px",
+      "original_height": "800px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/1d94d6130c36.png",
+      "caption": "The image displays three landing page examples with the title \"Landing Page Examples\" on a teal grid background.",
+      "source": "Swipe Pages",
+      "original_width": "1300px",
+      "original_height": "750px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/2b00c3c9bbf1.jpg",
+      "caption": "A clear UI/UX designer portfolio website screenshot with a man's portrait, navigation menu, and service descriptions.",
+      "source": "Figma",
+      "original_width": "1440px",
+      "original_height": "775px"
+    }
+  ]
+}

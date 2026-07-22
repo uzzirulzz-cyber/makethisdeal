@@ -1,0 +1,1089 @@
+     1→'use client';
+     2→
+     3→import React, { useState, useCallback } from 'react';
+     4→import { motion, AnimatePresence } from 'framer-motion';
+     5→import {
+     6→  ArrowLeft,
+     7→  ArrowRight,
+     8→  Check,
+     9→  Loader2,
+    10→  Sparkles,
+    11→  FileText,
+    12→  DollarSign,
+    13→  Globe,
+    14→  BarChart3,
+    15→  Eye,
+    16→  Plus,
+    17→  X,
+    18→} from 'lucide-react';
+    19→import { useAppStore } from '@/store/use-app-store';
+    20→import { CATEGORIES, COUNTRIES, BUSINESS_STAGES, TECHNOLOGY_STACKS } from '@/lib/constants';
+    21→import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+    22→import { Button } from '@/components/ui/button';
+    23→import { Input } from '@/components/ui/input';
+    24→import { Textarea } from '@/components/ui/textarea';
+    25→import { Label } from '@/components/ui/label';
+    26→import { Separator } from '@/components/ui/separator';
+    27→import { Switch } from '@/components/ui/switch';
+    28→import { Badge } from '@/components/ui/badge';
+    29→import {
+    30→  Select,
+    31→  SelectContent,
+    32→  SelectItem,
+    33→  SelectTrigger,
+    34→  SelectValue,
+    35→} from '@/components/ui/select';
+    36→import { toast } from 'sonner';
+    37→
+    38→/* ---------- Types ---------- */
+    39→
+    40→interface FormData {
+    41→  // Step 1
+    42→  name: string;
+    43→  category: string;
+    44→  industry: string;
+    45→  country: string;
+    46→  city: string;
+    47→  businessStage: string;
+    48→  foundedYear: string;
+    49→  visibility: boolean;
+    50→  // Step 2
+    51→  overview: string;
+    52→  businessModel: string;
+    53→  targetMarket: string;
+    54→  revenueModel: string;
+    55→  growthOpportunity: string;
+    56→  competitiveAdvantage: string;
+    57→  businessRisks: string;
+    58→  exitOpportunities: string;
+    59→  // Step 3
+    60→  developmentCost: string;
+    61→  infrastructureCost: string;
+    62→  marketingCost: string;
+    63→  legalCost: string;
+    64→  operationalCost: string;
+    65→  technologyCost: string;
+    66→  maintenanceCost: string;
+    67→  monthlyRevenue: string;
+    68→  annualRevenue: string;
+    69→  netProfit: string;
+    70→  ebitda: string;
+    71→  expectedROI: string;
+    72→  companyValuation: string;
+    73→  suggestedSellingPrice: string;
+    74→  reservePrice: string;
+    75→  minimumOffer: string;
+    76→  buyNowPrice: string;
+    77→  breakEvenAnalysis: string;
+    78→  // Step 4
+    79→  websiteUrl: string;
+    80→  demoUrl: string;
+    81→  githubRepo: string;
+    82→  googlePlayUrl: string;
+    83→  appleStoreUrl: string;
+    84→  adminPanelDemo: string;
+    85→  customerPortalDemo: string;
+    86→  apiDocumentation: string;
+    87→  technologyStack: string[];
+    88→  hostingProvider: string;
+    89→  cloudInfrastructure: string;
+    90→  sourceCodeAvailable: boolean;
+    91→  // Step 5
+    92→  monthlyVisitors: string;
+    93→  monthlyActiveUsers: string;
+    94→  registeredUsers: string;
+    95→  customers: string;
+    96→  subscribers: string;
+    97→  conversionRate: string;
+    98→  seoScore: string;
+    99→  trafficSources: string;
+   100→}
+   101→
+   102→const INITIAL_FORM: FormData = {
+   103→  name: '',
+   104→  category: '',
+   105→  industry: '',
+   106→  country: '',
+   107→  city: '',
+   108→  businessStage: '',
+   109→  foundedYear: '',
+   110→  visibility: true,
+   111→  overview: '',
+   112→  businessModel: '',
+   113→  targetMarket: '',
+   114→  revenueModel: '',
+   115→  growthOpportunity: '',
+   116→  competitiveAdvantage: '',
+   117→  businessRisks: '',
+   118→  exitOpportunities: '',
+   119→  developmentCost: '',
+   120→  infrastructureCost: '',
+   121→  marketingCost: '',
+   122→  legalCost: '',
+   123→  operationalCost: '',
+   124→  technologyCost: '',
+   125→  maintenanceCost: '',
+   126→  monthlyRevenue: '',
+   127→  annualRevenue: '',
+   128→  netProfit: '',
+   129→  ebitda: '',
+   130→  expectedROI: '',
+   131→  companyValuation: '',
+   132→  suggestedSellingPrice: '',
+   133→  reservePrice: '',
+   134→  minimumOffer: '',
+   135→  buyNowPrice: '',
+   136→  breakEvenAnalysis: '',
+   137→  websiteUrl: '',
+   138→  demoUrl: '',
+   139→  githubRepo: '',
+   140→  googlePlayUrl: '',
+   141→  appleStoreUrl: '',
+   142→  adminPanelDemo: '',
+   143→  customerPortalDemo: '',
+   144→  apiDocumentation: '',
+   145→  technologyStack: [],
+   146→  hostingProvider: '',
+   147→  cloudInfrastructure: '',
+   148→  sourceCodeAvailable: true,
+   149→  monthlyVisitors: '',
+   150→  monthlyActiveUsers: '',
+   151→  registeredUsers: '',
+   152→  customers: '',
+   153→  subscribers: '',
+   154→  conversionRate: '',
+   155→  seoScore: '',
+   156→  trafficSources: '',
+   157→};
+   158→
+   159→/* ---------- Step Config ---------- */
+   160→
+   161→const STEPS = [
+   162→  { id: 1, title: 'General Info', icon: FileText },
+   163→  { id: 2, title: 'Description', icon: FileText },
+   164→  { id: 3, title: 'Financials', icon: DollarSign },
+   165→  { id: 4, title: 'Digital Assets', icon: Globe },
+   166→  { id: 5, title: 'Metrics', icon: BarChart3 },
+   167→  { id: 6, title: 'Review', icon: Eye },
+   168→];
+   169→
+   170→/* ---------- Shared Components ---------- */
+   171→
+   172→function SectionLabel({ children }: { children: React.ReactNode }) {
+   173→  return <p className="text-sm font-medium text-foreground mb-1">{children}</p>;
+   174→}
+   175→
+   176→function FieldLabel({ children, optional }: { children: React.ReactNode; optional?: boolean }) {
+   177→  return (
+   178→    <Label className="text-sm text-muted-foreground flex items-center gap-1">
+   179→      {children}
+   180→      {optional && <span className="text-xs font-normal">(optional)</span>}
+   181→    </Label>
+   182→  );
+   183→}
+   184→
+   185→function CurrencyInput({
+   186→  label,
+   187→  optional,
+   188→  value,
+   189→  onChange,
+   190→}: {
+   191→  label: string;
+   192→  optional?: boolean;
+   193→  value: string;
+   194→  onChange: (v: string) => void;
+   195→}) {
+   196→  return (
+   197→    <div>
+   198→      <FieldLabel optional={optional}>{label}</FieldLabel>
+   199→      <div className="relative mt-1">
+   200→        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+   201→        <Input
+   202→          type="number"
+   203→          placeholder="0"
+   204→          value={value}
+   205→          onChange={(e) => onChange(e.target.value)}
+   206→          className="pl-6"
+   207→        />
+   208→      </div>
+   209→    </div>
+   210→  );
+   211→}
+   212→
+   213→/* ---------- Step: General Info ---------- */
+   214→
+   215→function StepGeneralInfo({ form, setForm }: { form: FormData; setForm: (f: FormData) => void }) {
+   216→  const update = (key: keyof FormData, value: string | boolean) =>
+   217→    setForm({ ...form, [key]: value });
+   218→
+   219→  return (
+   220→    <div className="space-y-5">
+   221→      <div>
+   222→        <FieldLabel>Project Name *</FieldLabel>
+   223→        <Input
+   224→          placeholder="e.g. TaskFlow Pro"
+   225→          value={form.name}
+   226→          onChange={(e) => update('name', e.target.value)}
+   227→          className="mt-1"
+   228→        />
+   229→      </div>
+   230→
+   231→      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   232→        <div>
+   233→          <FieldLabel>Category *</FieldLabel>
+   234→          <Select value={form.category} onValueChange={(v) => update('category', v)}>
+   235→            <SelectTrigger className="mt-1 w-full">
+   236→              <SelectValue placeholder="Select category" />
+   237→            </SelectTrigger>
+   238→            <SelectContent>
+   239→              {CATEGORIES.map((cat) => (
+   240→                <SelectItem key={cat.id} value={cat.slug}>
+   241→                  {cat.name}
+   242→                </SelectItem>
+   243→              ))}
+   244→            </SelectContent>
+   245→          </Select>
+   246→        </div>
+   247→        <div>
+   248→          <FieldLabel optional>Industry</FieldLabel>
+   249→          <Input
+   250→            placeholder="e.g. B2B Software"
+   251→            value={form.industry}
+   252→            onChange={(e) => update('industry', e.target.value)}
+   253→            className="mt-1"
+   254→          />
+   255→        </div>
+   256→      </div>
+   257→
+   258→      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   259→        <div>
+   260→          <FieldLabel>Country *</FieldLabel>
+   261→          <Select value={form.country} onValueChange={(v) => update('country', v)}>
+   262→            <SelectTrigger className="mt-1 w-full">
+   263→              <SelectValue placeholder="Select country" />
+   264→            </SelectTrigger>
+   265→            <SelectContent>
+   266→              {COUNTRIES.map((c) => (
+   267→                <SelectItem key={c} value={c}>
+   268→                  {c}
+   269→                </SelectItem>
+   270→              ))}
+   271→            </SelectContent>
+   272→          </Select>
+   273→        </div>
+   274→        <div>
+   275→          <FieldLabel optional>City</FieldLabel>
+   276→          <Input
+   277→            placeholder="e.g. San Francisco"
+   278→            value={form.city}
+   279→            onChange={(e) => update('city', e.target.value)}
+   280→            className="mt-1"
+   281→          />
+   282→        </div>
+   283→      </div>
+   284→
+   285→      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   286→        <div>
+   287→          <FieldLabel>Business Stage *</FieldLabel>
+   288→          <Select value={form.businessStage} onValueChange={(v) => update('businessStage', v)}>
+   289→            <SelectTrigger className="mt-1 w-full">
+   290→              <SelectValue placeholder="Select stage" />
+   291→            </SelectTrigger>
+   292→            <SelectContent>
+   293→              {BUSINESS_STAGES.map((s) => (
+   294→                <SelectItem key={s.value} value={s.value}>
+   295→                  {s.label}
+   296→                </SelectItem>
+   297→              ))}
+   298→            </SelectContent>
+   299→          </Select>
+   300→        </div>
+   301→        <div>
+   302→          <FieldLabel optional>Founded Year</FieldLabel>
+   303→          <Input
+   304→            type="number"
+   305→            placeholder="e.g. 2022"
+   306→            value={form.foundedYear}
+   307→            onChange={(e) => update('foundedYear', e.target.value)}
+   308→            className="mt-1"
+   309→          />
+   310→        </div>
+   311→      </div>
+   312→
+   313→      <div className="flex items-center justify-between rounded-lg border p-4">
+   314→        <div>
+   315→          <FieldLabel>Public Visibility</FieldLabel>
+   316→          <p className="text-xs text-muted-foreground mt-0.5">
+   317→            Make this project visible to all marketplace users
+   318→          </p>
+   319→        </div>
+   320→        <Switch
+   321→          checked={form.visibility}
+   322→          onCheckedChange={(v) => update('visibility', v)}
+   323→        />
+   324→      </div>
+   325→    </div>
+   326→  );
+   327→}
+   328→
+   329→/* ---------- Step: Description ---------- */
+   330→
+   331→function StepDescription({ form, setForm }: { form: FormData; setForm: (f: FormData) => void }) {
+   332→  const update = (key: keyof FormData, value: string) => setForm({ ...form, [key]: value });
+   333→
+   334→  const fields: { key: keyof FormData; label: string; optional?: boolean; rows?: number }[] = [
+   335→    { key: 'overview', label: 'Overview', rows: 4 },
+   336→    { key: 'businessModel', label: 'Business Model', rows: 3 },
+   337→    { key: 'targetMarket', label: 'Target Market', rows: 3 },
+   338→    { key: 'revenueModel', label: 'Revenue Model', rows: 3, optional: true },
+   339→    { key: 'growthOpportunity', label: 'Growth Opportunity', rows: 3, optional: true },
+   340→    { key: 'competitiveAdvantage', label: 'Competitive Advantage', rows: 3, optional: true },
+   341→    { key: 'businessRisks', label: 'Business Risks', rows: 3, optional: true },
+   342→    { key: 'exitOpportunities', label: 'Exit Opportunities', rows: 3, optional: true },
+   343→  ];
+   344→
+   345→  return (
+   346→    <div className="space-y-5">
+   347→      {fields.map((f) => (
+   348→        <div key={f.key}>
+   349→          <FieldLabel optional={f.optional}>{f.label}</FieldLabel>
+   350→          <Textarea
+   351→            placeholder={`Describe the ${f.label.toLowerCase()}...`}
+   352→            value={form[f.key] as string}
+   353→            onChange={(e) => update(f.key, e.target.value)}
+   354→            rows={f.rows || 3}
+   355→            className="mt-1 resize-none"
+   356→          />
+   357→        </div>
+   358→      ))}
+   359→    </div>
+   360→  );
+   361→}
+   362→
+   363→/* ---------- Step: Financials ---------- */
+   364→
+   365→function StepFinancials({ form, setForm }: { form: FormData; setForm: (f: FormData) => void }) {
+   366→  const update = (key: keyof FormData, value: string) => setForm({ ...form, [key]: value });
+   367→
+   368→  return (
+   369→    <div className="space-y-6">
+   370→      <div>
+   371→        <SectionLabel>Costs & Investment</SectionLabel>
+   372→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+   373→          <CurrencyInput label="Development Cost" optional value={form.developmentCost} onChange={(v) => update('developmentCost', v)} />
+   374→          <CurrencyInput label="Infrastructure Cost" optional value={form.infrastructureCost} onChange={(v) => update('infrastructureCost', v)} />
+   375→          <CurrencyInput label="Marketing Cost" optional value={form.marketingCost} onChange={(v) => update('marketingCost', v)} />
+   376→          <CurrencyInput label="Legal Cost" optional value={form.legalCost} onChange={(v) => update('legalCost', v)} />
+   377→          <CurrencyInput label="Operational Cost" optional value={form.operationalCost} onChange={(v) => update('operationalCost', v)} />
+   378→          <CurrencyInput label="Technology Cost" optional value={form.technologyCost} onChange={(v) => update('technologyCost', v)} />
+   379→          <CurrencyInput label="Maintenance Cost" optional value={form.maintenanceCost} onChange={(v) => update('maintenanceCost', v)} />
+   380→        </div>
+   381→      </div>
+   382→
+   383→      <Separator />
+   384→
+   385→      <div>
+   386→        <SectionLabel>Revenue & Profit</SectionLabel>
+   387→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+   388→          <CurrencyInput label="Monthly Revenue" optional value={form.monthlyRevenue} onChange={(v) => update('monthlyRevenue', v)} />
+   389→          <CurrencyInput label="Annual Revenue" value={form.annualRevenue} onChange={(v) => update('annualRevenue', v)} />
+   390→          <CurrencyInput label="Net Profit" optional value={form.netProfit} onChange={(v) => update('netProfit', v)} />
+   391→          <CurrencyInput label="EBITDA" optional value={form.ebitda} onChange={(v) => update('ebitda', v)} />
+   392→          <div>
+   393→            <FieldLabel optional>Expected ROI (%)</FieldLabel>
+   394→            <div className="relative mt-1">
+   395→              <Input
+   396→                type="number"
+   397→                placeholder="e.g. 150"
+   398→                value={form.expectedROI}
+   399→                onChange={(e) => update('expectedROI', e.target.value)}
+   400→              />
+   401→              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+   402→            </div>
+   403→          </div>
+   404→        </div>
+   405→      </div>
+   406→
+   407→      <Separator />
+   408→
+   409→      <div>
+   410→        <SectionLabel>Valuation & Pricing</SectionLabel>
+   411→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+   412→          <CurrencyInput label="Company Valuation" optional value={form.companyValuation} onChange={(v) => update('companyValuation', v)} />
+   413→          <CurrencyInput label="Suggested Selling Price" value={form.suggestedSellingPrice} onChange={(v) => update('suggestedSellingPrice', v)} />
+   414→          <CurrencyInput label="Reserve Price" optional value={form.reservePrice} onChange={(v) => update('reservePrice', v)} />
+   415→          <CurrencyInput label="Minimum Offer" optional value={form.minimumOffer} onChange={(v) => update('minimumOffer', v)} />
+   416→          <CurrencyInput label="Buy Now Price" optional value={form.buyNowPrice} onChange={(v) => update('buyNowPrice', v)} />
+   417→        </div>
+   418→      </div>
+   419→
+   420→      <Separator />
+   421→
+   422→      <div>
+   423→        <FieldLabel optional>Break-Even Analysis</FieldLabel>
+   424→        <Textarea
+   425→          placeholder="Describe your break-even analysis..."
+   426→          value={form.breakEvenAnalysis}
+   427→          onChange={(e) => update('breakEvenAnalysis', e.target.value)}
+   428→          rows={3}
+   429→          className="mt-1 resize-none"
+   430→        />
+   431→      </div>
+   432→    </div>
+   433→  );
+   434→}
+   435→
+   436→/* ---------- Step: Digital Assets ---------- */
+   437→
+   438→function StepDigitalAssets({ form, setForm }: { form: FormData; setForm: (f: FormData) => void }) {
+   439→  const update = (key: keyof FormData, value: string | boolean | string[]) =>
+   440→    setForm({ ...form, [key]: value });
+   441→
+   442→  const [techInput, setTechInput] = useState('');
+   443→
+   444→  const addTech = () => {
+   445→    const trimmed = techInput.trim();
+   446→    if (trimmed && !form.technologyStack.includes(trimmed)) {
+   447→      update('technologyStack', [...form.technologyStack, trimmed]);
+   448→      setTechInput('');
+   449→    }
+   450→  };
+   451→
+   452→  const removeTech = (tech: string) => {
+   453→    update('technologyStack', form.technologyStack.filter((t) => t !== tech));
+   454→  };
+   455→
+   456→  const selectTech = (tech: string) => {
+   457→    if (!form.technologyStack.includes(tech)) {
+   458→      update('technologyStack', [...form.technologyStack, tech]);
+   459→    }
+   460→  };
+   461→
+   462→  const availableTech = TECHNOLOGY_STACKS.filter(
+   463→    (t) => !form.technologyStack.includes(t)
+   464→  );
+   465→
+   466→  return (
+   467→    <div className="space-y-5">
+   468→      <div>
+   469→        <SectionLabel>URLs & Links</SectionLabel>
+   470→        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+   471→          <div>
+   472→            <FieldLabel>Website URL *</FieldLabel>
+   473→            <Input placeholder="https://example.com" value={form.websiteUrl} onChange={(e) => update('websiteUrl', e.target.value)} className="mt-1" />
+   474→          </div>
+   475→          <div>
+   476→            <FieldLabel optional>Demo URL</FieldLabel>
+   477→            <Input placeholder="https://demo.example.com" value={form.demoUrl} onChange={(e) => update('demoUrl', e.target.value)} className="mt-1" />
+   478→          </div>
+   479→          <div>
+   480→            <FieldLabel optional>GitHub Repository</FieldLabel>
+   481→            <Input placeholder="https://github.com/..." value={form.githubRepo} onChange={(e) => update('githubRepo', e.target.value)} className="mt-1" />
+   482→          </div>
+   483→          <div>
+   484→            <FieldLabel optional>Google Play URL</FieldLabel>
+   485→            <Input placeholder="https://play.google.com/..." value={form.googlePlayUrl} onChange={(e) => update('googlePlayUrl', e.target.value)} className="mt-1" />
+   486→          </div>
+   487→          <div>
+   488→            <FieldLabel optional>Apple App Store URL</FieldLabel>
+   489→            <Input placeholder="https://apps.apple.com/..." value={form.appleStoreUrl} onChange={(e) => update('appleStoreUrl', e.target.value)} className="mt-1" />
+   490→          </div>
+   491→          <div>
+   492→            <FieldLabel optional>Admin Panel Demo</FieldLabel>
+   493→            <Input placeholder="https://admin.example.com" value={form.adminPanelDemo} onChange={(e) => update('adminPanelDemo', e.target.value)} className="mt-1" />
+   494→          </div>
+   495→          <div>
+   496→            <FieldLabel optional>Customer Portal</FieldLabel>
+   497→            <Input placeholder="https://portal.example.com" value={form.customerPortalDemo} onChange={(e) => update('customerPortalDemo', e.target.value)} className="mt-1" />
+   498→          </div>
+   499→          <div>
+   500→            <FieldLabel optional>API Documentation</FieldLabel>
+   501→            <Input placeholder="https://docs.example.com" value={form.apiDocumentation} onChange={(e) => update('apiDocumentation', e.target.value)} className="mt-1" />
+   502→          </div>
+   503→        </div>
+   504→      </div>
+   505→
+   506→      <Separator />
+   507→
+   508→      {/* Technology Stack Multi-select */}
+   509→      <div>
+   510→        <SectionLabel>Technology Stack</SectionLabel>
+   511→        <div className="mt-2">
+   512→          {/* Selected tags */}
+   513→          {form.technologyStack.length > 0 && (
+   514→            <div className="flex flex-wrap gap-1.5 mb-3">
+   515→              {form.technologyStack.map((tech) => (
+   516→                <Badge key={tech} variant="secondary" className="gap-1 pr-1">
+   517→                  {tech}
+   518→                  <button
+   519→                    onClick={() => removeTech(tech)}
+   520→                    className="ml-0.5 hover:bg-muted rounded-full p-0.5"
+   521→                  >
+   522→                    <X className="size-3" />
+   523→                  </button>
+   524→                </Badge>
+   525→              ))}
+   526→            </div>
+   527→          )}
+   528→
+   529→          {/* Input to add custom tech */}
+   530→          <div className="flex gap-2 mb-3">
+   531→            <Input
+   532→              placeholder="Type a technology..."
+   533→              value={techInput}
+   534→              onChange={(e) => setTechInput(e.target.value)}
+   535→              onKeyDown={(e) => {
+   536→                if (e.key === 'Enter') {
+   537→                  e.preventDefault();
+   538→                  addTech();
+   539→                }
+   540→              }}
+   541→            />
+   542→            <Button type="button" variant="outline" size="sm" onClick={addTech}>
+   543→              <Plus className="size-4" />
+   544→            </Button>
+   545→          </div>
+   546→
+   547→          {/* Quick-select from common tech */}
+   548→          {availableTech.length > 0 && (
+   549→            <div className="max-h-40 overflow-y-auto rounded-md border p-2 custom-scrollbar">
+   550→              <p className="text-[10px] text-muted-foreground mb-1.5 px-1">Quick add:</p>
+   551→              <div className="flex flex-wrap gap-1">
+   552→                {availableTech.map((tech) => (
+   553→                  <button
+   554→                    key={tech}
+   555→                    onClick={() => selectTech(tech)}
+   556→                    className="text-xs px-2 py-1 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+   557→                  >
+   558→                    {tech}
+   559→                  </button>
+   560→                ))}
+   561→              </div>
+   562→            </div>
+   563→          )}
+   564→        </div>
+   565→      </div>
+   566→
+   567→      <Separator />
+   568→
+   569→      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   570→        <div>
+   571→          <FieldLabel optional>Hosting Provider</FieldLabel>
+   572→          <Input placeholder="e.g. AWS, Vercel" value={form.hostingProvider} onChange={(e) => update('hostingProvider', e.target.value)} className="mt-1" />
+   573→        </div>
+   574→        <div>
+   575→          <FieldLabel optional>Cloud Infrastructure</FieldLabel>
+   576→          <Input placeholder="e.g. AWS, GCP" value={form.cloudInfrastructure} onChange={(e) => update('cloudInfrastructure', e.target.value)} className="mt-1" />
+   577→        </div>
+   578→      </div>
+   579→
+   580→      <div className="flex items-center justify-between rounded-lg border p-4">
+   581→        <div>
+   582→          <FieldLabel>Source Code Available</FieldLabel>
+   583→          <p className="text-xs text-muted-foreground mt-0.5">
+   584→            Include source code with the project sale
+   585→          </p>
+   586→        </div>
+   587→        <Switch
+   588→          checked={form.sourceCodeAvailable}
+   589→          onCheckedChange={(v) => update('sourceCodeAvailable', v)}
+   590→        />
+   591→      </div>
+   592→    </div>
+   593→  );
+   594→}
+   595→
+   596→/* ---------- Step: Metrics ---------- */
+   597→
+   598→function StepMetrics({ form, setForm }: { form: FormData; setForm: (f: FormData) => void }) {
+   599→  const update = (key: keyof FormData, value: string) => setForm({ ...form, [key]: value });
+   600→
+   601→  return (
+   602→    <div className="space-y-5">
+   603→      <div>
+   604→        <SectionLabel>Traffic & Users</SectionLabel>
+   605→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+   606→          <div>
+   607→            <FieldLabel optional>Monthly Visitors</FieldLabel>
+   608→            <Input type="number" placeholder="e.g. 50000" value={form.monthlyVisitors} onChange={(e) => update('monthlyVisitors', e.target.value)} className="mt-1" />
+   609→          </div>
+   610→          <div>
+   611→            <FieldLabel optional>Monthly Active Users</FieldLabel>
+   612→            <Input type="number" placeholder="e.g. 12000" value={form.monthlyActiveUsers} onChange={(e) => update('monthlyActiveUsers', e.target.value)} className="mt-1" />
+   613→          </div>
+   614→          <div>
+   615→            <FieldLabel optional>Registered Users</FieldLabel>
+   616→            <Input type="number" placeholder="e.g. 25000" value={form.registeredUsers} onChange={(e) => update('registeredUsers', e.target.value)} className="mt-1" />
+   617→          </div>
+   618→          <div>
+   619→            <FieldLabel optional>Customers</FieldLabel>
+   620→            <Input type="number" placeholder="e.g. 3500" value={form.customers} onChange={(e) => update('customers', e.target.value)} className="mt-1" />
+   621→          </div>
+   622→          <div>
+   623→            <FieldLabel optional>Subscribers</FieldLabel>
+   624→            <Input type="number" placeholder="e.g. 1800" value={form.subscribers} onChange={(e) => update('subscribers', e.target.value)} className="mt-1" />
+   625→          </div>
+   626→        </div>
+   627→      </div>
+   628→
+   629→      <Separator />
+   630→
+   631→      <div>
+   632→        <SectionLabel>Performance</SectionLabel>
+   633→        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+   634→          <div>
+   635→            <FieldLabel optional>Conversion Rate (%)</FieldLabel>
+   636→            <div className="relative mt-1">
+   637→              <Input type="number" placeholder="e.g. 3.5" value={form.conversionRate} onChange={(e) => update('conversionRate', e.target.value)} />
+   638→              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+   639→            </div>
+   640→          </div>
+   641→          <div>
+   642→            <FieldLabel optional>SEO Score</FieldLabel>
+   643→            <div className="relative mt-1">
+   644→              <Input type="number" placeholder="e.g. 85" value={form.seoScore} onChange={(e) => update('seoScore', e.target.value)} />
+   645→              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">/100</span>
+   646→            </div>
+   647→          </div>
+   648→        </div>
+   649→      </div>
+   650→
+   651→      <Separator />
+   652→
+   653→      <div>
+   654→        <FieldLabel optional>Traffic Sources</FieldLabel>
+   655→        <Textarea
+   656→          placeholder="e.g. Organic Search, Direct, Social Media, Referral (comma-separated)"
+   657→          value={form.trafficSources}
+   658→          onChange={(e) => update('trafficSources', e.target.value)}
+   659→          rows={2}
+   660→          className="mt-1 resize-none"
+   661→        />
+   662→        <p className="text-[11px] text-muted-foreground mt-1">Separate each source with a comma</p>
+   663→      </div>
+   664→    </div>
+   665→  );
+   666→}
+   667→
+   668→/* ---------- Step: Review ---------- */
+   669→
+   670→function formatCurrency(value: string): string {
+   671→  const num = parseFloat(value);
+   672→  if (isNaN(num)) return '—';
+   673→  if (num >= 1_000_000_000) return `$${(num / 1_000_000_000).toFixed(2)}B`;
+   674→  if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`;
+   675→  if (num >= 1_000) return `$${(num / 1_000).toFixed(0)}K`;
+   676→  return `$${num.toLocaleString()}`;
+   677→}
+   678→
+   679→function ReviewSection({ title, children }: { title: string; children: React.ReactNode }) {
+   680→  return (
+   681→    <div>
+   682→      <h4 className="text-sm font-semibold mb-2 text-muted-foreground">{title}</h4>
+   683→      <div className="rounded-lg border p-4 space-y-2 bg-muted/20">
+   684→        {children}
+   685→      </div>
+   686→    </div>
+   687→  );
+   688→}
+   689→
+   690→function ReviewRow({ label, value }: { label: string; value: string | boolean | string[] }) {
+   691→  let display: React.ReactNode;
+   692→  if (Array.isArray(value)) {
+   693→    display = value.length > 0 ? (
+   694→      <div className="flex flex-wrap gap-1">
+   695→        {value.map((v) => (
+   696→          <Badge key={v} variant="secondary" className="text-xs">{v}</Badge>
+   697→        ))}
+   698→      </div>
+   699→    ) : <span className="text-sm text-muted-foreground">—</span>;
+   700→  } else if (typeof value === 'boolean') {
+   701→    display = (
+   702→      <Badge variant={value ? 'default' : 'outline'} className="text-xs">
+   703→        {value ? 'Yes' : 'No'}
+   704→      </Badge>
+   705→    );
+   706→  } else {
+   707→    display = <span className="text-sm">{value || '—'}</span>;
+   708→  }
+   709→
+   710→  return (
+   711→    <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5">
+   712→      <span className="text-xs text-muted-foreground">{label}</span>
+   713→      <div className="text-sm font-medium">{display}</div>
+   714→    </div>
+   715→  );
+   716→}
+   717→
+   718→function StepReview({ form }: { form: FormData }) {
+   719→  const catName = CATEGORIES.find((c) => c.slug === form.category)?.name || form.category;
+   720→  const stageName = BUSINESS_STAGES.find((s) => s.value === form.businessStage)?.label || form.businessStage;
+   721→
+   722→  return (
+   723→    <div className="space-y-5">
+   724→      <ReviewSection title="General Information">
+   725→        <ReviewRow label="Project Name" value={form.name} />
+   726→        <ReviewRow label="Category" value={catName} />
+   727→        <ReviewRow label="Industry" value={form.industry} />
+   728→        <ReviewRow label="Location" value={form.city ? `${form.city}, ${form.country}` : form.country} />
+   729→        <ReviewRow label="Business Stage" value={stageName} />
+   730→        <ReviewRow label="Founded Year" value={form.foundedYear} />
+   731→        <ReviewRow label="Public Visibility" value={form.visibility} />
+   732→      </ReviewSection>
+   733→
+   734→      <ReviewSection title="Description">
+   735→        <ReviewRow label="Overview" value={form.overview || '—'} />
+   736→        <ReviewRow label="Business Model" value={form.businessModel || '—'} />
+   737→        <ReviewRow label="Target Market" value={form.targetMarket || '—'} />
+   738→        <ReviewRow label="Revenue Model" value={form.revenueModel || '—'} />
+   739→      </ReviewSection>
+   740→
+   741→      <ReviewSection title="Financials">
+   742→        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+   743→          <ReviewRow label="Annual Revenue" value={formatCurrency(form.annualRevenue)} />
+   744→          <ReviewRow label="Net Profit" value={formatCurrency(form.netProfit)} />
+   745→          <ReviewRow label="Expected ROI" value={form.expectedROI ? `${form.expectedROI}%` : '—'} />
+   746→          <ReviewRow label="Selling Price" value={formatCurrency(form.suggestedSellingPrice)} />
+   747→          <ReviewRow label="Buy Now Price" value={formatCurrency(form.buyNowPrice)} />
+   748→          <ReviewRow label="Company Valuation" value={formatCurrency(form.companyValuation)} />
+   749→        </div>
+   750→      </ReviewSection>
+   751→
+   752→      <ReviewSection title="Digital Assets">
+   753→        <ReviewRow label="Website" value={form.websiteUrl} />
+   754→        <ReviewRow label="Technology Stack" value={form.technologyStack} />
+   755→        <ReviewRow label="Source Code" value={form.sourceCodeAvailable} />
+   756→      </ReviewSection>
+   757→
+   758→      <ReviewSection title="Business Metrics">
+   759→        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+   760→          <ReviewRow label="Monthly Visitors" value={form.monthlyVisitors || '—'} />
+   761→          <ReviewRow label="MAU" value={form.monthlyActiveUsers || '—'} />
+   762→          <ReviewRow label="Conversion Rate" value={form.conversionRate ? `${form.conversionRate}%` : '—'} />
+   763→          <ReviewRow label="SEO Score" value={form.seoScore ? `${form.seoScore}/100` : '—'} />
+   764→        </div>
+   765→      </ReviewSection>
+   766→    </div>
+   767→  );
+   768→}
+   769→
+   770→/* ---------- Main Component ---------- */
+   771→
+   772→export default function ProjectForm() {
+   773→  const { goBack } = useAppStore();
+   774→  const [currentStep, setCurrentStep] = useState(1);
+   775→  const [form, setForm] = useState<FormData>(INITIAL_FORM);
+   776→  const [submitting, setSubmitting] = useState(false);
+   777→  const [aiLoading, setAiLoading] = useState(false);
+   778→
+   779→  const canProceed = useCallback(() => {
+   780→    switch (currentStep) {
+   781→      case 1:
+   782→        return !!(form.name && form.category && form.country && form.businessStage);
+   783→      case 2:
+   784→        return !!form.overview && !!form.businessModel && !!form.targetMarket;
+   785→      case 3:
+   786→        return !!form.annualRevenue && !!form.suggestedSellingPrice;
+   787→      case 4:
+   788→        return !!form.websiteUrl;
+   789→      case 5:
+   790→        return true;
+   791→      case 6:
+   792→        return true;
+   793→      default:
+   794→        return false;
+   795→    }
+   796→  }, [currentStep, form]);
+   797→
+   798→  const nextStep = () => {
+   799→    if (currentStep < 6) setCurrentStep(currentStep + 1);
+   800→  };
+   801→
+   802→  const prevStep = () => {
+   803→    if (currentStep > 1) setCurrentStep(currentStep - 1);
+   804→  };
+   805→
+   806→  const buildPayload = () => {
+   807→    const catObj = CATEGORIES.find((c) => c.slug === form.category);
+   808→    const payload: Record<string, unknown> = {
+   809→      name: form.name,
+   810→      category: form.category,
+   811→      categoryName: catObj?.name,
+   812→      categoryIcon: catObj?.icon,
+   813→      categoryDescription: catObj?.description,
+   814→      industry: form.industry || undefined,
+   815→      country: form.country,
+   816→      city: form.city || undefined,
+   817→      businessStage: form.businessStage,
+   818→      foundedYear: form.foundedYear ? parseInt(form.foundedYear, 10) : undefined,
+   819→      visibility: form.visibility ? 'public' : 'private',
+   820→      overview: form.overview,
+   821→      businessModel: form.businessModel,
+   822→      targetMarket: form.targetMarket,
+   823→      revenueModel: form.revenueModel || undefined,
+   824→      growthOpportunity: form.growthOpportunity || undefined,
+   825→      competitiveAdvantage: form.competitiveAdvantage || undefined,
+   826→      businessRisks: form.businessRisks || undefined,
+   827→      exitOpportunities: form.exitOpportunities || undefined,
+   828→      developmentCost: form.developmentCost ? parseFloat(form.developmentCost) : undefined,
+   829→      infrastructureCost: form.infrastructureCost ? parseFloat(form.infrastructureCost) : undefined,
+   830→      marketingCost: form.marketingCost ? parseFloat(form.marketingCost) : undefined,
+   831→      legalCost: form.legalCost ? parseFloat(form.legalCost) : undefined,
+   832→      operationalCost: form.operationalCost ? parseFloat(form.operationalCost) : undefined,
+   833→      technologyCost: form.technologyCost ? parseFloat(form.technologyCost) : undefined,
+   834→      maintenanceCost: form.maintenanceCost ? parseFloat(form.maintenanceCost) : undefined,
+   835→      monthlyRevenue: form.monthlyRevenue ? parseFloat(form.monthlyRevenue) : undefined,
+   836→      annualRevenue: form.annualRevenue ? parseFloat(form.annualRevenue) : undefined,
+   837→      netProfit: form.netProfit ? parseFloat(form.netProfit) : undefined,
+   838→      ebitda: form.ebitda ? parseFloat(form.ebitda) : undefined,
+   839→      expectedROI: form.expectedROI ? parseFloat(form.expectedROI) : undefined,
+   840→      companyValuation: form.companyValuation ? parseFloat(form.companyValuation) : undefined,
+   841→      suggestedSellingPrice: form.suggestedSellingPrice ? parseFloat(form.suggestedSellingPrice) : undefined,
+   842→      reservePrice: form.reservePrice ? parseFloat(form.reservePrice) : undefined,
+   843→      minimumOffer: form.minimumOffer ? parseFloat(form.minimumOffer) : undefined,
+   844→      buyNowPrice: form.buyNowPrice ? parseFloat(form.buyNowPrice) : undefined,
+   845→      breakEvenAnalysis: form.breakEvenAnalysis || undefined,
+   846→      websiteUrl: form.websiteUrl,
+   847→      demoUrl: form.demoUrl || undefined,
+   848→      githubRepo: form.githubRepo || undefined,
+   849→      googlePlayUrl: form.googlePlayUrl || undefined,
+   850→      appleStoreUrl: form.appleStoreUrl || undefined,
+   851→      adminPanelDemo: form.adminPanelDemo || undefined,
+   852→      customerPortalDemo: form.customerPortalDemo || undefined,
+   853→      apiDocumentation: form.apiDocumentation || undefined,
+   854→      technologyStack: form.technologyStack.join(', '),
+   855→      hostingProvider: form.hostingProvider || undefined,
+   856→      cloudInfrastructure: form.cloudInfrastructure || undefined,
+   857→      sourceCodeAvailable: form.sourceCodeAvailable,
+   858→      monthlyVisitors: form.monthlyVisitors ? parseInt(form.monthlyVisitors, 10) : undefined,
+   859→      monthlyActiveUsers: form.monthlyActiveUsers ? parseInt(form.monthlyActiveUsers, 10) : undefined,
+   860→      registeredUsers: form.registeredUsers ? parseInt(form.registeredUsers, 10) : undefined,
+   861→      customers: form.customers ? parseInt(form.customers, 10) : undefined,
+   862→      subscribers: form.subscribers ? parseInt(form.subscribers, 10) : undefined,
+   863→      conversionRate: form.conversionRate ? parseFloat(form.conversionRate) : undefined,
+   864→      seoScore: form.seoScore ? parseInt(form.seoScore, 10) : undefined,
+   865→      trafficSources: form.trafficSources || undefined,
+   866→      auctionEnabled: false,
+   867→    };
+   868→    return payload;
+   869→  };
+   870→
+   871→  const handleSubmit = async () => {
+   872→    setSubmitting(true);
+   873→    try {
+   874→      const res = await fetch('/api/projects', {
+   875→        method: 'POST',
+   876→        headers: { 'Content-Type': 'application/json' },
+   877→        body: JSON.stringify(buildPayload()),
+   878→      });
+   879→      if (res.ok) {
+   880→        toast.success('Project created successfully!');
+   881→        goBack();
+   882→      } else {
+   883→        const data = await res.json().catch(() => ({}));
+   884→        toast.error(data.error || 'Failed to create project');
+   885→      }
+   886→    } catch {
+   887→      toast.error('Something went wrong. Please try again.');
+   888→    } finally {
+   889→      setSubmitting(false);
+   890→    }
+   891→  };
+   892→
+   893→  const handleAiValuation = async () => {
+   894→    setAiLoading(true);
+   895→    try {
+   896→      const payload = buildPayload();
+   897→      const res = await fetch('/api/projects/valuation', {
+   898→        method: 'POST',
+   899→        headers: { 'Content-Type': 'application/json' },
+   900→        body: JSON.stringify(payload),
+   901→      });
+   902→      if (res.ok) {
+   903→        const data = await res.json();
+   904→        if (data.aiValuation) {
+   905→          setForm((prev) => ({
+   906→            ...prev,
+   907→            companyValuation: String(data.aiValuation),
+   908→            suggestedSellingPrice: prev.suggestedSellingPrice || String(data.aiValuation),
+   909→          }));
+   910→          toast.success(`AI Valuation: $${(data.aiValuation / 1_000_000).toFixed(1)}M`);
+   911→        }
+   912→        if (data.investorPrice) {
+   913→          // Could show these in a dialog, for now just toast
+   914→          toast.info(`Investor Price: $${(data.investorPrice / 1_000_000).toFixed(1)}M`);
+   915→        }
+   916→      } else {
+   917→        toast.error('AI Valuation failed. Try again.');
+   918→      }
+   919→    } catch {
+   920→      toast.error('AI Valuation service unavailable.');
+   921→    } finally {
+   922→      setAiLoading(false);
+   923→    }
+   924→  };
+   925→
+   926→  const currentStepData = STEPS.find((s) => s.id === currentStep)!;
+   927→
+   928→  return (
+   929→    <motion.div
+   930→      initial={{ opacity: 0, y: 12 }}
+   931→      animate={{ opacity: 1, y: 0 }}
+   932→      transition={{ duration: 0.4 }}
+   933→      className="max-w-4xl mx-auto px-4 py-6"
+   934→    >
+   935→      {/* Back Button */}
+   936→      <Button
+   937→        variant="ghost"
+   938→        size="sm"
+   939→        className="gap-1.5 mb-4 text-muted-foreground hover:text-foreground -ml-2"
+   940→        onClick={goBack}
+   941→      >
+   942→        <ArrowLeft className="size-4" />
+   943→        Cancel
+   944→      </Button>
+   945→
+   946→      {/* Header */}
+   947→      <div className="mb-6">
+   948→        <h1 className="text-2xl font-bold">List a New Project</h1>
+   949→        <p className="text-sm text-muted-foreground mt-1">
+   950→          Fill in the details to list your project on the marketplace
+   951→        </p>
+   952→      </div>
+   953→
+   954→      {/* Progress Indicator */}
+   955→      <div className="mb-8">
+   956→        <div className="flex items-center justify-between relative">
+   957→          {/* Connector line */}
+   958→          <div className="absolute top-5 left-0 right-0 h-0.5 bg-muted z-0" />
+   959→          <div
+   960→            className="absolute top-5 left-0 h-0.5 bg-primary z-0 transition-all duration-500"
+   961→            style={{ width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
+   962→          />
+   963→
+   964→          {STEPS.map((step) => {
+   965→            const StepIcon = step.icon;
+   966→            const isActive = currentStep === step.id;
+   967→            const isCompleted = currentStep > step.id;
+   968→
+   969→            return (
+   970→              <button
+   971→                key={step.id}
+   972→                onClick={() => {
+   973→                  // Allow clicking on completed or current steps
+   974→                  if (isCompleted || isActive) setCurrentStep(step.id);
+   975→                }}
+   976→                className="flex flex-col items-center gap-1.5 relative z-10 group"
+   977→                disabled={!isCompleted && !isActive}
+   978→              >
+   979→                <div
+   980→                  className={`size-10 rounded-full flex items-center justify-center border-2 transition-all ${
+   981→                    isCompleted
+   982→                      ? 'bg-primary border-primary text-primary-foreground'
+   983→                      : isActive
+   984→                        ? 'bg-primary/10 border-primary text-primary'
+   985→                        : 'bg-background border-muted-foreground/30 text-muted-foreground'
+   986→                  } ${!isCompleted && !isActive ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+   987→                >
+   988→                  {isCompleted ? (
+   989→                    <Check className="size-4" />
+   990→                  ) : (
+   991→                    <StepIcon className="size-4" />
+   992→                  )}
+   993→                </div>
+   994→                <span
+   995→                  className={`text-[11px] font-medium hidden sm:block transition-colors ${
+   996→                    isActive || isCompleted ? 'text-foreground' : 'text-muted-foreground'
+   997→                  }`}
+   998→                >
+   999→                  {step.title}
+  1000→                </span>
+  1001→              </button>
+  1002→            );
+  1003→          })}
+  1004→        </div>
+  1005→      </div>
+  1006→
+  1007→      {/* Step Content */}
+  1008→      <Card>
+  1009→        <CardHeader className="pb-4">
+  1010→          <CardTitle className="text-lg">{currentStepData.title}</CardTitle>
+  1011→          <CardDescription>
+  1012→            {currentStep === 1 && 'Basic information about your project'}
+  1013→            {currentStep === 2 && 'Describe your business in detail'}
+  1014→            {currentStep === 3 && 'Financial data and pricing'}
+  1015→            {currentStep === 4 && 'Links, tech stack, and digital assets'}
+  1016→            {currentStep === 5 && 'Traffic and performance data'}
+  1017→            {currentStep === 6 && 'Review your listing before publishing'}
+  1018→          </CardDescription>
+  1019→        </CardHeader>
+  1020→        <CardContent>
+  1021→          <AnimatePresence mode="wait">
+  1022→            <motion.div
+  1023→              key={currentStep}
+  1024→              initial={{ opacity: 0, x: 20 }}
+  1025→              animate={{ opacity: 1, x: 0 }}
+  1026→              exit={{ opacity: 0, x: -20 }}
+  1027→              transition={{ duration: 0.25 }}
+  1028→            >
+  1029→              {currentStep === 1 && <StepGeneralInfo form={form} setForm={setForm} />}
+  1030→              {currentStep === 2 && <StepDescription form={form} setForm={setForm} />}
+  1031→              {currentStep === 3 && <StepFinancials form={form} setForm={setForm} />}
+  1032→              {currentStep === 4 && <StepDigitalAssets form={form} setForm={setForm} />}
+  1033→              {currentStep === 5 && <StepMetrics form={form} setForm={setForm} />}
+  1034→              {currentStep === 6 && <StepReview form={form} />}
+  1035→            </motion.div>
+  1036→          </AnimatePresence>
+  1037→
+  1038→          {/* Navigation */}
+  1039→          <Separator className="my-6" />
+  1040→          <div className="flex items-center justify-between">
+  1041→            <Button
+  1042→              variant="outline"
+  1043→              onClick={prevStep}
+  1044→              disabled={currentStep === 1}
+  1045→              className="gap-1.5"
+  1046→            >
+  1047→              <ArrowLeft className="size-4" />
+  1048→              Previous
+  1049→            </Button>
+  1050→
+  1051→            <div className="flex items-center gap-2">
+  1052→              {currentStep === 6 && (
+  1053→                <Button
+  1054→                  variant="outline"
+  1055→                  onClick={handleAiValuation}
+  1056→                  disabled={aiLoading || submitting}
+  1057→                  className="gap-1.5 text-violet-600 border-violet-200 hover:bg-violet-50 dark:text-violet-400 dark:border-violet-800 dark:hover:bg-violet-950/30"
+  1058→                >
+  1059→                  {aiLoading ? (
+  1060→                    <Loader2 className="size-4 animate-spin" />
+  1061→                  ) : (
+  1062→                    <Sparkles className="size-4" />
+  1063→                  )}
+  1064→                  AI Valuation
+  1065→                </Button>
+  1066→              )}
+  1067→
+  1068→              {currentStep < 6 ? (
+  1069→                <Button onClick={nextStep} disabled={!canProceed()} className="gap-1.5">
+  1070→                  Next
+  1071→                  <ArrowRight className="size-4" />
+  1072→                </Button>
+  1073→              ) : (
+  1074→                <Button onClick={handleSubmit} disabled={submitting} className="gap-1.5">
+  1075→                  {submitting ? (
+  1076→                    <Loader2 className="size-4 animate-spin" />
+  1077→                  ) : (
+  1078→                    <Check className="size-4" />
+  1079→                  )}
+  1080→                  Submit Project
+  1081→                </Button>
+  1082→              )}
+  1083→            </div>
+  1084→          </div>
+  1085→        </CardContent>
+  1086→      </Card>
+  1087→    </motion.div>
+  1088→  );
+  1089→}

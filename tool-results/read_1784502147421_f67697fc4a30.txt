@@ -1,0 +1,828 @@
+     1→     1→'use client';
+     2→     2→
+     3→     3→import React, { useEffect, useState, useRef } from 'react';
+     4→     4→import { motion, useInView } from 'framer-motion';
+     5→     5→import {
+     6→     6→  Globe, MapPin, TrendingUp, Shield, Zap, ArrowRight, CheckCircle2,
+     7→     7→  Star, ExternalLink, MessageSquare, Tag, Target, Users, BarChart3,
+     8→     8→  DollarSign, Rocket, ChevronRight, ShoppingCart, Package, Clock,
+     9→     9→  Award, Heart, ArrowLeft,
+    10→    10→} from 'lucide-react';
+    11→    11→import { useAppStore } from '@/store/use-app-store';
+    12→    12→import { getCategoryName } from '@/lib/constants';
+    13→    13→import type { Project } from '@/lib/types';
+    14→    14→import { Button } from '@/components/ui/button';
+    15→    15→import { Card, CardContent } from '@/components/ui/card';
+    16→    16→import { Badge } from '@/components/ui/badge';
+    17→    17→import { Separator } from '@/components/ui/separator';
+    18→    18→import { Skeleton } from '@/components/ui/skeleton';
+    19→    19→
+    20→    20→/* ------------------------------------------------------------------ */
+    21→    21→/*  Helpers                                                           */
+    22→    22→/* ------------------------------------------------------------------ */
+    23→    23→
+    24→    24→const PKR_TO_USD = 278;
+    25→    25→
+    26→    26→function formatPKR(value: number | undefined): string {
+    27→    27→  if (value === undefined || value === null) return '—';
+    28→    28→  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
+    29→    29→  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
+    30→    30→  return `PKR ${value.toLocaleString()}`;
+    31→    31→}
+    32→    32→
+    33→    33→function toUSD(pkr: number): number {
+    34→    34→  return Math.round(pkr / PKR_TO_USD);
+    35→    35→}
+    36→    36→
+    37→    37→function formatUSD(pkr: number | undefined): string {
+    38→    38→  if (pkr === undefined || pkr === null) return '';
+    39→    39→  const u = toUSD(pkr);
+    40→    40→  if (u >= 1_000_000) return `≈ US$ ${(u / 1_000_000).toFixed(1)}M`;
+    41→    41→  if (u >= 1_000) return `≈ US$ ${(u / 1_000).toFixed(1)}K`;
+    42→    42→  return `≈ US$ ${u.toLocaleString()}`;
+    43→    43→}
+    44→    44→
+    45→    45→function getFirstLine(text: string | undefined, fallback: string): string {
+    46→    46→  if (!text) return fallback;
+    47→    47→  const line = text.split('\n')[0].trim();
+    48→    48→  return line.length > 120 ? line.slice(0, 117) + '...' : line;
+    49→    49→}
+    50→    50→
+    51→    51→function generateTagline(project: Project): string {
+    52→    52→  if (project.overview) {
+    53→    53→    const first = project.overview.split('\n')[0].trim();
+    54→    54→    if (first.length > 10) return first.length > 140 ? first.slice(0, 137) + '...' : first;
+    55→    55→  }
+    56→    56→  const cat = getCategoryName(project.category);
+    57→    57→  const name = project.name;
+    58→    58→  const taglines: Record<string, string> = {
+    59→    59→    'SaaS': `${name} — Premium SaaS platform ready to scale your business`,
+    60→    60→    'AI Solutions': `${name} — Next-gen AI-powered solution for modern enterprises`,
+    61→    61→    'E-commerce': `${name} — Your next e-commerce powerhouse, ready to launch`,
+    62→    62→    'Real Estate': `${name} — Premium digital real estate with high growth potential`,
+    63→    63→    'Mobile Apps': `${name} — Feature-rich mobile app with engaged users`,
+    64→    64→    'Startups': `${name} — High-potential startup with proven traction`,
+    65→    65→    'FinTech': `${name} — Innovative financial technology platform`,
+    66→    66→    'HealthTech': `${name} — Transforming healthcare with technology`,
+    67→    67→    'EdTech': `${name} — Education technology for the next generation`,
+    68→    68→    'Cybersecurity': `${name} — Enterprise-grade security solutions`,
+    69→    69→    'Domains': `${name} — Premium domain name with brand-building potential`,
+    70→    70→    'Websites': `${name} — Established website with existing traffic`,
+    71→    71→    'Digital Products': `${name} — Ready-to-use digital product with revenue`,
+    72→    72→  };
+    73→    73→  return taglines[cat] || `${name} — A premium ${cat} opportunity on MakeThisDeal`;
+    74→    74→}
+    75→    75→
+    76→    76→function getTags(project: Project): string[] {
+    77→    77→  if (project.tags) {
+    78→    78→    return project.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
+    79→    79→  }
+    80→    80→  const tags: string[] = [];
+    81→    81→  if (project.category) tags.push(getCategoryName(project.category));
+    82→    82→  if (project.targetMarket) tags.push(project.targetMarket.split(',')[0]?.trim() || 'Global Market');
+    83→    83→  if (project.businessStage) tags.push(project.businessStage.charAt(0).toUpperCase() + project.businessStage.slice(1));
+    84→    84→  if (project.technologyStack) {
+    85→    85→    project.technologyStack.split(',').slice(0, 3).forEach((t) => tags.push(t.trim()));
+    86→    86→  }
+    87→    87→  return tags.slice(0, 8);
+    88→    88→}
+    89→    89→
+    90→    90→interface FeatureCard {
+    91→    91→  icon: React.ComponentType<{ className?: string }>;
+    92→    92→  title: string;
+    93→    93→  description: string;
+    94→    94→  accent: string;
+    95→    95→}
+    96→    96→
+    97→    97→function getFeatureCards(project: Project): FeatureCard[] {
+    98→    98→  const cards: FeatureCard[] = [];
+    99→    99→
+   100→   100→  // 1. Competitive Advantage
+   101→   101→  if (project.competitiveAdvantage) {
+   102→   102→    const short = project.competitiveAdvantage.split('\n')[0].trim();
+   103→   103→    cards.push({
+   104→   104→      icon: Shield,
+   105→   105→      title: 'Competitive Edge',
+   106→   106→      description: short.length > 120 ? short.slice(0, 117) + '...' : short,
+   107→   107→      accent: 'from-emerald-500 to-green-600',
+   108→   108→    });
+   109→   109→  }
+   110→   110→
+   111→   111→  // 2. Growth Opportunity
+   112→   112→  if (project.growthOpportunity) {
+   113→   113→    const short = project.growthOpportunity.split('\n')[0].trim();
+   114→   114→    cards.push({
+   115→   115→      icon: TrendingUp,
+   116→   116→      title: 'Growth Potential',
+   117→   117→      description: short.length > 120 ? short.slice(0, 117) + '...' : short,
+   118→   118→      accent: 'from-amber-500 to-yellow-500',
+   119→   119→    });
+   120→   120→  }
+   121→   121→
+   122→   122→  // 3. Target Market
+   123→   123→  if (project.targetMarket) {
+   124→   124→    cards.push({
+   125→   125→      icon: Target,
+   126→   126→      title: 'Target Market',
+   127→   127→      description: project.targetMarket.length > 120
+   128→   128→        ? project.targetMarket.slice(0, 117) + '...'
+   129→   129→        : project.targetMarket,
+   130→   130→      accent: 'from-cyan-500 to-sky-500',
+   131→   131→    });
+   132→   132→  }
+   133→   133→
+   134→   134→  // 4. Revenue / Business Model
+   135→   135→  if (project.revenueModel) {
+   136→   136→    cards.push({
+   137→   137→      icon: BarChart3,
+   138→   138→      title: 'Revenue Model',
+   139→   139→      description: project.revenueModel.length > 120
+   140→   140→        ? project.revenueModel.slice(0, 117) + '...'
+   141→   141→        : project.revenueModel,
+   142→   142→      accent: 'from-violet-500 to-purple-500',
+   143→   143→    });
+   144→   144→  }
+   145→   145→
+   146→   146→  // Fallbacks if not enough
+   147→   147→  if (cards.length < 4) {
+   148→   148→    if (project.monthlyRevenue || project.annualRevenue) {
+   149→   149→      cards.push({
+   150→   150→        icon: DollarSign,
+   151→   151→        title: 'Revenue Generating',
+   152→   152→        description: `This listing shows active revenue with ${project.monthlyRevenue ? formatPKR(project.monthlyRevenue) + '/mo' : formatPKR(project.annualRevenue) + '/yr'}`,
+   153→   153→        accent: 'from-emerald-400 to-teal-500',
+   154→   154→      });
+   155→   155→    }
+   156→   156→  }
+   157→   157→  if (cards.length < 4) {
+   158→   158→    cards.push({
+   159→   159→      icon: Zap,
+   160→   160→      title: 'Ready to Transfer',
+   161→   161→      description: 'Full documentation and seamless transfer process. Start building from day one.',
+   162→   162→      accent: 'from-amber-400 to-orange-500',
+   163→   163→    });
+   164→   164→  }
+   165→   165→  if (cards.length < 4) {
+   166→   166→    cards.push({
+   167→   167→      icon: Users,
+   168→   168→      title: 'Established Presence',
+   169→   169→      description: `${project.registeredUsers || project.customers || project.monthlyActiveUsers ? 'Existing user base with proven traction.' : 'Brand-ready digital asset with growth potential.'}`,
+   170→   170→      accent: 'from-pink-500 to-rose-500',
+   171→   171→    });
+   172→   172→  }
+   173→   173→
+   174→   174→  return cards.slice(0, 4);
+   175→   175→}
+   176→   176→
+   177→   177→const USE_CASE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+   178→   178→  saas: Package, 'ai-solutions': Rocket, ecommerce: ShoppingCart,
+   179→   179→  'real-estate': MapPin, 'mobile-apps': Zap, startups: Rocket,
+   180→   180→  fintech: DollarSign, healthtech: Heart, edtech: Star,
+   181→   181→  cybersecurity: Shield, domains: Globe, websites: ExternalLink,
+   182→   182→  'digital-products': Package, manufacturing: Package, retail: ShoppingCart,
+   183→   183→  wholesale: Package, investments: BarChart3, 'crm-erp': BarChart3,
+   184→   184→};
+   185→   185→
+   186→   186→function getUseCaseIcon(tag: string): React.ComponentType<{ className?: string }> {
+   187→   187→  const lower = tag.toLowerCase();
+   188→   188→  for (const [key, icon] of Object.entries(USE_CASE_ICONS)) {
+   189→   189→    if (lower.includes(key) || lower.includes(key.replace('-', ''))) return icon;
+   190→   190→  }
+   191→   191→  return Tag;
+   192→   192→}
+   193→   193→
+   194→   194→/* ------------------------------------------------------------------ */
+   195→   195→/*  Animated section wrapper                                          */
+   196→   196→/* ------------------------------------------------------------------ */
+   197→   197→
+   198→   198→function AnimatedSection({
+   199→   199→  children,
+   200→   200→  className = '',
+   201→   201→  delay = 0,
+   202→   202→  id,
+   203→   203→}: {
+   204→   204→  children: React.ReactNode;
+   205→   205→  className?: string;
+   206→   206→  delay?: number;
+   207→   207→  id?: string;
+   208→   208→}) {
+   209→   209→  const ref = useRef<HTMLDivElement>(null);
+   210→   210→  const inView = useInView(ref, { once: true, margin: '-60px' });
+   211→   211→
+   212→   212→  return (
+   213→   213→    <motion.div
+   214→   214→      ref={ref}
+   215→   215→      id={id}
+   216→   216→      initial={{ opacity: 0, y: 40 }}
+   217→   217→      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+   218→   218→      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+   219→   219→      className={className}
+   220→   220→    >
+   221→   221→      {children}
+   222→   222→    </motion.div>
+   223→   223→  );
+   224→   224→}
+   225→   225→
+   226→   226→/* ------------------------------------------------------------------ */
+   227→   227→/*  Skeleton                                                          */
+   228→   228→/* ------------------------------------------------------------------ */
+   229→   229→
+   230→   230→function StorefrontSkeleton() {
+   231→   231→  return (
+   232→   232→    <div className="min-h-screen bg-[#080f0c]">
+   233→   233→      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   234→   234→        <Skeleton className="h-16 w-full mb-6 rounded-xl" />
+   235→   235→        <Skeleton className="h-12 w-full max-w-2xl mx-auto mb-12 rounded-full" />
+   236→   236→        <div className="py-24 text-center space-y-4">
+   237→   237→          <Skeleton className="h-16 w-96 mx-auto" />
+   238→   238→          <Skeleton className="h-6 w-72 mx-auto" />
+   239→   239→          <Skeleton className="h-12 w-48 mx-auto mt-8 rounded-full" />
+   240→   240→        </div>
+   241→   241→        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20">
+   242→   242→          {Array.from({ length: 8 }).map((_, i) => (
+   243→   243→            <Skeleton key={i} className="h-24 rounded-xl" />
+   244→   244→          ))}
+   245→   245→        </div>
+   246→   246→        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+   247→   247→          {Array.from({ length: 4 }).map((_, i) => (
+   248→   248→            <Skeleton key={i} className="h-48 rounded-2xl" />
+   249→   249→          ))}
+   250→   250→        </div>
+   251→   251→        <Skeleton className="h-64 w-full rounded-2xl mb-20" />
+   252→   252→      </div>
+   253→   253→    </div>
+   254→   254→  );
+   255→   255→}
+   256→   256→
+   257→   257→/* ------------------------------------------------------------------ */
+   258→   258→/*  Step Number Badge                                                  */
+   259→   259→/* ------------------------------------------------------------------ */
+   260→   260→
+   261→   261→function StepBadge({ num }: { num: number }) {
+   262→   262→  return (
+   263→   263→    <div className="relative flex items-center justify-center size-14 shrink-0">
+   264→   264→      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 opacity-20" />
+   265→   265→      <div className="relative size-12 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
+   266→   266→        <span className="text-lg font-bold text-white">{num}</span>
+   267→   267→      </div>
+   268→   268→    </div>
+   269→   269→  );
+   270→   270→}
+   271→   271→
+   272→   272→/* ------------------------------------------------------------------ */
+   273→   273→/*  Main Component                                                     */
+   274→   274→/* ------------------------------------------------------------------ */
+   275→   275→
+   276→   276→export default function StorefrontPreview() {
+   277→   277→  const { selectedProjectId, setCurrentView } = useAppStore();
+   278→   278→  const [project, setProject] = useState<Project | null>(null);
+   279→   279→  const [loading, setLoading] = useState(true);
+   280→   280→
+   281→   281→  useEffect(() => {
+   282→   282→    if (!selectedProjectId) return;
+   283→   283→    let cancelled = false;
+   284→   284→
+   285→   285→    async function fetchProject() {
+   286→   286→      setLoading(true);
+   287→   287→      try {
+   288→   288→        const res = await fetch(`/api/projects/${selectedProjectId}`);
+   289→   289→        if (res.ok && !cancelled) {
+   290→   290→          const data = await res.json();
+   291→   291→          setProject(data);
+   292→   292→        }
+   293→   293→      } catch {
+   294→   294→        // Silently fail
+   295→   295→      } finally {
+   296→   296→        if (!cancelled) setLoading(false);
+   297→   297→      }
+   298→   298→    }
+   299→   299→
+   300→   300→    fetchProject();
+   301→   301→    return () => { cancelled = true; };
+   302→   302→  }, [selectedProjectId]);
+   303→   303→
+   304→   304→  if (loading) return <StorefrontSkeleton />;
+   305→   305→  if (!project) {
+   306→   306→    return (
+   307→   307→      <div className="min-h-screen bg-[#080f0c] flex items-center justify-center">
+   308→   308→        <div className="text-center space-y-4">
+   309→   309→          <p className="text-white/60">Project not found.</p>
+   310→   310→          <Button
+   311→   311→            variant="outline"
+   312→   312→            className="gap-2 text-white/80 border-white/20 hover:bg-white/10 hover:text-white"
+   313→   313→            onClick={() => setCurrentView('browse')}
+   314→   314→          >
+   315→   315→            <ArrowLeft className="size-4" /> Back to Marketplace
+   316→   316→          </Button>
+   317→   317→        </div>
+   318→   318→      </div>
+   319→   319→    );
+   320→   320→  }
+   321→   321→
+   322→   322→  const tagline = generateTagline(project);
+   323→   323→  const tags = getTags(project);
+   324→   324→  const features = getFeatureCards(project);
+   325→   325→  const brandName = project.name;
+   326→   326→  const category = getCategoryName(project.category);
+   327→   327→  const country = project.country || 'Pakistan';
+   328→   328→
+   329→   329→  return (
+   330→   330→    <div className="min-h-screen bg-[#080f0c] text-white overflow-x-hidden">
+   331→   331→      {/* ============ GRADIENT OVERLAY ============ */}
+   332→   332→      <div className="fixed inset-0 pointer-events-none">
+   333→   333→        <div className="absolute inset-0 bg-gradient-to-b from-[#080f0c] via-[#0a1a14] to-[#080f0c]" />
+   334→   334→        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-900/20 rounded-full blur-[120px]" />
+   335→   335→        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-emerald-800/10 rounded-full blur-[100px]" />
+   336→   336→      </div>
+   337→   337→
+   338→   338→      <div className="relative z-10">
+   339→   339→        {/* ============ HEADER ============ */}
+   340→   340→        <AnimatedSection>
+   341→   341→          <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#080f0c]/80 border-b border-white/[0.06]">
+   342→   342→            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   343→   343→              <div className="flex items-center justify-between h-16">
+   344→   344→                {/* Logo */}
+   345→   345→                <div className="flex items-center gap-3">
+   346→   346→                  <Button
+   347→   347→                    variant="ghost"
+   348→   348→                    size="sm"
+   349→   349→                    className="gap-1.5 text-white/50 hover:text-white hover:bg-white/10 -ml-2 mr-1"
+   350→   350→                    onClick={() => setCurrentView('browse')}
+   351→   351→                  >
+   352→   352→                    <ArrowLeft className="size-4" />
+   353→   353→                    <span className="hidden sm:inline">Marketplace</span>
+   354→   354→                  </Button>
+   355→   355→                  <Separator orientation="vertical" className="h-6 bg-white/10 mx-1 hidden sm:block" />
+   356→   356→                  <div className="flex items-center gap-2">
+   357→   357→                    <div className="size-8 rounded-lg bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
+   358→   358→                      <Globe className="size-4 text-white" />
+   359→   359→                    </div>
+   360→   360→                    <span className="font-bold text-white text-sm sm:text-base tracking-tight truncate max-w-[160px] sm:max-w-none">
+   361→   361→                      {brandName}
+   362→   362→                    </span>
+   363→   363→                  </div>
+   364→   364→                </div>
+   365→   365→
+   366→   366→                {/* Nav links (desktop) */}
+   367→   367→                <nav className="hidden md:flex items-center gap-6 text-sm text-white/50">
+   368→   368→                  <a href="#use-cases" className="hover:text-white transition-colors">Use Cases</a>
+   369→   369→                  <a href="#features" className="hover:text-white transition-colors">Why Choose</a>
+   370→   370→                  <a href="#how-to-buy" className="hover:text-white transition-colors">How to Buy</a>
+   371→   371→                  <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+   372→   372→                </nav>
+   373→   373→
+   374→   374→                {/* CTA */}
+   375→   375→                <Button
+   376→   376→                  onClick={() => setCurrentView('detail')}
+   377→   377→                  className="gap-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white border-0 shadow-lg shadow-emerald-500/20"
+   378→   378→                >
+   379→   379→                  <MessageSquare className="size-4" />
+   380→   380→                  <span className="hidden sm:inline">Make an Offer</span>
+   381→   381→                </Button>
+   382→   382→              </div>
+   383→   383→            </div>
+   384→   384→          </header>
+   385→   385→        </AnimatedSection>
+   386→   386→
+   387→   387→        {/* ============ LOCATION / TAGLINE BAR ============ */}
+   388→   388→        <AnimatedSection delay={0.1}>
+   389→   389→          <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-6">
+   390→   390→            <div className="inline-flex items-center gap-3 bg-white/[0.06] border border-white/[0.08] rounded-full px-5 py-2.5 backdrop-blur-sm">
+   391→   391→              <MapPin className="size-4 text-emerald-400 shrink-0" />
+   392→   392→              <span className="text-sm text-white/70">{country}{project.city ? ` • ${project.city}` : ''}</span>
+   393→   393→              <Separator orientation="vertical" className="h-4 bg-white/10" />
+   394→   394→              <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xs hover:bg-emerald-500/30">
+   395→   395→                {category}
+   396→   396→              </Badge>
+   397→   397→              {project.featured && (
+   398→   398→                <>
+   399→   399→                  <Separator orientation="vertical" className="h-4 bg-white/10" />
+   400→   400→                  <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-xs hover:bg-amber-500/30 gap-1">
+   401→   401→                    <Star className="size-3 fill-current" /> Featured
+   402→   402→                  </Badge>
+   403→   403→                </>
+   404→   404→              )}
+   405→   405→            </div>
+   406→   406→          </div>
+   407→   407→        </AnimatedSection>
+   408→   408→
+   409→   409→        {/* ============ HERO SECTION ============ */}
+   410→   410→        <AnimatedSection delay={0.15} className="mt-16 sm:mt-24 mb-20 sm:mb-28">
+   411→   411→          <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+   412→   412→            {/* Brand name */}
+   413→   413→            <motion.h1
+   414→   414→              initial={{ opacity: 0, scale: 0.95 }}
+   415→   415→              animate={{ opacity: 1, scale: 1 }}
+   416→   416→              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+   417→   417→              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[0.95] mb-6"
+   418→   418→            >
+   419→   419→              <span className="bg-gradient-to-r from-white via-emerald-100 to-emerald-300 bg-clip-text text-transparent">
+   420→   420→                {brandName}
+   421→   421→              </span>
+   422→   422→            </motion.h1>
+   423→   423→
+   424→   424→            {/* Tagline */}
+   425→   425→            <motion.p
+   426→   426→              initial={{ opacity: 0, y: 10 }}
+   427→   427→              animate={{ opacity: 1, y: 0 }}
+   428→   428→              transition={{ duration: 0.5, delay: 0.3 }}
+   429→   429→              className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed"
+   430→   430→            >
+   431→   431→              {tagline}
+   432→   432→            </motion.p>
+   433→   433→
+   434→   434→            {/* CTA buttons */}
+   435→   435→            <motion.div
+   436→   436→              initial={{ opacity: 0, y: 10 }}
+   437→   437→              animate={{ opacity: 1, y: 0 }}
+   438→   438→              transition={{ duration: 0.5, delay: 0.45 }}
+   439→   439→              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+   440→   440→            >
+   441→   441→              <Button
+   442→   442→                size="lg"
+   443→   443→                onClick={() => setCurrentView('detail')}
+   444→   444→                className="gap-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white border-0 shadow-xl shadow-emerald-500/25 h-12 px-8 text-base font-semibold rounded-full"
+   445→   445→              >
+   446→   446→                Make an Offer
+   447→   447→                <ArrowRight className="size-4" />
+   448→   448→              </Button>
+   449→   449→              {project.websiteUrl && (
+   450→   450→                <Button
+   451→   451→                  size="lg"
+   452→   452→                  variant="outline"
+   453→   453→                  onClick={() => window.open(project.websiteUrl, '_blank', 'noopener,noreferrer')}
+   454→   454→                  className="gap-2.5 border-white/15 text-white/80 hover:bg-white/10 hover:text-white hover:border-white/25 h-12 px-8 text-base font-medium rounded-full bg-white/[0.04]"
+   455→   455→                >
+   456→   456→                  <ExternalLink className="size-4" />
+   457→   457→                  Visit Website
+   458→   458→                </Button>
+   459→   459→              )}
+   460→   460→            </motion.div>
+   461→   461→
+   462→   462→            {/* Quick stats */}
+   463→   463→            <motion.div
+   464→   464→              initial={{ opacity: 0 }}
+   465→   465→              animate={{ opacity: 1 }}
+   466→   466→              transition={{ duration: 0.5, delay: 0.6 }}
+   467→   467→              className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-12 text-sm text-white/40"
+   468→   468→            >
+   469→   469→              {project.monthlyVisitors && (
+   470→   470→                <span className="flex items-center gap-1.5">
+   471→   471→                  <Globe className="size-3.5 text-emerald-500" />
+   472→   472→                  {project.monthlyVisitors.toLocaleString()} monthly visitors
+   473→   473→                </span>
+   474→   474→              )}
+   475→   475→              {project.registeredUsers && (
+   476→   476→                <span className="flex items-center gap-1.5">
+   477→   477→                  <Users className="size-3.5 text-emerald-500" />
+   478→   478→                  {project.registeredUsers.toLocaleString()} users
+   479→   479→                </span>
+   480→   480→              )}
+   481→   481→              {project.annualRevenue && (
+   482→   482→                <span className="flex items-center gap-1.5">
+   483→   483→                  <BarChart3 className="size-3.5 text-emerald-500" />
+   484→   484→                  {formatPKR(project.annualRevenue)} revenue
+   485→   485→                </span>
+   486→   486→              )}
+   487→   487→              {project.expectedROI && (
+   488→   488→                <span className="flex items-center gap-1.5">
+   489→   489→                  <TrendingUp className="size-3.5 text-emerald-500" />
+   490→   490→                  {project.expectedROI}% expected ROI
+   491→   491→                </span>
+   492→   492→              )}
+   493→   493→            </motion.div>
+   494→   494→          </div>
+   495→   495→        </AnimatedSection>
+   496→   496→
+   497→   497→        {/* ============ USE CASES / CATEGORY CARDS ============ */}
+   498→   498→        <AnimatedSection id="use-cases" delay={0.1} className="mb-20 sm:mb-28">
+   499→   499→          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   500→   500→            <div className="text-center mb-10">
+   501→   501→              <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/25 mb-4 text-xs uppercase tracking-widest">
+   502→   502→                <Tag className="size-3 mr-1.5" /> Use Cases
+   503→   503→              </Badge>
+   504→   504→              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+   505→   505→                Perfect For
+   506→   506→              </h2>
+   507→   507→              <p className="text-white/40 max-w-lg mx-auto">
+   508→   508→                This {category.toLowerCase()} listing is ideal for a wide range of applications
+   509→   509→              </p>
+   510→   510→            </div>
+   511→   511→
+   512→   512→            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+   513→   513→              {tags.map((tag, i) => {
+   514→   514→                const Icon = getUseCaseIcon(tag);
+   515→   515→                return (
+   516→   516→                  <motion.div
+   517→   517→                    key={i}
+   518→   518→                    initial={{ opacity: 0, y: 20 }}
+   519→   519→                    whileInView={{ opacity: 1, y: 0 }}
+   520→   520→                    viewport={{ once: true, margin: '-30px' }}
+   521→   521→                    transition={{ duration: 0.4, delay: i * 0.06 }}
+   522→   522→                  >
+   523→   523→                    <Card className="group relative overflow-hidden bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.08] hover:border-emerald-500/30 transition-all duration-300 cursor-default h-full">
+   524→   524→                      <CardContent className="p-4 sm:p-5 flex flex-col items-center text-center gap-3">
+   525→   525→                        <div className="size-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-600/20 flex items-center justify-center group-hover:from-emerald-500/30 group-hover:to-green-600/30 transition-colors">
+   526→   526→                          <Icon className="size-5 text-emerald-400" />
+   527→   527→                        </div>
+   528→   528→                        <span className="text-sm font-medium text-white/80 group-hover:text-white transition-colors leading-tight">
+   529→   529→                          {tag}
+   530→   530→                        </span>
+   531→   531→                      </CardContent>
+   532→   532→                      {/* Hover glow */}
+   533→   533→                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-green-500/0 group-hover:from-emerald-500/5 group-hover:to-green-500/5 transition-all pointer-events-none" />
+   534→   534→                    </Card>
+   535→   535→                  </motion.div>
+   536→   536→                );
+   537→   537→              })}
+   538→   538→            </div>
+   539→   539→          </div>
+   540→   540→        </AnimatedSection>
+   541→   541→
+   542→   542→        {/* ============ WHY CHOOSE / FEATURE CARDS ============ */}
+   543→   543→        <AnimatedSection id="features" delay={0.1} className="mb-20 sm:mb-28">
+   544→   544→          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   545→   545→            <div className="text-center mb-10">
+   546→   546→              <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/25 mb-4 text-xs uppercase tracking-widest">
+   547→   547→                <Award className="size-3 mr-1.5" /> Why Choose
+   548→   548→              </Badge>
+   549→   549→              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+   550→   550→                What Makes This Special
+   551→   551→              </h2>
+   552→   552→              <p className="text-white/40 max-w-lg mx-auto">
+   553→   553→                Key advantages and opportunities with this listing
+   554→   554→              </p>
+   555→   555→            </div>
+   556→   556→
+   557→   557→            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+   558→   558→              {features.map((feature, i) => {
+   559→   559→                const Icon = feature.icon;
+   560→   560→                return (
+   561→   561→                  <motion.div
+   562→   562→                    key={i}
+   563→   563→                    initial={{ opacity: 0, y: 24 }}
+   564→   564→                    whileInView={{ opacity: 1, y: 0 }}
+   565→   565→                    viewport={{ once: true, margin: '-40px' }}
+   566→   566→                    transition={{ duration: 0.5, delay: i * 0.08 }}
+   567→   567→                  >
+   568→   568→                    <Card className="group relative overflow-hidden bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.07] hover:border-white/[0.15] transition-all duration-300 h-full">
+   569→   569→                      <CardContent className="p-6 flex flex-col gap-4">
+   570→   570→                        <div className={`size-12 rounded-2xl bg-gradient-to-br ${feature.accent} opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-lg`}>
+   571→   571→                          <Icon className="size-6 text-white" />
+   572→   572→                        </div>
+   573→   573→                        <div>
+   574→   574→                          <h3 className="text-base font-semibold text-white mb-1.5">
+   575→   575→                            {feature.title}
+   576→   576→                          </h3>
+   577→   577→                          <p className="text-sm text-white/45 leading-relaxed">
+   578→   578→                            {feature.description}
+   579→   579→                          </p>
+   580→   580→                        </div>
+   581→   581→                      </CardContent>
+   582→   582→                    </Card>
+   583→   583→                  </motion.div>
+   584→   584→                );
+   585→   585→              })}
+   586→   586→            </div>
+   587→   587→          </div>
+   588→   588→        </AnimatedSection>
+   589→   589→
+   590→   590→        {/* ============ HOW TO BUY ============ */}
+   591→   591→        <AnimatedSection id="how-to-buy" delay={0.1} className="mb-20 sm:mb-28">
+   592→   592→          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   593→   593→            <div className="text-center mb-12">
+   594→   594→              <Badge className="bg-cyan-500/15 text-cyan-400 border-cyan-500/25 mb-4 text-xs uppercase tracking-widest">
+   595→   595→                <Rocket className="size-3 mr-1.5" /> Process
+   596→   596→              </Badge>
+   597→   597→              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+   598→   598→                How to Buy
+   599→   599→              </h2>
+   600→   600→              <p className="text-white/40 max-w-lg mx-auto">
+   601→   601→                Three simple steps to acquire this listing
+   602→   602→              </p>
+   603→   603→            </div>
+   604→   604→
+   605→   605→            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 relative">
+   606→   606→              {/* Connector line (desktop) */}
+   607→   607→              <div className="hidden md:block absolute top-7 left-[calc(16.67%+1rem)] right-[calc(16.67%+1rem)] h-px bg-gradient-to-r from-emerald-500/30 via-white/10 to-emerald-500/30" />
+   608→   608→
+   609→   609→              {[
+   610→   610→                {
+   611→   611→                  num: 1,
+   612→   612→                  icon: MessageSquare,
+   613→   613→                  title: 'Browse & Inquire',
+   614→   614→                  desc: 'Review the listing details, explore the demo site, and send your initial inquiry through our secure messaging system.',
+   615→   615→                },
+   616→   616→                {
+   617→   617→                  num: 2,
+   618→   618→                  icon: CheckCircle2,
+   619→   619→                  title: 'Negotiate & Agree',
+   620→   620→                  desc: 'Discuss terms, make your offer, and negotiate a fair price with the seller through our escrow-protected platform.',
+   621→   621→                },
+   622→   622→                {
+   623→   623→                  num: 3,
+   624→   624→                  icon: Zap,
+   625→   625→                  title: 'Transfer & Launch',
+   626→   626→                  desc: 'Complete the secure transfer of assets, domain, and source code. Launch your new venture with full seller support.',
+   627→   627→                },
+   628→   628→              ].map((step, i) => {
+   629→   629→                const Icon = step.icon;
+   630→   630→                return (
+   631→   631→                  <motion.div
+   632→   632→                    key={i}
+   633→   633→                    initial={{ opacity: 0, y: 24 }}
+   634→   634→                    whileInView={{ opacity: 1, y: 0 }}
+   635→   635→                    viewport={{ once: true, margin: '-40px' }}
+   636→   636→                    transition={{ duration: 0.5, delay: i * 0.12 }}
+   637→   637→                    className="relative"
+   638→   638→                  >
+   639→   639→                    <Card className="bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.07] hover:border-emerald-500/20 transition-all duration-300 text-center h-full">
+   640→   640→                      <CardContent className="p-6 sm:p-8 flex flex-col items-center gap-4">
+   641→   641→                        <StepBadge num={step.num} />
+   642→   642→                        <div className="size-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+   643→   643→                          <Icon className="size-6 text-emerald-400" />
+   644→   644→                        </div>
+   645→   645→                        <div>
+   646→   646→                          <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
+   647→   647→                          <p className="text-sm text-white/40 leading-relaxed">{step.desc}</p>
+   648→   648→                        </div>
+   649→   649→                        {i < 2 && (
+   650→   650→                          <ChevronRight className="size-5 text-white/20 hidden md:block absolute -right-4 top-8 z-10" />
+   651→   651→                        )}
+   652→   652→                      </CardContent>
+   653→   653→                    </Card>
+   654→   654→                  </motion.div>
+   655→   655→                );
+   656→   656→              })}
+   657→   657→            </div>
+   658→   658→          </div>
+   659→   659→        </AnimatedSection>
+   660→   660→
+   661→   661→        {/* ============ PRICING SECTION ============ */}
+   662→   662→        <AnimatedSection id="pricing" delay={0.1} className="mb-20 sm:mb-28">
+   663→   663→          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   664→   664→            <Card className="relative overflow-hidden bg-gradient-to-br from-white/[0.06] to-white/[0.02] border-white/[0.1]">
+   665→   665→              {/* Glow effect */}
+   666→   666→              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none" />
+   667→   667→
+   668→   668→              <CardContent className="relative p-8 sm:p-12 text-center">
+   669→   669→                <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/25 mb-6 text-xs uppercase tracking-widest">
+   670→   670→                  <DollarSign className="size-3 mr-1.5" /> Pricing
+   671→   671→                </Badge>
+   672→   672→
+   673→   673→                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+   674→   674→                  Investment Overview
+   675→   675→                </h2>
+   676→   676→                <p className="text-white/40 mb-10 max-w-md mx-auto">
+   677→   677→                  Transparent pricing with no hidden fees. Secure your next venture today.
+   678→   678→                </p>
+   679→   679→
+   680→   680→                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-3xl mx-auto mb-10">
+   681→   681→                  {/* Suggested Price */}
+   682→   682→                  <div className="bg-white/[0.04] rounded-2xl p-6 border border-white/[0.06]">
+   683→   683→                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">
+   684→   684→                      Asking Price
+   685→   685→                    </p>
+   686→   686→                    {project.suggestedSellingPrice ? (
+   687→   687→                      <>
+   688→   688→                        <p className="text-3xl sm:text-4xl font-extrabold text-white mb-1">
+   689→   689→                          {formatPKR(project.suggestedSellingPrice)}
+   690→   690→                        </p>
+   691→   691→                        <p className="text-sm text-emerald-400 font-medium">
+   692→   692→                          {formatUSD(project.suggestedSellingPrice)}
+   693→   693→                        </p>
+   694→   694→                      </>
+   695→   695→                    ) : (
+   696→   696→                      <p className="text-xl text-white/30">Contact for Price</p>
+   697→   697→                    )}
+   698→   698→                  </div>
+   699→   699→
+   700→   700→                  {/* Buy Now */}
+   701→   701→                  {project.buyNowPrice && (
+   702→   702→                    <div className="bg-white/[0.04] rounded-2xl p-6 border border-emerald-500/20 relative overflow-hidden">
+   703→   703→                      <div className="absolute top-2 right-2">
+   704→   704→                        <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px] px-2">
+   705→   705→                          Instant
+   706→   706→                        </Badge>
+   707→   707→                      </div>
+   708→   708→                      <p className="text-xs text-white/40 uppercase tracking-wider mb-2">
+   709→   709→                        Buy Now
+   710→   710→                      </p>
+   711→   711→                      <p className="text-3xl sm:text-4xl font-extrabold text-white mb-1">
+   712→   712→                        {formatPKR(project.buyNowPrice)}
+   713→   713→                      </p>
+   714→   714→                      <p className="text-sm text-emerald-400 font-medium">
+   715→   715→                        {formatUSD(project.buyNowPrice)}
+   716→   716→                      </p>
+   717→   717→                    </div>
+   718→   718→                  )}
+   719→   719→
+   720→   720→                  {/* Minimum Offer */}
+   721→   721→                  {project.minimumOffer && (
+   722→   722→                    <div className="bg-white/[0.04] rounded-2xl p-6 border border-white/[0.06]">
+   723→   723→                      <p className="text-xs text-white/40 uppercase tracking-wider mb-2">
+   724→   724→                        Minimum Offer
+   725→   725→                      </p>
+   726→   726→                      <p className="text-3xl sm:text-4xl font-extrabold text-white mb-1">
+   727→   727→                        {formatPKR(project.minimumOffer)}
+   728→   728→                      </p>
+   729→   729→                      <p className="text-sm text-white/40 font-medium">
+   730→   730→                        {formatUSD(project.minimumOffer)}
+   731→   731→                      </p>
+   732→   732→                    </div>
+   733→   733→                  )}
+   734→   734→                </div>
+   735→   735→
+   736→   736→                {/* Additional pricing info */}
+   737→   737→                {project.aiValuation && (
+   738→   738→                  <p className="text-sm text-white/30 mb-8">
+   739→   739→                    AI Valuation: <span className="text-white/50 font-medium">{formatPKR(project.aiValuation)}</span>
+   740→   740→                    {project.expectedROI && (
+   741→   741→                      <> • Expected ROI: <span className="text-emerald-400 font-medium">{project.expectedROI}%</span></>
+   742→   742→                    )}
+   743→   743→                  </p>
+   744→   744→                )}
+   745→   745→
+   746→   746→                {/* CTA */}
+   747→   747→                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+   748→   748→                  <Button
+   749→   749→                    size="lg"
+   750→   750→                    onClick={() => setCurrentView('detail')}
+   751→   751→                    className="gap-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white border-0 shadow-xl shadow-emerald-500/25 h-13 px-10 text-base font-semibold rounded-full"
+   752→   752→                  >
+   753→   753→                    <MessageSquare className="size-5" />
+   754→   754→                    Make an Offer
+   755→   755→                    <ArrowRight className="size-4" />
+   756→   756→                  </Button>
+   757→   757→                  <Button
+   758→   758→                    size="lg"
+   759→   759→                    variant="outline"
+   760→   760→                    className="gap-2.5 border-white/15 text-white/60 hover:bg-white/10 hover:text-white hover:border-white/25 h-13 px-8 text-base rounded-full bg-white/[0.03]"
+   761→   761→                    onClick={() => setCurrentView('detail')}
+   762→   762→                  >
+   763→   763→                    <Heart className="size-4" />
+   764→   764→                    Save & Review Later
+   765→   765→                  </Button>
+   766→   766→                </div>
+   767→   767→
+   768→   768→                {/* Trust badges */}
+   769→   769→                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-10 text-xs text-white/30">
+   770→   770→                  <span className="flex items-center gap-1.5">
+   771→   771→                    <Shield className="size-3.5 text-emerald-500/60" /> Secure Transactions
+   772→   772→                  </span>
+   773→   773→                  <span className="flex items-center gap-1.5">
+   774→   774→                    <Clock className="size-3.5 text-emerald-500/60" /> Fast Transfer
+   775→   775→                  </span>
+   776→   776→                  <span className="flex items-center gap-1.5">
+   777→   777→                    <CheckCircle2 className="size-3.5 text-emerald-500/60" /> Verified Listing
+   778→   778→                  </span>
+   779→   779→                  {project.seller?.verified && (
+   780→   780→                    <span className="flex items-center gap-1.5">
+   781→   781→                      <Award className="size-3.5 text-emerald-500/60" /> Verified Seller
+   782→   782→                    </span>
+   783→   783→                  )}
+   784→   784→                </div>
+   785→   785→              </CardContent>
+   786→   786→            </Card>
+   787→   787→          </div>
+   788→   788→        </AnimatedSection>
+   789→   789→
+   790→   790→        {/* ============ FOOTER ============ */}
+   791→   791→        <AnimatedSection delay={0.05}>
+   792→   792→          <footer className="border-t border-white/[0.06]">
+   793→   793→            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+   794→   794→              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+   795→   795→                <div className="flex items-center gap-3">
+   796→   796→                  <div className="size-8 rounded-lg bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
+   797→   797→                    <Globe className="size-4 text-white" />
+   798→   798→                  </div>
+   799→   799→                  <div>
+   800→   800→                    <span className="font-bold text-white text-sm">MakeThisDeal</span>
+   801→   801→                    <span className="text-white/30 text-xs ml-2">Buy & Sell Businesses</span>
+   802→   802→                  </div>
+   803→   803→                </div>
+   804→   804→
+   805→   805→                <div className="flex items-center gap-2 text-xs text-white/30">
+   806→   806→                  <span>Powered by</span>
+   807→   807→                  <span className="text-emerald-400 font-medium">MakeThisDeal</span>
+   808→   808→                  <span>•</span>
+   809→   809→                  <span>Secure Marketplace</span>
+   810→   810→                </div>
+   811→   811→
+   812→   812→                <Button
+   813→   813→                  variant="ghost"
+   814→   814→                  size="sm"
+   815→   815→                  className="gap-1.5 text-white/40 hover:text-white hover:bg-white/10 text-xs"
+   816→   816→                  onClick={() => setCurrentView('browse')}
+   817→   817→                >
+   818→   818→                  <ArrowLeft className="size-3" />
+   819→   819→                  Back to Marketplace
+   820→   820→                </Button>
+   821→   821→              </div>
+   822→   822→            </div>
+   823→   823→          </footer>
+   824→   824→        </AnimatedSection>
+   825→   825→      </div>
+   826→   826→    </div>
+   827→   827→  );
+   828→   828→}

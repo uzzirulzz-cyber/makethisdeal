@@ -1,0 +1,847 @@
+     1→'use client';
+     2→
+     3→import React, { useEffect, useState, useRef } from 'react';
+     4→import Image from 'next/image';
+     5→import { motion, useInView } from 'framer-motion';
+     6→import {
+     7→  Globe, MapPin, TrendingUp, Shield, Zap, ArrowRight, CheckCircle2,
+     8→  Star, ExternalLink, MessageSquare, Tag, Target, Users, BarChart3,
+     9→  DollarSign, Rocket, ChevronRight, ShoppingCart, Package, Clock,
+    10→  Award, Heart, ArrowLeft,
+    11→} from 'lucide-react';
+    12→import { useAppStore } from '@/store/use-app-store';
+    13→import { getCategoryName } from '@/lib/constants';
+    14→import type { Project } from '@/lib/types';
+    15→import { Button } from '@/components/ui/button';
+    16→import { Card, CardContent } from '@/components/ui/card';
+    17→import { Badge } from '@/components/ui/badge';
+    18→import { Separator } from '@/components/ui/separator';
+    19→import { Skeleton } from '@/components/ui/skeleton';
+    20→
+    21→/* ------------------------------------------------------------------ */
+    22→/*  Helpers                                                           */
+    23→/* ------------------------------------------------------------------ */
+    24→
+    25→const PKR_TO_USD = 278;
+    26→
+    27→function formatPKR(value: number | undefined): string {
+    28→  if (value === undefined || value === null) return '—';
+    29→  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
+    30→  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
+    31→  return `PKR ${value.toLocaleString()}`;
+    32→}
+    33→
+    34→function toUSD(pkr: number): number {
+    35→  return Math.round(pkr / PKR_TO_USD);
+    36→}
+    37→
+    38→function formatUSD(pkr: number | undefined): string {
+    39→  if (pkr === undefined || pkr === null) return '';
+    40→  const u = toUSD(pkr);
+    41→  if (u >= 1_000_000) return `≈ US$ ${(u / 1_000_000).toFixed(1)}M`;
+    42→  if (u >= 1_000) return `≈ US$ ${(u / 1_000).toFixed(1)}K`;
+    43→  return `≈ US$ ${u.toLocaleString()}`;
+    44→}
+    45→
+    46→function getFirstLine(text: string | undefined, fallback: string): string {
+    47→  if (!text) return fallback;
+    48→  const line = text.split('\n')[0].trim();
+    49→  return line.length > 120 ? line.slice(0, 117) + '...' : line;
+    50→}
+    51→
+    52→function generateTagline(project: Project): string {
+    53→  if (project.overview) {
+    54→    const first = project.overview.split('\n')[0].trim();
+    55→    if (first.length > 10) return first.length > 140 ? first.slice(0, 137) + '...' : first;
+    56→  }
+    57→  const cat = getCategoryName(project.category);
+    58→  const name = project.name;
+    59→  const taglines: Record<string, string> = {
+    60→    'SaaS': `${name} — Premium SaaS platform ready to scale your business`,
+    61→    'AI Solutions': `${name} — Next-gen AI-powered solution for modern enterprises`,
+    62→    'E-commerce': `${name} — Your next e-commerce powerhouse, ready to launch`,
+    63→    'Real Estate': `${name} — Premium digital real estate with high growth potential`,
+    64→    'Mobile Apps': `${name} — Feature-rich mobile app with engaged users`,
+    65→    'Startups': `${name} — High-potential startup with proven traction`,
+    66→    'FinTech': `${name} — Innovative financial technology platform`,
+    67→    'HealthTech': `${name} — Transforming healthcare with technology`,
+    68→    'EdTech': `${name} — Education technology for the next generation`,
+    69→    'Cybersecurity': `${name} — Enterprise-grade security solutions`,
+    70→    'Domains': `${name} — Premium domain name with brand-building potential`,
+    71→    'Websites': `${name} — Established website with existing traffic`,
+    72→    'Digital Products': `${name} — Ready-to-use digital product with revenue`,
+    73→  };
+    74→  return taglines[cat] || `${name} — A premium ${cat} opportunity on MakeThisDeal`;
+    75→}
+    76→
+    77→function getTags(project: Project): string[] {
+    78→  if (project.tags) {
+    79→    return project.tags.split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
+    80→  }
+    81→  const tags: string[] = [];
+    82→  if (project.category) tags.push(getCategoryName(project.category));
+    83→  if (project.targetMarket) tags.push(project.targetMarket.split(',')[0]?.trim() || 'Global Market');
+    84→  if (project.businessStage) tags.push(project.businessStage.charAt(0).toUpperCase() + project.businessStage.slice(1));
+    85→  if (project.technologyStack) {
+    86→    project.technologyStack.split(',').slice(0, 3).forEach((t) => tags.push(t.trim()));
+    87→  }
+    88→  return tags.slice(0, 8);
+    89→}
+    90→
+    91→interface FeatureCard {
+    92→  icon: React.ComponentType<{ className?: string }>;
+    93→  title: string;
+    94→  description: string;
+    95→}
+    96→
+    97→function getFeatureCards(project: Project): FeatureCard[] {
+    98→  const cards: FeatureCard[] = [];
+    99→
+   100→  // 1. Competitive Advantage
+   101→  if (project.competitiveAdvantage) {
+   102→    const short = project.competitiveAdvantage.split('\n')[0].trim();
+   103→    cards.push({
+   104→      icon: Shield,
+   105→      title: 'Competitive Edge',
+   106→      description: short.length > 120 ? short.slice(0, 117) + '...' : short,
+   107→    });
+   108→  }
+   109→
+   110→  // 2. Growth Opportunity
+   111→  if (project.growthOpportunity) {
+   112→    const short = project.growthOpportunity.split('\n')[0].trim();
+   113→    cards.push({
+   114→      icon: TrendingUp,
+   115→      title: 'Growth Potential',
+   116→      description: short.length > 120 ? short.slice(0, 117) + '...' : short,
+   117→    });
+   118→  }
+   119→
+   120→  // 3. Target Market
+   121→  if (project.targetMarket) {
+   122→    cards.push({
+   123→      icon: Target,
+   124→      title: 'Target Market',
+   125→      description: project.targetMarket.length > 120
+   126→        ? project.targetMarket.slice(0, 117) + '...'
+   127→        : project.targetMarket,
+   128→    });
+   129→  }
+   130→
+   131→  // 4. Revenue / Business Model
+   132→  if (project.revenueModel) {
+   133→    cards.push({
+   134→      icon: BarChart3,
+   135→      title: 'Revenue Model',
+   136→      description: project.revenueModel.length > 120
+   137→        ? project.revenueModel.slice(0, 117) + '...'
+   138→        : project.revenueModel,
+   139→    });
+   140→  }
+   141→
+   142→  // Fallbacks if not enough
+   143→  if (cards.length < 4) {
+   144→    if (project.monthlyRevenue || project.annualRevenue) {
+   145→      cards.push({
+   146→        icon: DollarSign,
+   147→        title: 'Revenue Generating',
+   148→        description: `This listing shows active revenue with ${project.monthlyRevenue ? formatPKR(project.monthlyRevenue) + '/mo' : formatPKR(project.annualRevenue) + '/yr'}`,
+   149→      });
+   150→    }
+   151→  }
+   152→  if (cards.length < 4) {
+   153→    cards.push({
+   154→      icon: Zap,
+   155→      title: 'Ready to Transfer',
+   156→      description: 'Full documentation and seamless transfer process. Start building from day one.',
+   157→    });
+   158→  }
+   159→  if (cards.length < 4) {
+   160→    cards.push({
+   161→      icon: Users,
+   162→      title: 'Established Presence',
+   163→      description: `${project.registeredUsers || project.customers || project.monthlyActiveUsers ? 'Existing user base with proven traction.' : 'Brand-ready digital asset with growth potential.'}`,
+   164→    });
+   165→  }
+   166→
+   167→  return cards.slice(0, 4);
+   168→}
+   169→
+   170→const USE_CASE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+   171→  saas: Package, 'ai-solutions': Rocket, ecommerce: ShoppingCart,
+   172→  'real-estate': MapPin, 'mobile-apps': Zap, startups: Rocket,
+   173→  fintech: DollarSign, healthtech: Heart, edtech: Star,
+   174→  cybersecurity: Shield, domains: Globe, websites: ExternalLink,
+   175→  'digital-products': Package, manufacturing: Package, retail: ShoppingCart,
+   176→  wholesale: Package, investments: BarChart3, 'crm-erp': BarChart3,
+   177→};
+   178→
+   179→function getUseCaseIcon(tag: string): React.ComponentType<{ className?: string }> {
+   180→  const lower = tag.toLowerCase();
+   181→  for (const [key, icon] of Object.entries(USE_CASE_ICONS)) {
+   182→    if (lower.includes(key) || lower.includes(key.replace('-', ''))) return icon;
+   183→  }
+   184→  return Tag;
+   185→}
+   186→
+   187→/* ------------------------------------------------------------------ */
+   188→/*  Animated section wrapper                                          */
+   189→/* ------------------------------------------------------------------ */
+   190→
+   191→function AnimatedSection({
+   192→  children,
+   193→  className = '',
+   194→  delay = 0,
+   195→  id,
+   196→}: {
+   197→  children: React.ReactNode;
+   198→  className?: string;
+   199→  delay?: number;
+   200→  id?: string;
+   201→}) {
+   202→  const ref = useRef<HTMLDivElement>(null);
+   203→  const inView = useInView(ref, { once: true, margin: '-60px' });
+   204→
+   205→  return (
+   206→    <motion.div
+   207→      ref={ref}
+   208→      id={id}
+   209→      initial={{ opacity: 0, y: 40 }}
+   210→      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+   211→      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+   212→      className={className}
+   213→    >
+   214→      {children}
+   215→    </motion.div>
+   216→  );
+   217→}
+   218→
+   219→/* ------------------------------------------------------------------ */
+   220→/*  Skeleton                                                          */
+   221→/* ------------------------------------------------------------------ */
+   222→
+   223→function StorefrontSkeleton() {
+   224→  return (
+   225→    <div className="min-h-screen bg-[#04070D]">
+   226→      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   227→        <Skeleton className="h-16 w-full mb-6 rounded-xl" />
+   228→        <Skeleton className="h-12 w-full max-w-2xl mx-auto mb-12 rounded-full" />
+   229→        <div className="py-24 text-center space-y-4">
+   230→          <Skeleton className="h-16 w-96 mx-auto" />
+   231→          <Skeleton className="h-6 w-72 mx-auto" />
+   232→          <Skeleton className="h-12 w-48 mx-auto mt-8 rounded-full" />
+   233→        </div>
+   234→        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20">
+   235→          {Array.from({ length: 8 }).map((_, i) => (
+   236→            <Skeleton key={i} className="h-24 rounded-xl" />
+   237→          ))}
+   238→        </div>
+   239→        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+   240→          {Array.from({ length: 4 }).map((_, i) => (
+   241→            <Skeleton key={i} className="h-48 rounded-2xl" />
+   242→          ))}
+   243→        </div>
+   244→        <Skeleton className="h-64 w-full rounded-2xl mb-20" />
+   245→      </div>
+   246→    </div>
+   247→  );
+   248→}
+   249→
+   250→/* ------------------------------------------------------------------ */
+   251→/*  Step Number Badge                                                  */
+   252→/* ------------------------------------------------------------------ */
+   253→
+   254→function StepBadge({ num }: { num: number }) {
+   255→  return (
+   256→    <div className="relative flex items-center justify-center size-14 shrink-0">
+   257→      <div className="absolute inset-0 rounded-full bg-[#0E6BFF] opacity-20" />
+   258→      <div className="relative size-12 rounded-full bg-[#0E6BFF] flex items-center justify-center">
+   259→        <span className="text-lg font-bold text-white">{num}</span>
+   260→      </div>
+   261→    </div>
+   262→  );
+   263→}
+   264→
+   265→/* ------------------------------------------------------------------ */
+   266→/*  Main Component                                                     */
+   267→/* ------------------------------------------------------------------ */
+   268→
+   269→export default function StorefrontPreview() {
+   270→  const { selectedProjectId, setCurrentView } = useAppStore();
+   271→  const [project, setProject] = useState<Project | null>(null);
+   272→  const [loading, setLoading] = useState(true);
+   273→
+   274→  useEffect(() => {
+   275→    if (!selectedProjectId) return;
+   276→    let cancelled = false;
+   277→
+   278→    async function fetchProject() {
+   279→      setLoading(true);
+   280→      try {
+   281→        const res = await fetch(`/api/projects/${selectedProjectId}`);
+   282→        if (res.ok && !cancelled) {
+   283→          const data = await res.json();
+   284→          setProject(data);
+   285→        }
+   286→      } catch {
+   287→        // Silently fail
+   288→      } finally {
+   289→        if (!cancelled) setLoading(false);
+   290→      }
+   291→    }
+   292→
+   293→    fetchProject();
+   294→    return () => { cancelled = true; };
+   295→  }, [selectedProjectId]);
+   296→
+   297→  if (loading) return <StorefrontSkeleton />;
+   298→  if (!project) {
+   299→    return (
+   300→      <div className="min-h-screen bg-[#04070D] flex items-center justify-center">
+   301→        <div className="text-center space-y-4">
+   302→          <p className="text-white/60">Project not found.</p>
+   303→          <Button
+   304→            variant="outline"
+   305→            className="gap-2 text-white/80 border-white/20 hover:bg-white/10 hover:text-white hover:border-[#0E6BFF]/50"
+   306→            onClick={() => setCurrentView('browse')}
+   307→          >
+   308→            <ArrowLeft className="size-4" /> Back to Marketplace
+   309→          </Button>
+   310→        </div>
+   311→      </div>
+   312→    );
+   313→  }
+   314→
+   315→  const tagline = generateTagline(project);
+   316→  const tags = getTags(project);
+   317→  const features = getFeatureCards(project);
+   318→  const brandName = project.name;
+   319→  const category = getCategoryName(project.category);
+   320→  const country = project.country || 'Global';
+   321→  const hasThumbnail = !!project.thumbnail;
+   322→
+   323→  return (
+   324→    <div className="min-h-screen bg-[#04070D] text-[#F5F7FA] overflow-x-hidden">
+   325→      {/* ============ GRADIENT OVERLAY ============ */}
+   326→      <div className="fixed inset-0 pointer-events-none">
+   327→        <div className="absolute inset-0 bg-gradient-to-b from-[#04070D] via-[#060B14] to-[#04070D]" />
+   328→        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#0E6BFF]/10 rounded-full blur-[120px]" />
+   329→        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-[#3B82F6]/5 rounded-full blur-[100px]" />
+   330→      </div>
+   331→
+   332→      <div className="relative z-10">
+   333→        {/* ============ HEADER ============ */}
+   334→        <AnimatedSection>
+   335→          <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#04070D]/80 border-b border-white/[0.06]">
+   336→            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   337→              <div className="flex items-center justify-between h-16">
+   338→                {/* Logo */}
+   339→                <div className="flex items-center gap-3">
+   340→                  <Button
+   341→                    variant="outline"
+   342→                    size="sm"
+   343→                    className="gap-1.5 text-[#8B95A8] border-white/[0.08] hover:text-[#F5F7FA] hover:bg-white/[0.05] hover:border-[#0E6BFF]/40 -ml-2 mr-1 transition-colors"
+   344→                    onClick={() => setCurrentView('browse')}
+   345→                  >
+   346→                    <ArrowLeft className="size-4" />
+   347→                    <span className="hidden sm:inline">Marketplace</span>
+   348→                  </Button>
+   349→                  <Separator orientation="vertical" className="h-6 bg-white/[0.06] mx-1 hidden sm:block" />
+   350→                  <div className="flex items-center gap-2">
+   351→                    <div className="size-8 rounded-lg bg-gradient-to-br from-[#0E6BFF] to-[#3B82F6] flex items-center justify-center">
+   352→                      <Globe className="size-4 text-white" />
+   353→                    </div>
+   354→                    <span className="font-bold text-[#F5F7FA] text-sm sm:text-base tracking-tight truncate max-w-[160px] sm:max-w-none">
+   355→                      {brandName}
+   356→                    </span>
+   357→                  </div>
+   358→                </div>
+   359→
+   360→                {/* Nav links (desktop) */}
+   361→                <nav className="hidden md:flex items-center gap-6 text-sm text-[#8B95A8]">
+   362→                  <a href="#use-cases" className="hover:text-[#F5F7FA] transition-colors">Use Cases</a>
+   363→                  <a href="#features" className="hover:text-[#F5F7FA] transition-colors">Why Choose</a>
+   364→                  <a href="#how-to-buy" className="hover:text-[#F5F7FA] transition-colors">How to Buy</a>
+   365→                  <a href="#pricing" className="hover:text-[#F5F7FA] transition-colors">Pricing</a>
+   366→                </nav>
+   367→
+   368→                {/* CTA */}
+   369→                <Button
+   370→                  onClick={() => setCurrentView('detail')}
+   371→                  className="btn-enterprise gap-2"
+   372→                >
+   373→                  <MessageSquare className="size-4" />
+   374→                  <span className="hidden sm:inline">Make an Offer</span>
+   375→                </Button>
+   376→              </div>
+   377→            </div>
+   378→          </header>
+   379→        </AnimatedSection>
+   380→
+   381→        {/* ============ LOCATION / TAGLINE BAR ============ */}
+   382→        <AnimatedSection delay={0.1}>
+   383→          <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-6">
+   384→            <div className="inline-flex items-center gap-3 bg-white/[0.03] border border-white/[0.06] rounded-full px-5 py-2.5 backdrop-blur-sm">
+   385→              <MapPin className="size-4 text-[#0E6BFF] shrink-0" />
+   386→              <span className="text-sm text-[#8B95A8]">{country}{project.city ? ` • ${project.city}` : ''}</span>
+   387→              <Separator orientation="vertical" className="h-4 bg-white/[0.06]" />
+   388→              <Badge className="bg-[#0E6BFF]/15 text-[#3B82F6] border-[#0E6BFF]/25 text-xs hover:bg-[#0E6BFF]/25">
+   389→                {category}
+   390→              </Badge>
+   391→              {project.featured && (
+   392→                <>
+   393→                  <Separator orientation="vertical" className="h-4 bg-white/[0.06]" />
+   394→                  <Badge className="bg-amber-500/15 text-amber-300 border-amber-500/25 text-xs hover:bg-amber-500/25 gap-1">
+   395→                    <Star className="size-3 fill-current" /> Featured
+   396→                  </Badge>
+   397→                </>
+   398→              )}
+   399→            </div>
+   400→          </div>
+   401→        </AnimatedSection>
+   402→
+   403→        {/* ============ HERO SECTION ============ */}
+   404→        <AnimatedSection delay={0.15} className="mt-16 sm:mt-24 mb-20 sm:mb-28">
+   405→          <div className="hero-gradient animated-bg relative overflow-hidden">
+   406→            {/* Grid pattern overlay */}
+   407→            <div className="grid-pattern pointer-events-none absolute inset-0" />
+   408→
+   409→            {/* Decorative gradient orbs */}
+   410→            <div className="pointer-events-none absolute -top-40 right-0 h-[500px] w-[500px] rounded-full bg-[#0E6BFF]/[0.06] blur-[100px]" />
+   411→            <div className="pointer-events-none absolute -bottom-40 -left-20 h-[400px] w-[400px] rounded-full bg-[#3B82F6]/[0.04] blur-[80px]" />
+   412→
+   413→            <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+   414→              <div className="flex flex-col items-center text-center">
+   415→                {/* Thumbnail image */}
+   416→                {hasThumbnail && (
+   417→                  <motion.div
+   418→                    initial={{ opacity: 0, scale: 0.9 }}
+   419→                    animate={{ opacity: 1, scale: 1 }}
+   420→                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+   421→                    className="relative w-full max-w-3xl aspect-video rounded-2xl overflow-hidden border border-white/[0.08] mb-10 shadow-2xl shadow-[#0E6BFF]/10"
+   422→                  >
+   423→                    <Image
+   424→                      src={project.thumbnail!}
+   425→                      alt={brandName}
+   426→                      fill
+   427→                      className="object-cover"
+   428→                      priority
+   429→                    />
+   430→                    <div className="absolute inset-0 bg-gradient-to-t from-[#04070D]/60 via-transparent to-transparent" />
+   431→                  </motion.div>
+   432→                )}
+   433→
+   434→                {/* Brand name */}
+   435→                <motion.h1
+   436→                  initial={{ opacity: 0, scale: 0.95 }}
+   437→                  animate={{ opacity: 1, scale: 1 }}
+   438→                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+   439→                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[0.95] mb-6"
+   440→                >
+   441→                  <span className="gradient-text">
+   442→                    {brandName}
+   443→                  </span>
+   444→                </motion.h1>
+   445→
+   446→                {/* Tagline */}
+   447→                <motion.p
+   448→                  initial={{ opacity: 0, y: 10 }}
+   449→                  animate={{ opacity: 1, y: 0 }}
+   450→                  transition={{ duration: 0.5, delay: 0.3 }}
+   451→                  className="text-lg sm:text-xl text-[#8B95A8] max-w-2xl mx-auto mb-10 leading-relaxed"
+   452→                >
+   453→                  {tagline}
+   454→                </motion.p>
+   455→
+   456→                {/* CTA buttons */}
+   457→                <motion.div
+   458→                  initial={{ opacity: 0, y: 10 }}
+   459→                  animate={{ opacity: 1, y: 0 }}
+   460→                  transition={{ duration: 0.5, delay: 0.45 }}
+   461→                  className="flex flex-col sm:flex-row items-center justify-center gap-4"
+   462→                >
+   463→                  <Button
+   464→                    size="lg"
+   465→                    onClick={() => setCurrentView('detail')}
+   466→                    className="btn-enterprise gap-2.5 h-12 px-8 text-base font-semibold rounded-full"
+   467→                  >
+   468→                    Make an Offer
+   469→                    <ArrowRight className="size-4" />
+   470→                  </Button>
+   471→                  {project.websiteUrl && (
+   472→                    <Button
+   473→                      size="lg"
+   474→                      variant="outline"
+   475→                      onClick={() => window.open(project.websiteUrl, '_blank', 'noopener,noreferrer')}
+   476→                      className="gap-2.5 border-white/[0.08] text-[#8B95A8] hover:bg-white/[0.05] hover:text-[#F5F7FA] hover:border-[#0E6BFF]/40 h-12 px-8 text-base font-medium rounded-full bg-white/[0.03] transition-colors"
+   477→                    >
+   478→                      <ExternalLink className="size-4" />
+   479→                      Visit Website
+   480→                    </Button>
+   481→                  )}
+   482→                </motion.div>
+   483→
+   484→                {/* Quick stats */}
+   485→                <motion.div
+   486→                  initial={{ opacity: 0 }}
+   487→                  animate={{ opacity: 1 }}
+   488→                  transition={{ duration: 0.5, delay: 0.6 }}
+   489→                  className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-12 text-sm text-[#8B95A8]"
+   490→                >
+   491→                  {project.monthlyVisitors && (
+   492→                    <span className="flex items-center gap-1.5">
+   493→                      <Globe className="size-3.5 text-[#0E6BFF]" />
+   494→                      {project.monthlyVisitors.toLocaleString()} monthly visitors
+   495→                    </span>
+   496→                  )}
+   497→                  {project.registeredUsers && (
+   498→                    <span className="flex items-center gap-1.5">
+   499→                      <Users className="size-3.5 text-[#0E6BFF]" />
+   500→                      {project.registeredUsers.toLocaleString()} users
+   501→                    </span>
+   502→                  )}
+   503→                  {project.annualRevenue && (
+   504→                    <span className="flex items-center gap-1.5">
+   505→                      <BarChart3 className="size-3.5 text-[#0E6BFF]" />
+   506→                      {formatPKR(project.annualRevenue)} revenue
+   507→                    </span>
+   508→                  )}
+   509→                  {project.expectedROI && (
+   510→                    <span className="flex items-center gap-1.5">
+   511→                      <TrendingUp className="size-3.5 text-[#0E6BFF]" />
+   512→                      {project.expectedROI}% expected ROI
+   513→                    </span>
+   514→                  )}
+   515→                </motion.div>
+   516→              </div>
+   517→            </div>
+   518→          </div>
+   519→        </AnimatedSection>
+   520→
+   521→        {/* ============ USE CASES / CATEGORY CARDS ============ */}
+   522→        <AnimatedSection id="use-cases" delay={0.1} className="mb-20 sm:mb-28">
+   523→          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   524→            <div className="text-center mb-10">
+   525→              <Badge className="bg-[#0E6BFF]/15 text-[#3B82F6] border-[#0E6BFF]/25 mb-4 text-xs uppercase tracking-widest">
+   526→                <Tag className="size-3 mr-1.5" /> Use Cases
+   527→              </Badge>
+   528→              <h2 className="text-3xl sm:text-4xl font-bold text-[#F5F7FA] mb-3">
+   529→                Perfect For
+   530→              </h2>
+   531→              <p className="text-[#8B95A8] max-w-lg mx-auto">
+   532→                This {category.toLowerCase()} listing is ideal for a wide range of applications
+   533→              </p>
+   534→            </div>
+   535→
+   536→            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+   537→              {tags.map((tag, i) => {
+   538→                const Icon = getUseCaseIcon(tag);
+   539→                return (
+   540→                  <motion.div
+   541→                    key={i}
+   542→                    initial={{ opacity: 0, y: 20 }}
+   543→                    whileInView={{ opacity: 1, y: 0 }}
+   544→                    viewport={{ once: true, margin: '-30px' }}
+   545→                    transition={{ duration: 0.4, delay: i * 0.06 }}
+   546→                  >
+   547→                    <div className="glass-card group relative overflow-hidden hover:blue-glow cursor-default h-full transition-all duration-300">
+   548→                      <CardContent className="p-4 sm:p-5 flex flex-col items-center text-center gap-3">
+   549→                        <div className="size-10 rounded-xl bg-[#0E6BFF]/10 flex items-center justify-center group-hover:bg-[#0E6BFF]/20 transition-colors">
+   550→                          <Icon className="size-5 text-[#3B82F6]" />
+   551→                        </div>
+   552→                        <span className="text-sm font-medium text-[#8B95A8] group-hover:text-[#F5F7FA] transition-colors leading-tight">
+   553→                          {tag}
+   554→                        </span>
+   555→                      </CardContent>
+   556→                    </div>
+   557→                  </motion.div>
+   558→                );
+   559→              })}
+   560→            </div>
+   561→          </div>
+   562→        </AnimatedSection>
+   563→
+   564→        {/* ============ WHY CHOOSE / FEATURE CARDS ============ */}
+   565→        <AnimatedSection id="features" delay={0.1} className="mb-20 sm:mb-28">
+   566→          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   567→            <div className="text-center mb-10">
+   568→              <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/25 mb-4 text-xs uppercase tracking-widest">
+   569→                <Award className="size-3 mr-1.5" /> Why Choose
+   570→              </Badge>
+   571→              <h2 className="text-3xl sm:text-4xl font-bold text-[#F5F7FA] mb-3">
+   572→                What Makes This Special
+   573→              </h2>
+   574→              <p className="text-[#8B95A8] max-w-lg mx-auto">
+   575→                Key advantages and opportunities with this listing
+   576→              </p>
+   577→            </div>
+   578→
+   579→            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+   580→              {features.map((feature, i) => {
+   581→                const Icon = feature.icon;
+   582→                return (
+   583→                  <motion.div
+   584→                    key={i}
+   585→                    initial={{ opacity: 0, y: 24 }}
+   586→                    whileInView={{ opacity: 1, y: 0 }}
+   587→                    viewport={{ once: true, margin: '-40px' }}
+   588→                    transition={{ duration: 0.5, delay: i * 0.08 }}
+   589→                  >
+   590→                    <div className="glass-card group hover:blue-glow transition-all duration-300 h-full">
+   591→                      <CardContent className="p-6 flex flex-col gap-4">
+   592→                        <div className="size-12 rounded-2xl bg-gradient-to-br from-[#0E6BFF] to-[#3B82F6] opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-lg shadow-[#0E6BFF]/20">
+   593→                          <Icon className="size-6 text-white" />
+   594→                        </div>
+   595→                        <div>
+   596→                          <h3 className="text-base font-semibold text-[#F5F7FA] mb-1.5">
+   597→                            {feature.title}
+   598→                          </h3>
+   599→                          <p className="text-sm text-[#8B95A8] leading-relaxed">
+   600→                            {feature.description}
+   601→                          </p>
+   602→                        </div>
+   603→                      </CardContent>
+   604→                    </div>
+   605→                  </motion.div>
+   606→                );
+   607→              })}
+   608→            </div>
+   609→          </div>
+   610→        </AnimatedSection>
+   611→
+   612→        {/* ============ HOW TO BUY ============ */}
+   613→        <AnimatedSection id="how-to-buy" delay={0.1} className="mb-20 sm:mb-28">
+   614→          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   615→            <div className="text-center mb-12">
+   616→              <Badge className="bg-[#0E6BFF]/15 text-[#3B82F6] border-[#0E6BFF]/25 mb-4 text-xs uppercase tracking-widest">
+   617→                <Rocket className="size-3 mr-1.5" /> Process
+   618→              </Badge>
+   619→              <h2 className="text-3xl sm:text-4xl font-bold text-[#F5F7FA] mb-3">
+   620→                How to Buy
+   621→              </h2>
+   622→              <p className="text-[#8B95A8] max-w-lg mx-auto">
+   623→                Three simple steps to acquire this listing
+   624→              </p>
+   625→            </div>
+   626→
+   627→            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 relative">
+   628→              {/* Connector line (desktop) */}
+   629→              <div className="hidden md:block absolute top-7 left-[calc(16.67%+1rem)] right-[calc(16.67%+1rem)] h-px bg-gradient-to-r from-[#0E6BFF]/30 via-white/[0.06] to-[#0E6BFF]/30" />
+   630→
+   631→              {[
+   632→                {
+   633→                  num: 1,
+   634→                  icon: MessageSquare,
+   635→                  title: 'Browse & Inquire',
+   636→                  desc: 'Review the listing details, explore the demo site, and send your initial inquiry through our secure messaging system.',
+   637→                },
+   638→                {
+   639→                  num: 2,
+   640→                  icon: CheckCircle2,
+   641→                  title: 'Negotiate & Agree',
+   642→                  desc: 'Discuss terms, make your offer, and negotiate a fair price with the seller through our escrow-protected platform.',
+   643→                },
+   644→                {
+   645→                  num: 3,
+   646→                  icon: Zap,
+   647→                  title: 'Transfer & Launch',
+   648→                  desc: 'Complete the secure transfer of assets, domain, and source code. Launch your new venture with full seller support.',
+   649→                },
+   650→              ].map((step, i) => {
+   651→                const Icon = step.icon;
+   652→                return (
+   653→                  <motion.div
+   654→                    key={i}
+   655→                    initial={{ opacity: 0, y: 24 }}
+   656→                    whileInView={{ opacity: 1, y: 0 }}
+   657→                    viewport={{ once: true, margin: '-40px' }}
+   658→                    transition={{ duration: 0.5, delay: i * 0.12 }}
+   659→                    className="relative"
+   660→                  >
+   661→                    <div className="glass-card text-center h-full transition-all duration-300">
+   662→                      <CardContent className="p-6 sm:p-8 flex flex-col items-center gap-4">
+   663→                        <StepBadge num={step.num} />
+   664→                        <div className="size-12 rounded-2xl bg-[#0E6BFF]/10 flex items-center justify-center">
+   665→                          <Icon className="size-6 text-[#3B82F6]" />
+   666→                        </div>
+   667→                        <div>
+   668→                          <h3 className="text-lg font-semibold text-[#F5F7FA] mb-2">{step.title}</h3>
+   669→                          <p className="text-sm text-[#8B95A8] leading-relaxed">{step.desc}</p>
+   670→                        </div>
+   671→                        {i < 2 && (
+   672→                          <ChevronRight className="size-5 text-white/20 hidden md:block absolute -right-4 top-8 z-10" />
+   673→                        )}
+   674→                      </CardContent>
+   675→                    </div>
+   676→                  </motion.div>
+   677→                );
+   678→              })}
+   679→            </div>
+   680→          </div>
+   681→        </AnimatedSection>
+   682→
+   683→        {/* ============ PRICING SECTION ============ */}
+   684→        <AnimatedSection id="pricing" delay={0.1} className="mb-20 sm:mb-28">
+   685→          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+   686→            <div className="stat-gradient blue-glow-strong relative overflow-hidden">
+   687→              <CardContent className="relative p-8 sm:p-12 text-center">
+   688→                <Badge className="bg-[#0E6BFF]/20 text-[#3B82F6] border-[#0E6BFF]/30 mb-6 text-xs uppercase tracking-widest">
+   689→                  <DollarSign className="size-3 mr-1.5" /> Pricing
+   690→                </Badge>
+   691→
+   692→                <h2 className="text-3xl sm:text-4xl font-bold text-[#F5F7FA] mb-2">
+   693→                  Investment Overview
+   694→                </h2>
+   695→                <p className="text-[#8B95A8] mb-10 max-w-md mx-auto">
+   696→                  Transparent pricing with no hidden fees. Secure your next venture today.
+   697→                </p>
+   698→
+   699→                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-3xl mx-auto mb-10">
+   700→                  {/* Suggested Price */}
+   701→                  <div className="bg-white/[0.03] rounded-2xl p-6 border border-white/[0.06]">
+   702→                    <p className="text-xs text-[#8B95A8] uppercase tracking-wider mb-2">
+   703→                      Asking Price
+   704→                    </p>
+   705→                    {project.suggestedSellingPrice ? (
+   706→                      <>
+   707→                        <p className="text-3xl sm:text-4xl font-extrabold gradient-text mb-1">
+   708→                          {formatPKR(project.suggestedSellingPrice)}
+   709→                        </p>
+   710→                        <p className="text-sm text-[#3B82F6] font-medium">
+   711→                          {formatUSD(project.suggestedSellingPrice)}
+   712→                        </p>
+   713→                      </>
+   714→                    ) : (
+   715→                      <p className="text-xl text-[#8B95A8]">Contact for Price</p>
+   716→                    )}
+   717→                  </div>
+   718→
+   719→                  {/* Buy Now */}
+   720→                  {project.buyNowPrice && (
+   721→                    <div className="bg-white/[0.03] rounded-2xl p-6 border border-[#0E6BFF]/20 relative overflow-hidden">
+   722→                      <div className="absolute top-2 right-2">
+   723→                        <Badge className="bg-[#0E6BFF]/20 text-[#3B82F6] border-[#0E6BFF]/30 text-[10px] px-2">
+   724→                          Instant
+   725→                        </Badge>
+   726→                      </div>
+   727→                      <p className="text-xs text-[#8B95A8] uppercase tracking-wider mb-2">
+   728→                        Buy Now
+   729→                      </p>
+   730→                      <p className="text-3xl sm:text-4xl font-extrabold gradient-text mb-1">
+   731→                        {formatPKR(project.buyNowPrice)}
+   732→                      </p>
+   733→                      <p className="text-sm text-[#3B82F6] font-medium">
+   734→                        {formatUSD(project.buyNowPrice)}
+   735→                      </p>
+   736→                    </div>
+   737→                  )}
+   738→
+   739→                  {/* Minimum Offer */}
+   740→                  {project.minimumOffer && (
+   741→                    <div className="bg-white/[0.03] rounded-2xl p-6 border border-white/[0.06]">
+   742→                      <p className="text-xs text-[#8B95A8] uppercase tracking-wider mb-2">
+   743→                        Minimum Offer
+   744→                      </p>
+   745→                      <p className="text-3xl sm:text-4xl font-extrabold text-[#F5F7FA] mb-1">
+   746→                        {formatPKR(project.minimumOffer)}
+   747→                      </p>
+   748→                      <p className="text-sm text-[#8B95A8] font-medium">
+   749→                        {formatUSD(project.minimumOffer)}
+   750→                      </p>
+   751→                    </div>
+   752→                  )}
+   753→                </div>
+   754→
+   755→                {/* Additional pricing info */}
+   756→                {project.aiValuation && (
+   757→                  <p className="text-sm text-[#8B95A8] mb-8">
+   758→                    AI Valuation: <span className="text-[#F5F7FA]/80 font-medium">{formatPKR(project.aiValuation)}</span>
+   759→                    {project.expectedROI && (
+   760→                      <> • Expected ROI: <span className="text-[#3B82F6] font-medium">{project.expectedROI}%</span></>
+   761→                    )}
+   762→                  </p>
+   763→                )}
+   764→
+   765→                {/* CTA */}
+   766→                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+   767→                  <Button
+   768→                    size="lg"
+   769→                    onClick={() => setCurrentView('detail')}
+   770→                    className="btn-enterprise gap-2.5 h-13 px-10 text-base font-semibold rounded-full"
+   771→                  >
+   772→                    <MessageSquare className="size-5" />
+   773→                    Make an Offer
+   774→                    <ArrowRight className="size-4" />
+   775→                  </Button>
+   776→                  <Button
+   777→                    size="lg"
+   778→                    variant="outline"
+   779→                    className="gap-2.5 border-white/[0.08] text-[#8B95A8] hover:bg-white/[0.05] hover:text-[#F5F7FA] hover:border-[#0E6BFF]/40 h-13 px-8 text-base rounded-full bg-white/[0.03] transition-colors"
+   780→                    onClick={() => setCurrentView('detail')}
+   781→                  >
+   782→                    <Heart className="size-4" />
+   783→                    Save & Review Later
+   784→                  </Button>
+   785→                </div>
+   786→
+   787→                {/* Trust badges */}
+   788→                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-10 text-xs text-[#8B95A8]">
+   789→                  <span className="flex items-center gap-1.5 border border-white/[0.06] bg-white/[0.03] rounded-full px-3 py-1.5">
+   790→                    <Shield className="size-3.5 text-[#0E6BFF]/70" /> Secure Transactions
+   791→                  </span>
+   792→                  <span className="flex items-center gap-1.5 border border-white/[0.06] bg-white/[0.03] rounded-full px-3 py-1.5">
+   793→                    <Clock className="size-3.5 text-[#0E6BFF]/70" /> Fast Transfer
+   794→                  </span>
+   795→                  <span className="flex items-center gap-1.5 border border-white/[0.06] bg-white/[0.03] rounded-full px-3 py-1.5">
+   796→                    <CheckCircle2 className="size-3.5 text-[#0E6BFF]/70" /> Verified Listing
+   797→                  </span>
+   798→                  {project.seller?.verified && (
+   799→                    <span className="flex items-center gap-1.5 border border-white/[0.06] bg-white/[0.03] rounded-full px-3 py-1.5">
+   800→                      <Award className="size-3.5 text-[#0E6BFF]/70" /> Verified Seller
+   801→                    </span>
+   802→                  )}
+   803→                </div>
+   804→              </CardContent>
+   805→            </div>
+   806→          </div>
+   807→        </AnimatedSection>
+   808→
+   809→        {/* ============ FOOTER ============ */}
+   810→        <AnimatedSection delay={0.05}>
+   811→          <footer className="bg-[#060B14] border-t border-white/[0.06]">
+   812→            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+   813→              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+   814→                <div className="flex items-center gap-3">
+   815→                  <div className="size-8 rounded-lg bg-gradient-to-br from-[#0E6BFF] to-[#3B82F6] flex items-center justify-center">
+   816→                    <Globe className="size-4 text-white" />
+   817→                  </div>
+   818→                  <div>
+   819→                    <span className="font-bold text-[#F5F7FA] text-sm">MakeThisDeal</span>
+   820→                    <span className="text-[#8B95A8] text-xs ml-2">Together We Grow Strong</span>
+   821→                  </div>
+   822→                </div>
+   823→
+   824→                <div className="flex items-center gap-2 text-xs text-[#8B95A8]">
+   825→                  <span>Powered by</span>
+   826→                  <span className="text-[#3B82F6] font-medium">www.makethisdeal.biz</span>
+   827→                  <span>•</span>
+   828→                  <span>Secure Marketplace</span>
+   829→                </div>
+   830→
+   831→                <Button
+   832→                  variant="outline"
+   833→                  size="sm"
+   834→                  className="gap-1.5 text-[#8B95A8] hover:text-[#F5F7FA] hover:bg-white/[0.05] hover:border-[#0E6BFF]/40 text-xs border-white/[0.08] transition-colors"
+   835→                  onClick={() => setCurrentView('browse')}
+   836→                >
+   837→                  <ArrowLeft className="size-3" />
+   838→                  Back to Marketplace
+   839→                </Button>
+   840→              </div>
+   841→            </div>
+   842→          </footer>
+   843→        </AnimatedSection>
+   844→      </div>
+   845→    </div>
+   846→  );
+   847→}
