@@ -1,26 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { findStaticProject } from '@/lib/static-products';
 
+/**
+ * GET /api/projects/[id] — serves from static in-memory data.
+ * No database dependency — works on Vercel serverless.
+ */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const project = await db.project.findUnique({
-      where: { id },
-      include: {
-        seller: { select: { id: true, name: true, company: true, country: true, avatar: true, verified: true, bio: true } },
-        _count: { select: { offers: true, favorites: true } },
-        offers: {
-          take: 5,
-          orderBy: { createdAt: 'desc' },
-          include: {
-            buyer: { select: { id: true, name: true, company: true, avatar: true, verified: true } },
-          },
-        },
-      },
-    });
+    const project = findStaticProject(id);
 
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
@@ -32,35 +23,39 @@ export async function GET(
   }
 }
 
+/**
+ * PUT /api/projects/[id] — disabled on Vercel (no DB).
+ */
 export async function PUT(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
-    const body = await request.json();
-    const project = await db.project.update({
-      where: { id },
-      data: body,
-      include: {
-        seller: { select: { id: true, name: true, company: true, country: true, avatar: true, verified: true } },
-      },
-    });
-    return NextResponse.json(project);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const { id } = await params;
+  const project = findStaticProject(id);
+  if (!project) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
+  return NextResponse.json({
+    message: 'Product updates via API are disabled. Edit src/lib/static-products.ts to update products.',
+    status: 'info',
+    project,
+  });
 }
 
+/**
+ * DELETE /api/projects/[id] — disabled on Vercel (no DB).
+ */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
-    await db.project.delete({ where: { id } });
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const { id } = await params;
+  const project = findStaticProject(id);
+  if (!project) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
+  return NextResponse.json({
+    message: 'Product deletion via API is disabled. Edit src/lib/static-products.ts to remove products.',
+    status: 'info',
+  });
 }

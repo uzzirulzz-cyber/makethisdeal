@@ -1,0 +1,1253 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useCallback } from 'react';
+     4→import { motion, AnimatePresence } from 'framer-motion';
+     5→import {
+     6→  Briefcase,
+     7→  Heart,
+     8→  TrendingUp,
+     9→  DollarSign,
+    10→  FolderOpen,
+    11→  Send,
+    12→  Sparkles,
+    13→  Pencil,
+    14→  Trash2,
+    15→  ArrowRight,
+    16→  Eye,
+    17→  Clock,
+    18→  CheckCircle2,
+    19→  XCircle,
+    20→  Loader2,
+    21→  Search,
+    22→  PackageOpen,
+    23→  LayoutGrid,
+    24→  BarChart3,
+    25→  Calculator,
+    26→  Star,
+    27→  AlertCircle,
+    28→} from 'lucide-react';
+    29→import { useAppStore } from '@/store/use-app-store';
+    30→import { useCurrency } from '@/hooks/use-currency';
+    31→import { CATEGORIES, BUSINESS_STAGES, COUNTRIES, TECHNOLOGY_STACKS, CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
+    32→import type { Project, Offer, ProjectStatus, OfferStatus } from '@/lib/types';
+    33→
+    34→import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+    35→import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+    36→import { Badge } from '@/components/ui/badge';
+    37→import { Button } from '@/components/ui/button';
+    38→import { Input } from '@/components/ui/input';
+    39→import { Label } from '@/components/ui/label';
+    40→import { Textarea } from '@/components/ui/textarea';
+    41→import { Separator } from '@/components/ui/separator';
+    42→import { Progress } from '@/components/ui/progress';
+    43→import { Skeleton } from '@/components/ui/skeleton';
+    44→import {
+    45→  Select,
+    46→  SelectContent,
+    47→  SelectItem,
+    48→  SelectTrigger,
+    49→  SelectValue,
+    50→} from '@/components/ui/select';
+    51→import {
+    52→  AlertDialog,
+    53→  AlertDialogAction,
+    54→  AlertDialogCancel,
+    55→  AlertDialogContent,
+    56→  AlertDialogDescription,
+    57→  AlertDialogFooter,
+    58→  AlertDialogHeader,
+    59→  AlertDialogTitle,
+    60→} from '@/components/ui/alert-dialog';
+    61→
+    62→// ---------------------------------------------------------------------------
+    63→// Types
+    64→// ---------------------------------------------------------------------------
+    65→
+    66→interface ValuationResult {
+    67→  estimatedValue: number;
+    68→  recommendedPrice: number;
+    69→  investorPrice: number;
+    70→  wholesalePrice: number;
+    71→  acquisitionPrice: number;
+    72→  confidenceScore: number;
+    73→  valuationDetails: string;
+    74→  keyFactors: string[];
+    75→}
+    76→
+    77→interface ValuationForm {
+    78→  projectName: string;
+    79→  category: string;
+    80→  industry: string;
+    81→  country: string;
+    82→  businessStage: string;
+    83→  annualRevenue: string;
+    84→  monthlyRevenue: string;
+    85→  netProfit: string;
+    86→  ebitda: string;
+    87→  totalInvestment: string;
+    88→  monthlyVisitors: string;
+    89→  registeredUsers: string;
+    90→  customers: string;
+    91→  subscribers: string;
+    92→  technologyStack: string;
+    93→  competitiveAdvantage: string;
+    94→  growthOpportunity: string;
+    95→}
+    96→
+    97→// ---------------------------------------------------------------------------
+    98→// Helpers
+    99→// ---------------------------------------------------------------------------
+   100→
+   101→// formatCurrency is replaced by useCurrency().formatPrice()
+   102→
+   103→const formatDate = (dateStr: string) => {
+   104→  const d = new Date(dateStr);
+   105→  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+   106→};
+   107→
+   108→const statusConfig: Record<
+   109→  ProjectStatus,
+   110→  { label: string; className: string }
+   111→> = {
+   112→  active: {
+   113→    label: 'Active',
+   114→    className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+   115→  },
+   116→  sold: {
+   117→    label: 'Sold',
+   118→    className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+   119→  },
+   120→  paused: {
+   121→    label: 'Paused',
+   122→    className: 'bg-gray-100 text-gray-600 dark:bg-gray-800/40 dark:text-gray-400 border-gray-200 dark:border-gray-700',
+   123→  },
+   124→  draft: {
+   125→    label: 'Draft',
+   126→    className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+   127→  },
+   128→};
+   129→
+   130→const offerStatusConfig: Record<
+   131→  OfferStatus,
+   132→  { label: string; icon: typeof Clock; className: string }
+   133→> = {
+   134→  pending: {
+   135→    label: 'Pending',
+   136→    icon: Clock,
+   137→    className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+   138→  },
+   139→  accepted: {
+   140→    label: 'Accepted',
+   141→    icon: CheckCircle2,
+   142→    className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+   143→  },
+   144→  rejected: {
+   145→    label: 'Rejected',
+   146→    icon: XCircle,
+   147→    className: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border-red-200 dark:border-red-800',
+   148→  },
+   149→  withdrawn: {
+   150→    label: 'Withdrawn',
+   151→    icon: XCircle,
+   152→    className: 'bg-gray-100 text-gray-600 dark:bg-gray-800/40 dark:text-gray-400 border-gray-200 dark:border-gray-700',
+   153→  },
+   154→};
+   155→
+   156→const emptyForm: ValuationForm = {
+   157→  projectName: '',
+   158→  category: '',
+   159→  industry: '',
+   160→  country: '',
+   161→  businessStage: '',
+   162→  annualRevenue: '',
+   163→  monthlyRevenue: '',
+   164→  netProfit: '',
+   165→  ebitda: '',
+   166→  totalInvestment: '',
+   167→  monthlyVisitors: '',
+   168→  registeredUsers: '',
+   169→  customers: '',
+   170→  subscribers: '',
+   171→  technologyStack: '',
+   172→  competitiveAdvantage: '',
+   173→  growthOpportunity: '',
+   174→};
+   175→
+   176→// ---------------------------------------------------------------------------
+   177→// Animation variants
+   178→// ---------------------------------------------------------------------------
+   179→
+   180→const containerVariants = {
+   181→  hidden: { opacity: 0 },
+   182→  visible: {
+   183→    opacity: 1,
+   184→    transition: { staggerChildren: 0.06 },
+   185→  },
+   186→};
+   187→
+   188→const itemVariants = {
+   189→  hidden: { opacity: 0, y: 16 },
+   190→  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+   191→};
+   192→
+   193→const cardHover = {
+   194→  scale: 1.015,
+   195→  transition: { type: 'spring', stiffness: 400, damping: 25 },
+   196→};
+   197→
+   198→// ---------------------------------------------------------------------------
+   199→// Component
+   200→// ---------------------------------------------------------------------------
+   201→
+   202→export default function UserDashboard() {
+   203→  const {
+   204→    currentUser,
+   205→    projects,
+   206→    setProjects,
+   207→    goToProject,
+   208→    setCurrentView,
+   209→  } = useAppStore();
+   210→  const { formatPrice } = useCurrency();
+   211→
+   212→  // ---- local state ----
+   213→  const [myOffers, setMyOffers] = useState<Offer[]>([]);
+   214→  const [favorites, setFavorites] = useState<Project[]>([]);
+   215→  const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
+   216→  const [deleting, setDeleting] = useState(false);
+   217→
+   218→  // valuation
+   219→  const [vForm, setVForm] = useState<ValuationForm>(emptyForm);
+   220→  const [vLoading, setVLoading] = useState(false);
+   221→  const [vResult, setVResult] = useState<ValuationResult | null>(null);
+   222→  const [vError, setVError] = useState<string | null>(null);
+   223→
+   224→  // ---- data fetching ----
+   225→  const fetchDashboardData = useCallback(async () => {
+   226→    if (!currentUser) return;
+   227→    try {
+   228→      const res = await fetch('/api/projects?sellerId=' + currentUser.id);
+   229→      if (res.ok) {
+   230→        const data = await res.json();
+   231→        if (Array.isArray(data)) setProjects(data);
+   232→        else if (data.projects) setProjects(data.projects);
+   233→      }
+   234→
+   235→      const offersRes = await fetch('/api/offers?buyerId=' + currentUser.id);
+   236→      if (offersRes.ok) {
+   237→        const offersData = await offersRes.json();
+   238→        if (Array.isArray(offersData)) setMyOffers(offersData);
+   239→        else if (offersData.offers) setMyOffers(offersData.offers);
+   240→      }
+   241→
+   242→      const favRes = await fetch('/api/favorites?userId=' + currentUser.id);
+   243→      if (favRes.ok) {
+   244→        const favData = await favRes.json();
+   245→        if (Array.isArray(favData)) setFavorites(favData);
+   246→        else if (favData.projects) setFavorites(favData.projects);
+   247→      }
+   248→    } catch {
+   249→      // silently fail – the store data will still be used
+   250→    }
+   251→  }, [currentUser, setProjects]);
+   252→
+   253→  useEffect(() => {
+   254→    fetchDashboardData();
+   255→  }, [fetchDashboardData]);
+   256→
+   257→  // ---- derived data ----
+   258→  const myProjects = currentUser
+   259→    ? projects.filter((p) => p.sellerId === currentUser.id)
+   260→    : [];
+   261→
+   262→  const activeOffers = myOffers.filter((o) => o.status === 'pending').length;
+   263→
+   264→  const totalPortfolioValue = myProjects.reduce(
+   265→    (sum, p) => sum + (p.companyValuation ?? p.suggestedSellingPrice ?? 0),
+   266→    0,
+   267→  );
+   268→
+   269→  // ---- delete handler ----
+   270→  const handleDelete = async () => {
+   271→    if (!deleteTarget) return;
+   272→    setDeleting(true);
+   273→    try {
+   274→      await fetch('/api/projects/' + deleteTarget.id, { method: 'DELETE' });
+   275→      setProjects(projects.filter((p) => p.id !== deleteTarget.id));
+   276→      setDeleteTarget(null);
+   277→    } catch {
+   278→      // keep dialog open on error
+   279→    } finally {
+   280→      setDeleting(false);
+   281→    }
+   282→  };
+   283→
+   284→  // ---- valuation handler ----
+   285→  const handleValuation = async () => {
+   286→    if (!vForm.projectName.trim()) return;
+   287→    setVLoading(true);
+   288→    setVError(null);
+   289→    setVResult(null);
+   290→    try {
+   291→      const res = await fetch('/api/projects/valuation', {
+   292→        method: 'POST',
+   293→        headers: { 'Content-Type': 'application/json' },
+   294→        body: JSON.stringify(vForm),
+   295→      });
+   296→      if (!res.ok) throw new Error('Valuation request failed');
+   297→      const data = await res.json();
+   298→      setVResult(data);
+   299→    } catch {
+   300→      setVError('Something went wrong. Please try again.');
+   301→    } finally {
+   302→      setVLoading(false);
+   303→    }
+   304→  };
+   305→
+   306→  // ---- render: not signed in ----
+   307→  if (!currentUser) {
+   308→    return (
+   309→      <motion.section
+   310→        initial={{ opacity: 0, y: 20 }}
+   311→        animate={{ opacity: 1, y: 0 }}
+   312→        className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center"
+   313→      >
+   314→        <div className="flex size-16 items-center justify-center rounded-2xl bg-primary/10">
+   315→          <Briefcase className="size-8 text-primary" />
+   316→        </div>
+   317→        <div className="space-y-2">
+   318→          <h2 className="text-2xl font-bold tracking-tight">Sign in to your Dashboard</h2>
+   319→          <p className="max-w-md text-muted-foreground">
+   320→            Access your projects, manage offers, track favorites, and use the AI Valuation
+   321→            Engine — all in one place.
+   322→          </p>
+   323→        </div>
+   324→        <Button size="lg" onClick={() => {
+   325→          const { setCurrentUser } = useAppStore.getState();
+   326→          setCurrentUser({
+   327→            id: 'demo_user',
+   328→            email: 'demo@makethisdeal.com',
+   329→            name: 'Demo User',
+   330→            role: 'seller',
+   331→            company: 'Demo Corp',
+   332→            country: 'United States',
+   333→            verified: false,
+   334→            createdAt: new Date().toISOString(),
+   335→          });
+   336→        }}>
+   337→          Sign In
+   338→          <ArrowRight className="ml-2 size-4" />
+   339→        </Button>
+   340→      </motion.section>
+   341→    );
+   342→  }
+   343→
+   344→  // ---- render: dashboard ----
+   345→  return (
+   346→    <motion.div
+   347→      variants={containerVariants}
+   348→      initial="hidden"
+   349→      animate="visible"
+   350→      className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8"
+   351→    >
+   352→      {/* ================================================================== */}
+   353→      {/* Welcome & Quick Stats                                               */}
+   354→      {/* ================================================================== */}
+   355→      <motion.div variants={itemVariants} className="space-y-4">
+   356→        <div>
+   357→          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+   358→            Welcome back, {currentUser.name?.split(' ')[0] ?? 'there'}
+   359→          </h1>
+   360→          <p className="mt-1 text-muted-foreground">
+   361→            Here&apos;s an overview of your marketplace activity.
+   362→          </p>
+   363→        </div>
+   364→
+   365→        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-4 lg:gap-4">
+   366→          {[
+   367→            {
+   368→              label: 'My Projects',
+   369→              value: myProjects.length,
+   370→              icon: LayoutGrid,
+   371→              color: 'text-emerald-600 dark:text-emerald-400',
+   372→              bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+   373→            },
+   374→            {
+   375→              label: 'Active Offers',
+   376→              value: activeOffers,
+   377→              icon: Send,
+   378→              color: 'text-amber-600 dark:text-amber-400',
+   379→              bg: 'bg-amber-50 dark:bg-amber-950/40',
+   380→            },
+   381→            {
+   382→              label: 'Favorites',
+   383→              value: favorites.length,
+   384→              icon: Heart,
+   385→              color: 'text-rose-600 dark:text-rose-400',
+   386→              bg: 'bg-rose-50 dark:bg-rose-950/40',
+   387→            },
+   388→            {
+   389→              label: 'Portfolio Value',
+   390→              value: formatPrice(totalPortfolioValue),
+   391→              icon: TrendingUp,
+   392→              color: 'text-violet-600 dark:text-violet-400',
+   393→              bg: 'bg-violet-50 dark:bg-violet-950/40',
+   394→            },
+   395→          ].map((stat) => (
+   396→            <Card key={stat.label} className="relative overflow-hidden">
+   397→              <CardContent className="flex items-center gap-3 p-4">
+   398→                <div
+   399→                  className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${stat.bg}`}
+   400→                >
+   401→                  <stat.icon className={`size-5 ${stat.color}`} />
+   402→                </div>
+   403→                <div className="min-w-0">
+   404→                  <p className="truncate text-xs font-medium text-muted-foreground">
+   405→                    {stat.label}
+   406→                  </p>
+   407→                  <p className="text-lg font-bold tracking-tight">{stat.value}</p>
+   408→                </div>
+   409→              </CardContent>
+   410→            </Card>
+   411→          ))}
+   412→        </div>
+   413→      </motion.div>
+   414→
+   415→      {/* ================================================================== */}
+   416→      {/* Tabs                                                                */}
+   417→      {/* ================================================================== */}
+   418→      <motion.div variants={itemVariants}>
+   419→        <Tabs defaultValue="projects" className="w-full">
+   420→          <TabsList className="flex w-full overflow-x-auto sm:w-auto">
+   421→            <TabsTrigger value="projects" className="gap-1.5">
+   422→              <LayoutGrid className="size-4" />
+   423→              <span className="hidden sm:inline">My Projects</span>
+   424→              <span className="sm:hidden">Projects</span>
+   425→            </TabsTrigger>
+   426→            <TabsTrigger value="offers" className="gap-1.5">
+   427→              <Send className="size-4" />
+   428→              <span className="hidden sm:inline">My Offers</span>
+   429→              <span className="sm:hidden">Offers</span>
+   430→            </TabsTrigger>
+   431→            <TabsTrigger value="favorites" className="gap-1.5">
+   432→              <Heart className="size-4" />
+   433→              <span className="hidden sm:inline">Favorites</span>
+   434→              <span className="sm:hidden">Favs</span>
+   435→            </TabsTrigger>
+   436→            <TabsTrigger value="valuation" className="gap-1.5">
+   437→              <Calculator className="size-4" />
+   438→              <span className="hidden sm:inline">Valuation Tool</span>
+   439→              <span className="sm:hidden">Valuate</span>
+   440→            </TabsTrigger>
+   441→          </TabsList>
+   442→
+   443→          {/* -------------------------------------------------------------- */}
+   444→          {/* Tab 1 – My Projects                                              */}
+   445→          {/* -------------------------------------------------------------- */}
+   446→          <TabsContent value="projects">
+   447→            <AnimatePresence mode="wait">
+   448→              {myProjects.length === 0 ? (
+   449→                <motion.div
+   450→                  key="empty-projects"
+   451→                  initial={{ opacity: 0, y: 12 }}
+   452→                  animate={{ opacity: 1, y: 0 }}
+   453→                  exit={{ opacity: 0 }}
+   454→                >
+   455→                  <Card>
+   456→                    <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+   457→                      <div className="flex size-16 items-center justify-center rounded-2xl bg-muted">
+   458→                        <PackageOpen className="size-8 text-muted-foreground" />
+   459→                      </div>
+   460→                      <div className="space-y-1">
+   461→                        <h3 className="text-lg font-semibold">No projects yet</h3>
+   462→                        <p className="max-w-sm text-sm text-muted-foreground">
+   463→                          List your first project and start receiving offers from buyers
+   464→                          worldwide.
+   465→                        </p>
+   466→                      </div>
+   467→                      <Button onClick={() => setCurrentView('create')}>
+   468→                        <FolderOpen className="mr-2 size-4" />
+   469→                        List Your First Project
+   470→                      </Button>
+   471→                    </CardContent>
+   472→                  </Card>
+   473→                </motion.div>
+   474→              ) : (
+   475→                <motion.div
+   476→                  key="projects-grid"
+   477→                  variants={containerVariants}
+   478→                  initial="hidden"
+   479→                  animate="visible"
+   480→                  className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+   481→                >
+   482→                  {myProjects.map((project) => {
+   483→                    const iconKey = getCategoryIconKey(project.category);
+   484→                    const CatIcon = CATEGORY_ICONS[iconKey] ?? Briefcase;
+   485→                    const sc = statusConfig[project.status as ProjectStatus] ?? statusConfig.active;
+   486→                    return (
+   487→                      <motion.div key={project.id} variants={itemVariants} whileHover={cardHover}>
+   488→                        <Card className="group relative flex h-full cursor-pointer flex-col overflow-hidden transition-shadow hover:shadow-lg">
+   489→                          {/* thumbnail / icon header */}
+   490→                          <div
+   491→                            className="relative flex h-32 items-center justify-center bg-gradient-to-br from-muted to-muted/50"
+   492→                            onClick={() => goToProject(project.id)}
+   493→                          >
+   494→                            {project.thumbnail ? (
+   495→                              <img
+   496→                                src={project.thumbnail}
+   497→                                alt={project.name}
+   498→                                className="h-full w-full object-cover"
+   499→                              />
+   500→                            ) : (
+   501→                              <CatIcon className="size-12 text-muted-foreground/40" />
+   502→                            )}
+   503→                            <Badge
+   504→                              variant="outline"
+   505→                              className={`absolute right-2 top-2 ${sc.className}`}
+   506→                            >
+   507→                              {sc.label}
+   508→                            </Badge>
+   509→                          </div>
+   510→
+   511→                          <CardContent
+   512→                            className="flex flex-1 flex-col gap-2 p-4"
+   513→                            onClick={() => goToProject(project.id)}
+   514→                          >
+   515→                            <div className="flex items-start justify-between gap-2">
+   516→                              <h3 className="line-clamp-1 text-sm font-semibold leading-tight">
+   517→                                {project.name}
+   518→                              </h3>
+   519→                            </div>
+   520→                            <p className="text-xs text-muted-foreground">{getCategoryName(project.category)}</p>
+   521→
+   522→                            <div className="mt-auto flex items-center justify-between pt-2 text-xs text-muted-foreground">
+   523→                              <span>
+   524→                                {project._count?.offers ?? 0} offer
+   525→                                {(project._count?.offers ?? 0) !== 1 ? 's' : ''}
+   526→                              </span>
+   527→                              <span>{formatDate(project.createdAt)}</span>
+   528→                            </div>
+   529→
+   530→                            {/* price row */}
+   531→                            <div className="flex items-center gap-3 border-t pt-2 text-xs">
+   532→                              <div className="flex items-center gap-1 font-semibold text-foreground">
+   533→                                <DollarSign className="size-3" />
+   534→                                {formatPrice(
+   535→                                  project.suggestedSellingPrice ?? project.companyValuation ?? 0,
+   536→                                )}
+   537→                              </div>
+   538→                              {project.annualRevenue != null && project.annualRevenue > 0 && (
+   539→                                <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+   540→                                  <TrendingUp className="size-3" />
+   541→                                  {formatPrice(project.annualRevenue)}/yr
+   542→                                </div>
+   543→                              )}
+   544→                            </div>
+   545→                          </CardContent>
+   546→
+   547→                          {/* action bar */}
+   548→                          <div className="flex border-t">
+   549→                            <Button
+   550→                              variant="ghost"
+   551→                              size="sm"
+   552→                              className="flex-1 rounded-none text-xs"
+   553→                              onClick={(e) => {
+   554→                                e.stopPropagation();
+   555→                                goToProject(project.id);
+   556→                              }}
+   557→                            >
+   558→                              <Eye className="mr-1.5 size-3.5" />
+   559→                              View
+   560→                            </Button>
+   561→                            <Separator orientation="vertical" className="h-auto" />
+   562→                            <Button
+   563→                              variant="ghost"
+   564→                              size="sm"
+   565→                              className="flex-1 rounded-none text-xs"
+   566→                              onClick={(e) => {
+   567→                                e.stopPropagation();
+   568→                                goToProject(project.id);
+   569→                              }}
+   570→                            >
+   571→                              <Pencil className="mr-1.5 size-3.5" />
+   572→                              Edit
+   573→                            </Button>
+   574→                            <Separator orientation="vertical" className="h-auto" />
+   575→                            <Button
+   576→                              variant="ghost"
+   577→                              size="sm"
+   578→                              className="flex-1 rounded-none text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+   579→                              onClick={(e) => {
+   580→                                e.stopPropagation();
+   581→                                setDeleteTarget(project);
+   582→                              }}
+   583→                            >
+   584→                              <Trash2 className="mr-1.5 size-3.5" />
+   585→                              Delete
+   586→                            </Button>
+   587→                          </div>
+   588→                        </Card>
+   589→                      </motion.div>
+   590→                    );
+   591→                  })}
+   592→                </motion.div>
+   593→              )}
+   594→            </AnimatePresence>
+   595→          </TabsContent>
+   596→
+   597→          {/* -------------------------------------------------------------- */}
+   598→          {/* Tab 2 – My Offers                                                */}
+   599→          {/* -------------------------------------------------------------- */}
+   600→          <TabsContent value="offers">
+   601→            <AnimatePresence mode="wait">
+   602→              {myOffers.length === 0 ? (
+   603→                <motion.div
+   604→                  key="empty-offers"
+   605→                  initial={{ opacity: 0, y: 12 }}
+   606→                  animate={{ opacity: 1, y: 0 }}
+   607→                  exit={{ opacity: 0 }}
+   608→                >
+   609→                  <Card>
+   610→                    <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+   611→                      <div className="flex size-16 items-center justify-center rounded-2xl bg-muted">
+   612→                        <Send className="size-8 text-muted-foreground" />
+   613→                      </div>
+   614→                      <div className="space-y-1">
+   615→                        <h3 className="text-lg font-semibold">No offers yet</h3>
+   616→                        <p className="max-w-sm text-sm text-muted-foreground">
+   617→                          Browse available projects and make your first offer to get started.
+   618→                        </p>
+   619→                      </div>
+   620→                      <Button onClick={() => setCurrentView('browse')}>
+   621→                        <Search className="mr-2 size-4" />
+   622→                        Browse Projects
+   623→                      </Button>
+   624→                    </CardContent>
+   625→                  </Card>
+   626→                </motion.div>
+   627→              ) : (
+   628→                <motion.div
+   629→                  key="offers-list"
+   630→                  variants={containerVariants}
+   631→                  initial="hidden"
+   632→                  animate="visible"
+   633→                  className="space-y-3"
+   634→                >
+   635→                  {myOffers.map((offer) => {
+   636→                    const sc =
+   637→                      offerStatusConfig[offer.status as OfferStatus] ??
+   638→                      offerStatusConfig.pending;
+   639→                    const StatusIcon = sc.icon;
+   640→                    return (
+   641→                      <motion.div key={offer.id} variants={itemVariants}>
+   642→                        <Card
+   643→                          className="cursor-pointer transition-shadow hover:shadow-md"
+   644→                          onClick={() => offer.projectId && goToProject(offer.projectId)}
+   645→                        >
+   646→                          <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+   647→                            <div className="min-w-0 flex-1">
+   648→                              <p className="truncate text-sm font-semibold">
+   649→                                {offer.project?.name ?? 'Unknown Project'}
+   650→                              </p>
+   651→                              <p className="mt-0.5 text-xs text-muted-foreground">
+   652→                                {offer.project?.category ?? '—'} &middot;{' '}
+   653→                                {formatDate(offer.createdAt)}
+   654→                              </p>
+   655→                            </div>
+   656→                            <div className="flex items-center gap-3">
+   657→                              <div className="text-right">
+   658→                                <p className="text-sm font-bold">
+   659→                                  {formatPrice(offer.amount)}
+   660→                                </p>
+   661→                                <p className="text-[11px] text-muted-foreground">Offer Amount</p>
+   662→                              </div>
+   663→                              <Badge
+   664→                                variant="outline"
+   665→                                className={`gap-1 ${sc.className}`}
+   666→                              >
+   667→                                <StatusIcon className="size-3" />
+   668→                                {sc.label}
+   669→                              </Badge>
+   670→                            </div>
+   671→                          </CardContent>
+   672→                        </Card>
+   673→                      </motion.div>
+   674→                    );
+   675→                  })}
+   676→                </motion.div>
+   677→              )}
+   678→            </AnimatePresence>
+   679→          </TabsContent>
+   680→
+   681→          {/* -------------------------------------------------------------- */}
+   682→          {/* Tab 3 – Favorites                                                */}
+   683→          {/* -------------------------------------------------------------- */}
+   684→          <TabsContent value="favorites">
+   685→            <AnimatePresence mode="wait">
+   686→              {favorites.length === 0 ? (
+   687→                <motion.div
+   688→                  key="empty-favorites"
+   689→                  initial={{ opacity: 0, y: 12 }}
+   690→                  animate={{ opacity: 1, y: 0 }}
+   691→                  exit={{ opacity: 0 }}
+   692→                >
+   693→                  <Card>
+   694→                    <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+   695→                      <div className="flex size-16 items-center justify-center rounded-2xl bg-rose-50 dark:bg-rose-950/40">
+   696→                        <Heart className="size-8 text-rose-400" />
+   697→                      </div>
+   698→                      <div className="space-y-1">
+   699→                        <h3 className="text-lg font-semibold">No favorites yet</h3>
+   700→                        <p className="max-w-sm text-sm text-muted-foreground">
+   701→                          Explore the marketplace and save projects you&apos;re interested in.
+   702→                        </p>
+   703→                      </div>
+   704→                      <Button onClick={() => setCurrentView('browse')}>
+   705→                        <Search className="mr-2 size-4" />
+   706→                        Start Exploring
+   707→                      </Button>
+   708→                    </CardContent>
+   709→                  </Card>
+   710→                </motion.div>
+   711→              ) : (
+   712→                <motion.div
+   713→                  key="favorites-grid"
+   714→                  variants={containerVariants}
+   715→                  initial="hidden"
+   716→                  animate="visible"
+   717→                  className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+   718→                >
+   719→                  {favorites.map((project) => {
+   720→                    const iconKey = getCategoryIconKey(project.category);
+   721→                    const CatIcon = CATEGORY_ICONS[iconKey] ?? Briefcase;
+   722→                    const sc = statusConfig[project.status as ProjectStatus] ?? statusConfig.active;
+   723→                    return (
+   724→                      <motion.div key={project.id} variants={itemVariants} whileHover={cardHover}>
+   725→                        <Card className="group relative flex h-full cursor-pointer flex-col overflow-hidden transition-shadow hover:shadow-lg">
+   726→                          <div
+   727→                            className="relative flex h-32 items-center justify-center bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-950/30 dark:to-rose-900/20"
+   728→                            onClick={() => goToProject(project.id)}
+   729→                          >
+   730→                            {project.thumbnail ? (
+   731→                              <img
+   732→                                src={project.thumbnail}
+   733→                                alt={project.name}
+   734→                                className="h-full w-full object-cover"
+   735→                              />
+   736→                            ) : (
+   737→                              <CatIcon className="size-12 text-rose-300 dark:text-rose-700" />
+   738→                            )}
+   739→                            <Badge
+   740→                              variant="outline"
+   741→                              className={`absolute right-2 top-2 ${sc.className}`}
+   742→                            >
+   743→                              {sc.label}
+   744→                            </Badge>
+   745→                            <div className="absolute left-2 top-2">
+   746→                              <Heart className="size-5 fill-rose-500 text-rose-500" />
+   747→                            </div>
+   748→                          </div>
+   749→
+   750→                          <CardContent
+   751→                            className="flex flex-1 flex-col gap-2 p-4"
+   752→                            onClick={() => goToProject(project.id)}
+   753→                          >
+   754→                            <h3 className="line-clamp-1 text-sm font-semibold leading-tight">
+   755→                              {project.name}
+   756→                            </h3>
+   757→                            <p className="text-xs text-muted-foreground">{getCategoryName(project.category)}</p>
+   758→                            <div className="mt-auto flex items-center justify-between border-t pt-2 text-xs">
+   759→                              <span className="font-semibold text-foreground">
+   760→                                {formatPrice(
+   761→                                  project.suggestedSellingPrice ?? project.companyValuation ?? 0,
+   762→                                )}
+   763→                              </span>
+   764→                              {project.seller && (
+   765→                                <span className="text-muted-foreground">
+   766→                                  by {project.seller.name}
+   767→                                </span>
+   768→                              )}
+   769→                            </div>
+   770→                          </CardContent>
+   771→                        </Card>
+   772→                      </motion.div>
+   773→                    );
+   774→                  })}
+   775→                </motion.div>
+   776→              )}
+   777→            </AnimatePresence>
+   778→          </TabsContent>
+   779→
+   780→          {/* -------------------------------------------------------------- */}
+   781→          {/* Tab 4 – Valuation Tool                                           */}
+   782→          {/* -------------------------------------------------------------- */}
+   783→          <TabsContent value="valuation">
+   784→            <motion.div
+   785→              variants={containerVariants}
+   786→              initial="hidden"
+   787→              animate="visible"
+   788→              className="grid gap-6 lg:grid-cols-2"
+   789→            >
+   790→              {/* ---- Form ---- */}
+   791→              <motion.div variants={itemVariants}>
+   792→                <Card>
+   793→                  <CardHeader>
+   794→                    <CardTitle className="flex items-center gap-2 text-lg">
+   795→                      <Sparkles className="size-5 text-amber-500" />
+   796→                      AI Valuation Engine
+   797→                    </CardTitle>
+   798→                    <CardDescription>
+   799→                      Enter your project details to get an instant AI-powered business valuation.
+   800→                    </CardDescription>
+   801→                  </CardHeader>
+   802→                  <CardContent className="space-y-5">
+   803→                    {/* Basic Info */}
+   804→                    <div className="space-y-3">
+   805→                      <h4 className="text-sm font-semibold text-foreground">Basic Information</h4>
+   806→                      <div className="grid gap-3 sm:grid-cols-2">
+   807→                        <div className="space-y-1.5 sm:col-span-2">
+   808→                          <Label htmlFor="v-projectName">Project Name *</Label>
+   809→                          <Input
+   810→                            id="v-projectName"
+   811→                            placeholder="My Awesome SaaS"
+   812→                            value={vForm.projectName}
+   813→                            onChange={(e) => setVForm((f) => ({ ...f, projectName: e.target.value }))}
+   814→                          />
+   815→                        </div>
+   816→                        <div className="space-y-1.5">
+   817→                          <Label htmlFor="v-category">Category</Label>
+   818→                          <Select
+   819→                            value={vForm.category}
+   820→                            onValueChange={(v) => setVForm((f) => ({ ...f, category: v }))}
+   821→                          >
+   822→                            <SelectTrigger id="v-category" className="w-full">
+   823→                              <SelectValue placeholder="Select category" />
+   824→                            </SelectTrigger>
+   825→                            <SelectContent>
+   826→                              {CATEGORIES.map((c) => (
+   827→                                <SelectItem key={c.id} value={c.slug}>
+   828→                                  {c.name}
+   829→                                </SelectItem>
+   830→                              ))}
+   831→                            </SelectContent>
+   832→                          </Select>
+   833→                        </div>
+   834→                        <div className="space-y-1.5">
+   835→                          <Label htmlFor="v-industry">Industry</Label>
+   836→                          <Input
+   837→                            id="v-industry"
+   838→                            placeholder="e.g. FinTech"
+   839→                            value={vForm.industry}
+   840→                            onChange={(e) => setVForm((f) => ({ ...f, industry: e.target.value }))}
+   841→                          />
+   842→                        </div>
+   843→                        <div className="space-y-1.5">
+   844→                          <Label htmlFor="v-country">Country</Label>
+   845→                          <Select
+   846→                            value={vForm.country}
+   847→                            onValueChange={(v) => setVForm((f) => ({ ...f, country: v }))}
+   848→                          >
+   849→                            <SelectTrigger id="v-country" className="w-full">
+   850→                              <SelectValue placeholder="Select country" />
+   851→                            </SelectTrigger>
+   852→                            <SelectContent className="max-h-60">
+   853→                              {COUNTRIES.map((c) => (
+   854→                                <SelectItem key={c} value={c}>
+   855→                                  {c}
+   856→                                </SelectItem>
+   857→                              ))}
+   858→                            </SelectContent>
+   859→                          </Select>
+   860→                        </div>
+   861→                        <div className="space-y-1.5">
+   862→                          <Label htmlFor="v-stage">Business Stage</Label>
+   863→                          <Select
+   864→                            value={vForm.businessStage}
+   865→                            onValueChange={(v) => setVForm((f) => ({ ...f, businessStage: v }))}
+   866→                          >
+   867→                            <SelectTrigger id="v-stage" className="w-full">
+   868→                              <SelectValue placeholder="Select stage" />
+   869→                            </SelectTrigger>
+   870→                            <SelectContent>
+   871→                              {BUSINESS_STAGES.map((s) => (
+   872→                                <SelectItem key={s.value} value={s.value}>
+   873→                                  {s.label}
+   874→                                </SelectItem>
+   875→                              ))}
+   876→                            </SelectContent>
+   877→                          </Select>
+   878→                        </div>
+   879→                      </div>
+   880→                    </div>
+   881→
+   882→                    <Separator />
+   883→
+   884→                    {/* Financial Info */}
+   885→                    <div className="space-y-3">
+   886→                      <h4 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   887→                        <BarChart3 className="size-4 text-emerald-600 dark:text-emerald-400" />
+   888→                        Financial Metrics
+   889→                      </h4>
+   890→                      <div className="grid gap-3 sm:grid-cols-2">
+   891→                        {[
+   892→                          { key: 'annualRevenue' as const, label: 'Annual Revenue ($)', placeholder: 'e.g. 120000' },
+   893→                          { key: 'monthlyRevenue' as const, label: 'Monthly Revenue ($)', placeholder: 'e.g. 10000' },
+   894→                          { key: 'netProfit' as const, label: 'Net Profit ($)', placeholder: 'e.g. 30000' },
+   895→                          { key: 'ebitda' as const, label: 'EBITDA ($)', placeholder: 'e.g. 45000' },
+   896→                          { key: 'totalInvestment' as const, label: 'Total Investment ($)', placeholder: 'e.g. 50000' },
+   897→                        ].map(({ key, label, placeholder }) => (
+   898→                          <div key={key} className="space-y-1.5">
+   899→                            <Label htmlFor={`v-${key}`}>{label}</Label>
+   900→                            <Input
+   901→                              id={`v-${key}`}
+   902→                              type="number"
+   903→                              placeholder={placeholder}
+   904→                              value={vForm[key]}
+   905→                              onChange={(e) =>
+   906→                                setVForm((f) => ({ ...f, [key]: e.target.value }))
+   907→                              }
+   908→                            />
+   909→                          </div>
+   910→                        ))}
+   911→                      </div>
+   912→                    </div>
+   913→
+   914→                    <Separator />
+   915→
+   916→                    {/* Business Metrics */}
+   917→                    <div className="space-y-3">
+   918→                      <h4 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   919→                        <TrendingUp className="size-4 text-violet-600 dark:text-violet-400" />
+   920→                        Business Metrics
+   921→                      </h4>
+   922→                      <div className="grid gap-3 sm:grid-cols-2">
+   923→                        {[
+   924→                          { key: 'monthlyVisitors' as const, label: 'Monthly Visitors', placeholder: 'e.g. 50000' },
+   925→                          { key: 'registeredUsers' as const, label: 'Registered Users', placeholder: 'e.g. 8000' },
+   926→                          { key: 'customers' as const, label: 'Customers', placeholder: 'e.g. 500' },
+   927→                          { key: 'subscribers' as const, label: 'Subscribers', placeholder: 'e.g. 200' },
+   928→                        ].map(({ key, label, placeholder }) => (
+   929→                          <div key={key} className="space-y-1.5">
+   930→                            <Label htmlFor={`v-${key}`}>{label}</Label>
+   931→                            <Input
+   932→                              id={`v-${key}`}
+   933→                              type="number"
+   934→                              placeholder={placeholder}
+   935→                              value={vForm[key]}
+   936→                              onChange={(e) =>
+   937→                                setVForm((f) => ({ ...f, [key]: e.target.value }))
+   938→                              }
+   939→                            />
+   940→                          </div>
+   941→                        ))}
+   942→                      </div>
+   943→
+   944→                      <div className="space-y-1.5">
+   945→                        <Label htmlFor="v-tech">Technology Stack</Label>
+   946→                        <Input
+   947→                          id="v-tech"
+   948→                          placeholder="e.g. React, Node.js, PostgreSQL"
+   949→                          value={vForm.technologyStack}
+   950→                          onChange={(e) =>
+   951→                            setVForm((f) => ({ ...f, technologyStack: e.target.value }))
+   952→                          }
+   953→                        />
+   954→                      </div>
+   955→
+   956→                      <div className="space-y-1.5">
+   957→                        <Label htmlFor="v-advantage">Competitive Advantage</Label>
+   958→                        <Textarea
+   959→                          id="v-advantage"
+   960→                          placeholder="What makes this business unique?"
+   961→                          rows={3}
+   962→                          value={vForm.competitiveAdvantage}
+   963→                          onChange={(e) =>
+   964→                            setVForm((f) => ({ ...f, competitiveAdvantage: e.target.value }))
+   965→                          }
+   966→                        />
+   967→                      </div>
+   968→
+   969→                      <div className="space-y-1.5">
+   970→                        <Label htmlFor="v-growth">Growth Opportunity</Label>
+   971→                        <Textarea
+   972→                          id="v-growth"
+   973→                          placeholder="Describe growth potential and expansion plans..."
+   974→                          rows={3}
+   975→                          value={vForm.growthOpportunity}
+   976→                          onChange={(e) =>
+   977→                            setVForm((f) => ({ ...f, growthOpportunity: e.target.value }))
+   978→                          }
+   979→                        />
+   980→                      </div>
+   981→                    </div>
+   982→
+   983→                    <Button
+   984→                      className="w-full"
+   985→                      size="lg"
+   986→                      disabled={vLoading || !vForm.projectName.trim()}
+   987→                      onClick={handleValuation}
+   988→                    >
+   989→                      {vLoading ? (
+   990→                        <>
+   991→                          <Loader2 className="mr-2 size-4 animate-spin" />
+   992→                          Analyzing...
+   993→                        </>
+   994→                      ) : (
+   995→                        <>
+   996→                          <Sparkles className="mr-2 size-4" />
+   997→                          Get AI Valuation
+   998→                        </>
+   999→                      )}
+  1000→                    </Button>
+  1001→                  </CardContent>
+  1002→                </Card>
+  1003→              </motion.div>
+  1004→
+  1005→              {/* ---- Results ---- */}
+  1006→              <motion.div variants={itemVariants}>
+  1007→                <AnimatePresence mode="wait">
+  1008→                  {vLoading && (
+  1009→                    <motion.div
+  1010→                      key="v-loading"
+  1011→                      initial={{ opacity: 0 }}
+  1012→                      animate={{ opacity: 1 }}
+  1013→                      exit={{ opacity: 0 }}
+  1014→                    >
+  1015→                      <Card>
+  1016→                        <CardHeader>
+  1017→                          <Skeleton className="h-6 w-48" />
+  1018→                          <Skeleton className="h-4 w-64" />
+  1019→                        </CardHeader>
+  1020→                        <CardContent className="space-y-4">
+  1021→                          <Skeleton className="h-24 w-full rounded-xl" />
+  1022→                          <div className="grid grid-cols-2 gap-3">
+  1023→                            {[...Array(4)].map((_, i) => (
+  1024→                              <Skeleton key={i} className="h-20 w-full rounded-lg" />
+  1025→                            ))}
+  1026→                          </div>
+  1027→                          <Skeleton className="h-4 w-full" />
+  1028→                          <Skeleton className="h-16 w-full rounded-lg" />
+  1029→                        </CardContent>
+  1030→                      </Card>
+  1031→                    </motion.div>
+  1032→                  )}
+  1033→
+  1034→                  {!vLoading && vError && (
+  1035→                    <motion.div
+  1036→                      key="v-error"
+  1037→                      initial={{ opacity: 0, y: 12 }}
+  1038→                      animate={{ opacity: 1, y: 0 }}
+  1039→                      exit={{ opacity: 0 }}
+  1040→                    >
+  1041→                      <Card className="border-red-200 dark:border-red-900">
+  1042→                        <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+  1043→                          <AlertCircle className="size-10 text-red-500" />
+  1044→                          <p className="text-sm font-medium text-red-600 dark:text-red-400">
+  1045→                            {vError}
+  1046→                          </p>
+  1047→                          <Button
+  1048→                            variant="outline"
+  1049→                            size="sm"
+  1050→                            onClick={handleValuation}
+  1051→                          >
+  1052→                            Retry
+  1053→                          </Button>
+  1054→                        </CardContent>
+  1055→                      </Card>
+  1056→                    </motion.div>
+  1057→                  )}
+  1058→
+  1059→                  {!vLoading && !vError && !vResult && (
+  1060→                    <motion.div
+  1061→                      key="v-empty"
+  1062→                      initial={{ opacity: 0, y: 12 }}
+  1063→                      animate={{ opacity: 1, y: 0 }}
+  1064→                      exit={{ opacity: 0 }}
+  1065→                    >
+  1066→                      <Card>
+  1067→                        <CardContent className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+  1068→                          <div className="flex size-16 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-950/40">
+  1069→                            <Sparkles className="size-8 text-amber-500" />
+  1070→                          </div>
+  1071→                          <div className="space-y-1">
+  1072→                            <h3 className="text-lg font-semibold">Ready to Valuate</h3>
+  1073→                            <p className="max-w-xs text-sm text-muted-foreground">
+  1074→                              Fill in the form and click &quot;Get AI Valuation&quot; to receive a
+  1075→                              comprehensive business valuation.
+  1076→                            </p>
+  1077→                          </div>
+  1078→                        </CardContent>
+  1079→                      </Card>
+  1080→                    </motion.div>
+  1081→                  )}
+  1082→
+  1083→                  {!vLoading && vResult && (
+  1084→                    <motion.div
+  1085→                      key="v-result"
+  1086→                      initial={{ opacity: 0, scale: 0.97 }}
+  1087→                      animate={{ opacity: 1, scale: 1 }}
+  1088→                      exit={{ opacity: 0 }}
+  1089→                      className="space-y-4"
+  1090→                    >
+  1091→                      {/* Main value */}
+  1092→                      <Card className="overflow-hidden border-2 border-amber-300/60 dark:border-amber-700/40">
+  1093→                        <CardContent className="relative p-6 text-center">
+  1094→                          <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-transparent to-orange-50 dark:from-amber-950/20 dark:via-transparent dark:to-orange-950/20" />
+  1095→                          <div className="relative space-y-2">
+  1096→                            <p className="text-sm font-medium text-muted-foreground">
+  1097→                              Estimated Value
+  1098→                            </p>
+  1099→                            <p className="text-4xl font-extrabold tracking-tight sm:text-5xl">
+  1100→                              {formatPrice(vResult.estimatedValue)}
+  1101→                            </p>
+  1102→                            <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+  1103→                              <Star className="size-3.5 fill-amber-400 text-amber-400" />
+  1104→                              AI-Powered Valuation
+  1105→                            </div>
+  1106→                          </div>
+  1107→                        </CardContent>
+  1108→                      </Card>
+  1109→
+  1110→                      {/* Price breakdown */}
+  1111→                      <Card>
+  1112→                        <CardHeader className="pb-3">
+  1113→                          <CardTitle className="text-sm font-semibold">Price Breakdown</CardTitle>
+  1114→                        </CardHeader>
+  1115→                        <CardContent>
+  1116→                          <div className="grid grid-cols-2 gap-3">
+  1117→                            {[
+  1118→                              {
+  1119→                                label: 'Recommended Price',
+  1120→                                value: vResult.recommendedPrice,
+  1121→                                color: 'text-emerald-600 dark:text-emerald-400',
+  1122→                              },
+  1123→                              {
+  1124→                                label: 'Investor Price',
+  1125→                                value: vResult.investorPrice,
+  1126→                                color: 'text-amber-600 dark:text-amber-400',
+  1127→                              },
+  1128→                              {
+  1129→                                label: 'Wholesale Price',
+  1130→                                value: vResult.wholesalePrice,
+  1131→                                color: 'text-violet-600 dark:text-violet-400',
+  1132→                              },
+  1133→                              {
+  1134→                                label: 'Acquisition Price',
+  1135→                                value: vResult.acquisitionPrice,
+  1136→                                color: 'text-rose-600 dark:text-rose-400',
+  1137→                              },
+  1138→                            ].map((p) => (
+  1139→                              <div
+  1140→                                key={p.label}
+  1141→                                className="rounded-lg border bg-muted/30 p-3"
+  1142→                              >
+  1143→                                <p className="text-[11px] font-medium text-muted-foreground">
+  1144→                                  {p.label}
+  1145→                                </p>
+  1146→                                <p className={`mt-1 text-lg font-bold ${p.color}`}>
+  1147→                                  {formatPrice(p.value)}
+  1148→                                </p>
+  1149→                              </div>
+  1150→                            ))}
+  1151→                          </div>
+  1152→                        </CardContent>
+  1153→                      </Card>
+  1154→
+  1155→                      {/* Confidence Score */}
+  1156→                      <Card>
+  1157→                        <CardHeader className="pb-3">
+  1158→                          <CardTitle className="text-sm font-semibold">
+  1159→                            Confidence Score
+  1160→                          </CardTitle>
+  1161→                        </CardHeader>
+  1162→                        <CardContent className="space-y-2">
+  1163→                          <div className="flex items-center justify-between text-sm">
+  1164→                            <span className="text-muted-foreground">Reliability</span>
+  1165→                            <span className="font-semibold">{vResult.confidenceScore}%</span>
+  1166→                          </div>
+  1167→                          <Progress
+  1168→                            value={vResult.confidenceScore}
+  1169→                            className="h-3"
+  1170→                          />
+  1171→                        </CardContent>
+  1172→                      </Card>
+  1173→
+  1174→                      {/* Valuation Details */}
+  1175→                      {vResult.valuationDetails && (
+  1176→                        <Card>
+  1177→                          <CardHeader className="pb-3">
+  1178→                            <CardTitle className="text-sm font-semibold">
+  1179→                              Valuation Details
+  1180→                            </CardTitle>
+  1181→                          </CardHeader>
+  1182→                          <CardContent>
+  1183→                            <p className="text-sm leading-relaxed text-muted-foreground">
+  1184→                              {vResult.valuationDetails}
+  1185→                            </p>
+  1186→                          </CardContent>
+  1187→                        </Card>
+  1188→                      )}
+  1189→
+  1190→                      {/* Key Factors */}
+  1191→                      {vResult.keyFactors && vResult.keyFactors.length > 0 && (
+  1192→                        <Card>
+  1193→                          <CardHeader className="pb-3">
+  1194→                            <CardTitle className="text-sm font-semibold">Key Factors</CardTitle>
+  1195→                          </CardHeader>
+  1196→                          <CardContent>
+  1197→                            <div className="flex flex-wrap gap-2">
+  1198→                              {vResult.keyFactors.map((factor, i) => (
+  1199→                                <Badge
+  1200→                                  key={i}
+  1201→                                  variant="secondary"
+  1202→                                  className="rounded-full px-3 py-1 text-xs"
+  1203→                                >
+  1204→                                  {factor}
+  1205→                                </Badge>
+  1206→                              ))}
+  1207→                            </div>
+  1208→                          </CardContent>
+  1209→                        </Card>
+  1210→                      )}
+  1211→                    </motion.div>
+  1212→                  )}
+  1213→                </AnimatePresence>
+  1214→              </motion.div>
+  1215→            </motion.div>
+  1216→          </TabsContent>
+  1217→        </Tabs>
+  1218→      </motion.div>
+  1219→
+  1220→      {/* ================================================================== */}
+  1221→      {/* Delete Confirmation Dialog                                          */}
+  1222→      {/* ================================================================== */}
+  1223→      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+  1224→        <AlertDialogContent>
+  1225→          <AlertDialogHeader>
+  1226→            <AlertDialogTitle>Delete Project</AlertDialogTitle>
+  1227→            <AlertDialogDescription>
+  1228→              Are you sure you want to delete &quot;{deleteTarget?.name}&quot;? This action cannot
+  1229→              be undone and will permanently remove the project and all associated offers.
+  1230→            </AlertDialogDescription>
+  1231→          </AlertDialogHeader>
+  1232→          <AlertDialogFooter>
+  1233→            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+  1234→            <AlertDialogAction
+  1235→              onClick={handleDelete}
+  1236→              disabled={deleting}
+  1237→              className="bg-red-600 text-white hover:bg-red-700 focus:ring-red-600"
+  1238→            >
+  1239→              {deleting ? (
+  1240→                <>
+  1241→                  <Loader2 className="mr-2 size-4 animate-spin" />
+  1242→                  Deleting...
+  1243→                </>
+  1244→              ) : (
+  1245→                'Delete'
+  1246→              )}
+  1247→            </AlertDialogAction>
+  1248→          </AlertDialogFooter>
+  1249→        </AlertDialogContent>
+  1250→      </AlertDialog>
+  1251→    </motion.div>
+  1252→  );
+  1253→}

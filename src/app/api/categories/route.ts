@@ -1,16 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { NextResponse } from 'next/server';
+import { STATIC_CATEGORIES } from '@/lib/static-products';
 
+/**
+ * GET /api/categories — serves from static data.
+ * No database dependency — works on Vercel serverless.
+ */
 export async function GET() {
-  try {
-    const categories = await db.category.findMany({
-      orderBy: { order: 'asc' },
-      include: {
-        _count: { select: { projects: true } },
-      },
-    });
-    return NextResponse.json(categories);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  return NextResponse.json(STATIC_CATEGORIES);
 }
