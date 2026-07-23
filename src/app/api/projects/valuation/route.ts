@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateText } from 'z-ai-web-dev-sdk';
+import ZAI from 'z-ai-web-dev-sdk';
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,20 +45,20 @@ Based on industry benchmarks, revenue multiples, market conditions, and asset va
   "investorPrice": <number - price attractive to investors (0.85x-0.95x estimated value)>,
   "wholesalePrice": <number - bulk/quick sale price (0.75x-0.85x estimated value)>,
   "acquisitionPrice": <number - strategic acquisition premium (1.2x-1.5x estimated value)>,
-  "valuationDetails": "<string - 3-4 sentence explanation of the valuation methodology and key factors>",
+  "valuationDetails": "<string - 3-4 sentence explanation>",
   "confidenceScore": <number 1-10>,
   "keyFactors": ["<factor1>", "<factor2>", "<factor3>", "<factor4>", "<factor5>"]
 }
 
 Use realistic market multiples. Return ONLY the JSON, no other text.`;
 
-    const result = await generateText({
+    const ai = ZAI.create();
+    const result = await ai.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
     });
 
-    const responseText = result.content || result.text || '';
-    // Extract JSON from response
+    const responseText = result.choices?.[0]?.message?.content || '';
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('Could not parse valuation response');
@@ -67,17 +67,18 @@ Use realistic market multiples. Return ONLY the JSON, no other text.`;
     const valuation = JSON.parse(jsonMatch[0]);
     return NextResponse.json(valuation);
   } catch (error: any) {
-    // Fallback valuation if AI fails
-    const revenue = request.body?.annualRevenue || 0;
+    console.error('Valuation error:', error.message);
+    // Fallback valuation
+    const revenue = annualRevenue || 0;
     const fallback = {
-      estimatedValue: revenue * 5,
-      recommendedPrice: revenue * 5.5,
-      investorPrice: revenue * 4.5,
-      wholesalePrice: revenue * 4,
-      acquisitionPrice: revenue * 6,
-      valuationDetails: 'Estimated using standard revenue multiple of 5x. Adjust based on specific business factors, growth rate, and market conditions.',
+      estimatedValue: revenue * 5 || 5000,
+      recommendedPrice: revenue * 5.5 || 5500,
+      investorPrice: revenue * 4.5 || 4500,
+      wholesalePrice: revenue * 4 || 4000,
+      acquisitionPrice: revenue * 6 || 6000,
+      valuationDetails: 'Estimated using standard revenue multiple. AI valuation is temporarily unavailable.',
       confidenceScore: 5,
-      keyFactors: ['Revenue-based valuation', 'Industry standard multiples', 'Market conditions considered'],
+      keyFactors: ['Revenue-based estimation', 'Industry standard multiples', 'Market conditions'],
     };
     return NextResponse.json(fallback);
   }
