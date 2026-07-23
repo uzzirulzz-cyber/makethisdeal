@@ -1,0 +1,835 @@
+     1→     1→'use client';
+     2→     2→
+     3→     3→import React, { useEffect, useState } from 'react';
+     4→     4→import { motion } from 'framer-motion';
+     5→     5→import {
+     6→     6→  ArrowLeft,
+     7→     7→  Star,
+     8→     8→  CheckCircle2,
+     9→     9→  ExternalLink,
+    10→    10→  Globe,
+    11→    11→  Monitor,
+    12→    12→  Github,
+    13→    13→  Smartphone,
+    14→    14→  Shield,
+    15→    15→  Users,
+    16→    16→  Eye,
+    17→    17→  TrendingUp,
+    18→    18→  Heart,
+    19→    19→  MessageSquare,
+    20→    20→  Gavel,
+    21→    21→  Sparkles,
+    22→    22→  Store,
+    23→    23→  MapPin,
+    24→    24→  Building2,
+    25→    25→  Calendar,
+    26→    26→  BarChart3,
+    27→    27→  Target,
+    28→    28→  Zap,
+    29→    29→  AlertTriangle,
+    30→    30→  DoorOpen,
+    31→    31→  Copy,
+    32→    32→} from 'lucide-react';
+    33→    33→import { useAppStore } from '@/store/use-app-store';
+    34→    34→import { CATEGORY_ICONS, getCategoryName, getCategoryIconKey } from '@/lib/constants';
+    35→    35→import type { Project, Offer } from '@/lib/types';
+    36→    36→import { useCurrency } from '@/hooks/use-currency';
+    37→    37→import { formatCompact, type CurrencyMode } from '@/lib/currency';
+    38→    38→import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+    39→    39→import { Badge } from '@/components/ui/badge';
+    40→    40→import { Button } from '@/components/ui/button';
+    41→    41→import { Skeleton } from '@/components/ui/skeleton';
+    42→    42→import { Separator } from '@/components/ui/separator';
+    43→    43→import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+    44→    44→import { Progress } from '@/components/ui/progress';
+    45→    45→
+    46→    46→/* ---------- Helpers ---------- */
+    47→    47→
+    48→    48→function formatNumber(value: number | undefined): string {
+    49→    49→  if (value === undefined || value === null) return '—';
+    50→    50→  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+    51→    51→  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+    52→    52→  return value.toLocaleString();
+    53→    53→}
+    54→    54→
+    55→    55→function getCategoryIconName(category: string): string {
+    56→    56→  return getCategoryIconKey(category);
+    57→    57→}
+    58→    58→
+    59→    59→function getCategoryGradient(category: string): string {
+    60→    60→  const name = getCategoryName(category);
+    61→    61→  const map: Record<string, string> = {
+    62→    62→    'SaaS': 'from-emerald-500/30 to-teal-600/30',
+    63→    63→    'AI Solutions': 'from-violet-500/30 to-fuchsia-600/30',
+    64→    64→    'E-commerce': 'from-orange-500/30 to-amber-600/30',
+    65→    65→    'Real Estate': 'from-cyan-500/30 to-sky-600/30',
+    66→    66→    'Mobile Apps': 'from-pink-500/30 to-rose-600/30',
+    67→    67→    'Startups': 'from-lime-500/30 to-green-600/30',
+    68→    68→    'FinTech': 'from-emerald-600/30 to-green-700/30',
+    69→    69→    'HealthTech': 'from-red-400/30 to-pink-500/30',
+    70→    70→    'EdTech': 'from-yellow-500/30 to-orange-500/30',
+    71→    71→    'Cybersecurity': 'from-slate-500/30 to-zinc-600/30',
+    72→    72→    'Domains': 'from-purple-400/30 to-violet-500/30',
+    73→    73→    'Websites': 'from-sky-400/30 to-cyan-500/30',
+    74→    74→  };
+    75→    75→  return map[name] || 'from-stone-500/30 to-neutral-600/30';
+    76→    76→}
+    77→    77→
+    78→    78→const STAGE_LABELS: Record<string, string> = {
+    79→    79→  idea: 'Idea / Concept',
+    80→    80→  startup: 'Startup',
+    81→    81→  growth: 'Growth Stage',
+    82→    82→  mature: 'Mature Business',
+    83→    83→  exit: 'Exit / Acquisition',
+    84→    84→};
+    85→    85→
+    86→    86→function formatDate(dateStr: string): string {
+    87→    87→  return new Date(dateStr).toLocaleDateString('en-US', {
+    88→    88→    year: 'numeric',
+    89→    89→    month: 'long',
+    90→    90→    day: 'numeric',
+    91→    91→  });
+    92→    92→}
+    93→    93→
+    94→    94→/* ---------- Skeleton ---------- */
+    95→    95→
+    96→    96→function DetailSkeleton() {
+    97→    97→  return (
+    98→    98→    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    99→    99→      <Skeleton className="h-8 w-24" />
+   100→   100→      <div className="flex gap-3">
+   101→   101→        <Skeleton className="h-10 w-64" />
+   102→   102→        <Skeleton className="h-10 w-24" />
+   103→   103→        <Skeleton className="h-10 w-20" />
+   104→   104→      </div>
+   105→   105→      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+   106→   106→        <div className="lg:col-span-2 space-y-4">
+   107→   107→          <Skeleton className="h-72 w-full" />
+   108→   108→          <Skeleton className="h-64 w-full" />
+   109→   109→          <Skeleton className="h-64 w-full" />
+   110→   110→        </div>
+   111→   111→        <div className="space-y-4">
+   112→   112→          <Skeleton className="h-48 w-full" />
+   113→   113→          <Skeleton className="h-40 w-full" />
+   114→   114→          <Skeleton className="h-36 w-full" />
+   115→   115→        </div>
+   116→   116→      </div>
+   117→   117→    </div>
+   118→   118→  );
+   119→   119→}
+   120→   120→
+   121→   121→/* ---------- Financial Table ---------- */
+   122→   122→
+   123→   123→function FinancialTable({ project }: { project: Project }) {
+   124→   124→  const { formatPrice } = useCurrency();
+   125→   125→  const rows = [
+   126→   126→    { label: 'Development Cost', value: project.developmentCost },
+   127→   127→    { label: 'Infrastructure Cost', value: project.infrastructureCost },
+   128→   128→    { label: 'Marketing Cost', value: project.marketingCost },
+   129→   129→    { label: 'Legal Cost', value: project.legalCost },
+   130→   130→    { label: 'Operational Cost', value: project.operationalCost },
+   131→   131→    { label: 'Technology Cost', value: project.technologyCost },
+   132→   132→    { label: 'Maintenance Cost', value: project.maintenanceCost },
+   133→   133→    { label: 'Total Investment', value: project.totalInvestment, bold: true },
+   134→   134→    { label: 'Monthly Revenue', value: project.monthlyRevenue },
+   135→   135→    { label: 'Annual Revenue', value: project.annualRevenue, bold: true },
+   136→   136→    { label: 'Net Profit', value: project.netProfit, bold: true },
+   137→   137→    { label: 'EBITDA', value: project.ebitda },
+   138→   138→    { label: 'Expected ROI', value: project.expectedROI, isPercent: true, bold: true },
+   139→   139→    { label: 'Company Valuation', value: project.companyValuation, bold: true },
+   140→   140→  ];
+   141→   141→
+   142→   142→  return (
+   143→   143→    <div className="rounded-lg border overflow-hidden">
+   144→   144→      <table className="w-full text-sm">
+   145→   145→        <thead>
+   146→   146→          <tr className="bg-muted/50">
+   147→   147→            <th className="text-left font-medium px-4 py-2.5 text-muted-foreground">Metric</th>
+   148→   148→            <th className="text-right font-medium px-4 py-2.5 text-muted-foreground">Value</th>
+   149→   149→          </tr>
+   150→   150→        </thead>
+   151→   151→        <tbody>
+   152→   152→          {rows.map((row, i) => (
+   153→   153→            <tr
+   154→   154→              key={i}
+   155→   155→              className={i % 2 === 0 ? 'bg-background' : 'bg-muted/20'}
+   156→   156→            >
+   157→   157→              <td className={`px-4 py-2.5 ${row.bold ? 'font-semibold' : 'text-muted-foreground'}`}>
+   158→   158→                {row.label}
+   159→   159→              </td>
+   160→   160→              <td className={`text-right px-4 py-2.5 ${row.bold ? 'font-semibold' : ''}`}>
+   161→   161→                {row.isPercent
+   162→   162→                  ? row.value !== undefined && row.value !== null
+   163→   163→                    ? `${row.value}%`
+   164→   164→                    : '—'
+   165→   165→                  : formatPrice(row.value)}
+   166→   166→              </td>
+   167→   167→            </tr>
+   168→   168→          ))}
+   169→   169→        </tbody>
+   170→   170→      </table>
+   171→   171→    </div>
+   172→   172→  );
+   173→   173→}
+   174→   174→
+   175→   175→/* ---------- Digital Assets ---------- */
+   176→   176→
+   177→   177→function DigitalAssetLink({
+   178→   178→  icon: Icon,
+   179→   179→  label,
+   180→   180→  url,
+   181→   181→}: {
+   182→   182→  icon: React.ComponentType<{ className?: string }>;
+   183→   183→  label: string;
+   184→   184→  url?: string;
+   185→   185→}) {
+   186→   186→  if (!url) return null;
+   187→   187→  return (
+   188→   188→    <a
+   189→   189→      href={url}
+   190→   190→      target="_blank"
+   191→   191→      rel="noopener noreferrer"
+   192→   192→      className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+   193→   193→    >
+   194→   194→      <div className="size-9 rounded-md bg-muted flex items-center justify-center shrink-0">
+   195→   195→        <Icon className="size-4 text-muted-foreground" />
+   196→   196→      </div>
+   197→   197→      <div className="min-w-0 flex-1">
+   198→   198→        <p className="text-sm font-medium">{label}</p>
+   199→   199→        <p className="text-xs text-muted-foreground truncate">{url}</p>
+   200→   200→      </div>
+   201→   201→      <ExternalLink className="size-4 text-muted-foreground shrink-0" />
+   202→   202→    </a>
+   203→   203→  );
+   204→   204→}
+   205→   205→
+   206→   206→/* ---------- Business Metrics ---------- */
+   207→   207→
+   208→   208→function MetricBar({ label, value, max, suffix = '' }: { label: string; value?: number; max: number; suffix?: string }) {
+   209→   209→  const pct = value !== undefined && value !== null ? Math.min((value / max) * 100, 100) : 0;
+   210→   210→  return (
+   211→   211→    <div className="space-y-1.5">
+   212→   212→      <div className="flex justify-between text-sm">
+   213→   213→        <span className="text-muted-foreground">{label}</span>
+   214→   214→        <span className="font-medium">
+   215→   215→          {value !== undefined && value !== null ? value.toLocaleString() : '—'}{suffix}
+   216→   216→        </span>
+   217→   217→      </div>
+   218→   218→      <Progress value={pct} className="h-2" />
+   219→   219→    </div>
+   220→   220→  );
+   221→   221→}
+   222→   222→
+   223→   223→/* ---------- Main Component ---------- */
+   224→   224→
+   225→   225→export default function ProjectDetail() {
+   226→   226→  const { selectedProjectId, goBack, setCurrentView, currentUser, pkrToUsd } = useAppStore();
+   227→   227→  const { formatPrice, mode, symbol } = useCurrency();
+   228→   228→  const [project, setProject] = useState<Project | null>(null);
+   229→   229→  const [loading, setLoading] = useState(true);
+   230→   230→  const [offers, setOffers] = useState<Offer[]>([]);
+   231→   231→
+   232→   232→  useEffect(() => {
+   233→   233→    if (!selectedProjectId) return;
+   234→   234→    let cancelled = false;
+   235→   235→
+   236→   236→    async function fetchProject() {
+   237→   237→      setLoading(true);
+   238→   238→      try {
+   239→   239→        const res = await fetch(`/api/projects/${selectedProjectId}`);
+   240→   240→        if (res.ok && !cancelled) {
+   241→   241→          const data = await res.json();
+   242→   242→          setProject(data);
+   243→   243→          setOffers(data.offers || []);
+   244→   244→        }
+   245→   245→      } catch {
+   246→   246→        // Silently fail
+   247→   247→      } finally {
+   248→   248→        if (!cancelled) setLoading(false);
+   249→   249→      }
+   250→   250→    }
+   251→   251→
+   252→   252→    fetchProject();
+   253→   253→    return () => {
+   254→   254→      cancelled = true;
+   255→   255→    };
+   256→   256→  }, [selectedProjectId]);
+   257→   257→
+   258→   258→  if (loading) return <DetailSkeleton />;
+   259→   259→  if (!project) {
+   260→   260→    return (
+   261→   261→      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+   262→   262→        <p className="text-muted-foreground">Project not found.</p>
+   263→   263→        <Button variant="outline" className="mt-4 gap-2" onClick={goBack}>
+   264→   264→          <ArrowLeft className="size-4" /> Go Back
+   265→   265→        </Button>
+   266→   266→      </div>
+   267→   267→    );
+   268→   268→  }
+   269→   269→
+   270→   270→  const iconKey = getCategoryIconName(project.category);
+   271→   271→  const IconComp = CATEGORY_ICONS[iconKey] || Globe;
+   272→   272→  const gradient = getCategoryGradient(project.category);
+   273→   273→  const isOwner = currentUser && currentUser.id === project.sellerId;
+   274→   274→
+   275→   275→  return (
+   276→   276→    <motion.div
+   277→   277→      initial={{ opacity: 0, y: 12 }}
+   278→   278→      animate={{ opacity: 1, y: 0 }}
+   279→   279→      transition={{ duration: 0.4 }}
+   280→   280→      className="max-w-7xl mx-auto px-4 py-6"
+   281→   281→    >
+   282→   282→      {/* Back Button */}
+   283→   283→      <Button
+   284→   284→        variant="ghost"
+   285→   285→        size="sm"
+   286→   286→        className="gap-1.5 mb-4 text-muted-foreground hover:text-foreground -ml-2"
+   287→   287→        onClick={goBack}
+   288→   288→      >
+   289→   289→        <ArrowLeft className="size-4" />
+   290→   290→        Back to Listings
+   291→   291→      </Button>
+   292→   292→
+   293→   293→      {/* Hero Section */}
+   294→   294→      <div className={`rounded-2xl bg-gradient-to-br ${gradient} p-6 md:p-8 mb-6`}>
+   295→   295→        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+   296→   296→          <div className="flex-1 min-w-0">
+   297→   297→            <div className="flex flex-wrap items-center gap-2 mb-3">
+   298→   298→              {project.featured && (
+   299→   299→                <Badge className="gap-1 bg-amber-500 text-white border-amber-500">
+   300→   300→                  <Star className="size-3 fill-current" />
+   301→   301→                  Featured
+   302→   302→                </Badge>
+   303→   303→              )}
+   304→   304→              <Badge variant="secondary" className="bg-green-500/90 text-white border-green-500/90">
+   305→   305→                {project.status === 'active' ? 'Active' : project.status}
+   306→   306→              </Badge>
+   307→   307→              {project.businessStage && (
+   308→   308→                <Badge variant="outline">
+   309→   309→                  {STAGE_LABELS[project.businessStage] || project.businessStage}
+   310→   310→                </Badge>
+   311→   311→              )}
+   312→   312→            </div>
+   313→   313→            <h1 className="text-2xl md:text-3xl font-bold mb-2">{project.name}</h1>
+   314→   314→            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+   315→   315→              <span className="flex items-center gap-1.5">
+   316→   316→                <IconComp className="size-4" />
+   317→   317→                {getCategoryName(project.category)}
+   318→   318→              </span>
+   319→   319→              {project.country && (
+   320→   320→                <span className="flex items-center gap-1.5">
+   321→   321→                  <MapPin className="size-3.5" />
+   322→   322→                  {project.city ? `${project.city}, ` : ''}{project.country}
+   323→   323→                </span>
+   324→   324→              )}
+   325→   325→              {project.foundedYear && (
+   326→   326→                <span className="flex items-center gap-1.5">
+   327→   327→                  <Calendar className="size-3.5" />
+   328→   328→                  Founded {project.foundedYear}
+   329→   329→                </span>
+   330→   330→              )}
+   331→   331→            </div>
+   332→   332→          </div>
+   333→   333→        </div>
+   334→   334→      </div>
+   335→   335→
+   336→   336→      {/* Two-Column Layout */}
+   337→   337→      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+   338→   338→        {/* LEFT COLUMN */}
+   339→   339→        <div className="lg:col-span-2 space-y-6">
+   340→   340→          <Tabs defaultValue="overview" className="w-full">
+   341→   341→            <TabsList className="w-full justify-start flex-wrap h-auto gap-1 bg-transparent p-0 border-b rounded-none">
+   342→   342→              <TabsTrigger
+   343→   343→                value="overview"
+   344→   344→                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3"
+   345→   345→              >
+   346→   346→                Overview
+   347→   347→              </TabsTrigger>
+   348→   348→              <TabsTrigger
+   349→   349→                value="financials"
+   350→   350→                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3"
+   351→   351→              >
+   352→   352→                Financial Information
+   353→   353→              </TabsTrigger>
+   354→   354→              <TabsTrigger
+   355→   355→                value="assets"
+   356→   356→                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3"
+   357→   357→              >
+   358→   358→                Digital Assets
+   359→   359→              </TabsTrigger>
+   360→   360→              <TabsTrigger
+   361→   361→                value="metrics"
+   362→   362→                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3"
+   363→   363→              >
+   364→   364→                Business Metrics
+   365→   365→              </TabsTrigger>
+   366→   366→            </TabsList>
+   367→   367→
+   368→   368→            {/* Overview Tab */}
+   369→   369→            <TabsContent value="overview" className="mt-6 space-y-6">
+   370→   370→              <Card>
+   371→   371→                <CardHeader>
+   372→   372→                  <CardTitle className="text-base">Overview</CardTitle>
+   373→   373→                </CardHeader>
+   374→   374→                <CardContent>
+   375→   375→                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   376→   376→                    {project.overview || 'No overview provided.'}
+   377→   377→                  </p>
+   378→   378→                </CardContent>
+   379→   379→              </Card>
+   380→   380→
+   381→   381→              <Card>
+   382→   382→                <CardHeader>
+   383→   383→                  <CardTitle className="text-base flex items-center gap-2">
+   384→   384→                    <Target className="size-4" />
+   385→   385→                    Business Model
+   386→   386→                  </CardTitle>
+   387→   387→                </CardHeader>
+   388→   388→                <CardContent>
+   389→   389→                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   390→   390→                    {project.businessModel || 'Not specified.'}
+   391→   391→                  </p>
+   392→   392→                </CardContent>
+   393→   393→              </Card>
+   394→   394→
+   395→   395→              <Card>
+   396→   396→                <CardHeader>
+   397→   397→                  <CardTitle className="text-base flex items-center gap-2">
+   398→   398→                    <Users className="size-4" />
+   399→   399→                    Target Market
+   400→   400→                  </CardTitle>
+   401→   401→                </CardHeader>
+   402→   402→                <CardContent>
+   403→   403→                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   404→   404→                    {project.targetMarket || 'Not specified.'}
+   405→   405→                  </p>
+   406→   406→                </CardContent>
+   407→   407→              </Card>
+   408→   408→
+   409→   409→              <Card>
+   410→   410→                <CardHeader>
+   411→   411→                  <CardTitle className="text-base flex items-center gap-2">
+   412→   412→                    <BarChart3 className="size-4" />
+   413→   413→                    Revenue Model
+   414→   414→                  </CardTitle>
+   415→   415→                </CardHeader>
+   416→   416→                <CardContent>
+   417→   417→                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   418→   418→                    {project.revenueModel || 'Not specified.'}
+   419→   419→                  </p>
+   420→   420→                </CardContent>
+   421→   421→              </Card>
+   422→   422→
+   423→   423→              <Card>
+   424→   424→                <CardHeader>
+   425→   425→                  <CardTitle className="text-base flex items-center gap-2">
+   426→   426→                    <Zap className="size-4" />
+   427→   427→                    Growth Opportunity
+   428→   428→                  </CardTitle>
+   429→   429→                </CardHeader>
+   430→   430→                <CardContent>
+   431→   431→                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   432→   432→                    {project.growthOpportunity || 'Not specified.'}
+   433→   433→                  </p>
+   434→   434→                </CardContent>
+   435→   435→              </Card>
+   436→   436→
+   437→   437→              <Card>
+   438→   438→                <CardHeader>
+   439→   439→                  <CardTitle className="text-base flex items-center gap-2">
+   440→   440→                    <TrendingUp className="size-4" />
+   441→   441→                    Competitive Advantage
+   442→   442→                  </CardTitle>
+   443→   443→                </CardHeader>
+   444→   444→                <CardContent>
+   445→   445→                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   446→   446→                    {project.competitiveAdvantage || 'Not specified.'}
+   447→   447→                  </p>
+   448→   448→                </CardContent>
+   449→   449→              </Card>
+   450→   450→
+   451→   451→              <Card>
+   452→   452→                <CardHeader>
+   453→   453→                  <CardTitle className="text-base flex items-center gap-2">
+   454→   454→                    <AlertTriangle className="size-4" />
+   455→   455→                    Business Risks
+   456→   456→                  </CardTitle>
+   457→   457→                </CardHeader>
+   458→   458→                <CardContent>
+   459→   459→                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   460→   460→                    {project.businessRisks || 'Not specified.'}
+   461→   461→                  </p>
+   462→   462→                </CardContent>
+   463→   463→              </Card>
+   464→   464→
+   465→   465→              <Card>
+   466→   466→                <CardHeader>
+   467→   467→                  <CardTitle className="text-base flex items-center gap-2">
+   468→   468→                    <DoorOpen className="size-4" />
+   469→   469→                    Exit Opportunities
+   470→   470→                  </CardTitle>
+   471→   471→                </CardHeader>
+   472→   472→                <CardContent>
+   473→   473→                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   474→   474→                    {project.exitOpportunities || 'Not specified.'}
+   475→   475→                  </p>
+   476→   476→                </CardContent>
+   477→   477→              </Card>
+   478→   478→
+   479→   479→              {project.breakEvenAnalysis && (
+   480→   480→                <Card>
+   481→   481→                  <CardHeader>
+   482→   482→                    <CardTitle className="text-base">Break-Even Analysis</CardTitle>
+   483→   483→                  </CardHeader>
+   484→   484→                  <CardContent>
+   485→   485→                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+   486→   486→                      {project.breakEvenAnalysis}
+   487→   487→                    </p>
+   488→   488→                  </CardContent>
+   489→   489→                </Card>
+   490→   490→              )}
+   491→   491→            </TabsContent>
+   492→   492→
+   493→   493→            {/* Financial Tab */}
+   494→   494→            <TabsContent value="financials" className="mt-6">
+   495→   495→              <Card>
+   496→   496→                <CardHeader>
+   497→   497→                  <CardTitle className="text-base flex items-center gap-2">
+   498→   498→                    <BarChart3 className="size-4" />
+   499→   499→                    Financial Information
+   500→   500→                  </CardTitle>
+   501→   501→                </CardHeader>
+   502→   502→                <CardContent>
+   503→   503→                  <FinancialTable project={project} />
+   504→   504→                </CardContent>
+   505→   505→              </Card>
+   506→   506→            </TabsContent>
+   507→   507→
+   508→   508→            {/* Digital Assets Tab */}
+   509→   509→            <TabsContent value="assets" className="mt-6 space-y-6">
+   510→   510→              <Card>
+   511→   511→                <CardHeader>
+   512→   512→                  <CardTitle className="text-base flex items-center gap-2">
+   513→   513→                    <Globe className="size-4" />
+   514→   514→                    Digital Assets & Links
+   515→   515→                  </CardTitle>
+   516→   516→                </CardHeader>
+   517→   517→                <CardContent className="space-y-3">
+   518→   518→                  <DigitalAssetLink icon={Globe} label="Website" url={project.websiteUrl} />
+   519→   519→                  <DigitalAssetLink icon={Monitor} label="Demo" url={project.demoUrl} />
+   520→   520→                  <DigitalAssetLink icon={Github} label="GitHub Repository" url={project.githubRepo} />
+   521→   521→                  <DigitalAssetLink icon={Smartphone} label="Google Play" url={project.googlePlayUrl} />
+   522→   522→                  <DigitalAssetLink icon={Smartphone} label="Apple App Store" url={project.appleStoreUrl} />
+   523→   523→                  <DigitalAssetLink icon={Monitor} label="Admin Panel Demo" url={project.adminPanelDemo} />
+   524→   524→                  <DigitalAssetLink icon={Monitor} label="Customer Portal" url={project.customerPortalDemo} />
+   525→   525→                  <DigitalAssetLink icon={Copy} label="API Documentation" url={project.apiDocumentation} />
+   526→   526→                </CardContent>
+   527→   527→              </Card>
+   528→   528→
+   529→   529→              {(project.technologyStack || project.hostingProvider || project.cloudInfrastructure) && (
+   530→   530→                <Card>
+   531→   531→                  <CardHeader>
+   532→   532→                    <CardTitle className="text-base">Technical Details</CardTitle>
+   533→   533→                  </CardHeader>
+   534→   534→                  <CardContent className="space-y-3">
+   535→   535→                    {project.technologyStack && (
+   536→   536→                      <div>
+   537→   537→                        <p className="text-xs font-medium text-muted-foreground mb-1.5">Technology Stack</p>
+   538→   538→                        <div className="flex flex-wrap gap-1.5">
+   539→   539→                          {project.technologyStack.split(',').map((tech, i) => (
+   540→   540→                            <Badge key={i} variant="secondary" className="text-xs">
+   541→   541→                              {tech.trim()}
+   542→   542→                            </Badge>
+   543→   543→                          ))}
+   544→   544→                        </div>
+   545→   545→                      </div>
+   546→   546→                    )}
+   547→   547→                    {project.hostingProvider && (
+   548→   548→                      <div className="flex items-center justify-between py-1">
+   549→   549→                        <span className="text-sm text-muted-foreground">Hosting Provider</span>
+   550→   550→                        <span className="text-sm font-medium">{project.hostingProvider}</span>
+   551→   551→                      </div>
+   552→   552→                    )}
+   553→   553→                    {project.cloudInfrastructure && (
+   554→   554→                      <div className="flex items-center justify-between py-1">
+   555→   555→                        <span className="text-sm text-muted-foreground">Cloud Infrastructure</span>
+   556→   556→                        <span className="text-sm font-medium">{project.cloudInfrastructure}</span>
+   557→   557→                      </div>
+   558→   558→                    )}
+   559→   559→                    <div className="flex items-center justify-between py-1">
+   560→   560→                      <span className="text-sm text-muted-foreground">Source Code</span>
+   561→   561→                      <Badge variant={project.sourceCodeAvailable ? 'default' : 'outline'}>
+   562→   562→                        {project.sourceCodeAvailable ? 'Available' : 'Not Included'}
+   563→   563→                      </Badge>
+   564→   564→                    </div>
+   565→   565→                  </CardContent>
+   566→   566→                </Card>
+   567→   567→              )}
+   568→   568→            </TabsContent>
+   569→   569→
+   570→   570→            {/* Metrics Tab */}
+   571→   571→            <TabsContent value="metrics" className="mt-6">
+   572→   572→              <Card>
+   573→   573→                <CardHeader>
+   574→   574→                  <CardTitle className="text-base flex items-center gap-2">
+   575→   575→                    <BarChart3 className="size-4" />
+   576→   576→                    Business Metrics
+   577→   577→                  </CardTitle>
+   578→   578→                </CardHeader>
+   579→   579→                <CardContent className="space-y-5">
+   580→   580→                  <MetricBar label="Monthly Visitors" value={project.monthlyVisitors} max={5_000_000} />
+   581→   581→                  <MetricBar label="Monthly Active Users" value={project.monthlyActiveUsers} max={1_000_000} />
+   582→   582→                  <MetricBar label="Registered Users" value={project.registeredUsers} max={2_000_000} />
+   583→   583→                  <MetricBar label="Customers" value={project.customers} max={500_000} />
+   584→   584→                  <MetricBar label="Subscribers" value={project.subscribers} max={200_000} />
+   585→   585→                  <MetricBar label="Conversion Rate" value={project.conversionRate} max={100} suffix="%" />
+   586→   586→                  <MetricBar label="SEO Score" value={project.seoScore} max={100} suffix="/100" />
+   587→   587→
+   588→   588→                  {project.trafficSources && (
+   589→   589→                    <div className="pt-2">
+   590→   590→                      <p className="text-xs font-medium text-muted-foreground mb-1.5">Traffic Sources</p>
+   591→   591→                      <div className="flex flex-wrap gap-1.5">
+   592→   592→                        {project.trafficSources.split(',').map((src, i) => (
+   593→   593→                          <Badge key={i} variant="outline" className="text-xs">
+   594→   594→                            {src.trim()}
+   595→   595→                          </Badge>
+   596→   596→                        ))}
+   597→   597→                      </div>
+   598→   598→                    </div>
+   599→   599→                  )}
+   600→   600→                </CardContent>
+   601→   601→              </Card>
+   602→   602→            </TabsContent>
+   603→   603→          </Tabs>
+   604→   604→        </div>
+   605→   605→
+   606→   606→        {/* RIGHT COLUMN (Sidebar) */}
+   607→   607→        <div className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+   608→   608→          {/* Price Card */}
+   609→   609→          <Card>
+   610→   610→            <CardHeader className="pb-3">
+   611→   611→              <CardTitle className="text-base flex items-center gap-2">
+   612→   612→                <Gavel className="size-4" />
+   613→   613→                Pricing
+   614→   614→              </CardTitle>
+   615→   615→            </CardHeader>
+   616→   616→            <CardContent className="space-y-3">
+   617→   617→              <div className="text-center py-2">
+   618→   618→                <p className="text-xs text-muted-foreground mb-1">Selling Price</p>
+   619→   619→                <p className="text-3xl font-bold text-primary">{formatPrice(project.suggestedSellingPrice)}</p>
+   620→   620→                {project.suggestedSellingPrice && project.suggestedSellingPrice >= 100000 && (
+   621→   621→                  <p className="text-sm text-muted-foreground">≈ {formatCompact(project.suggestedSellingPrice, mode === 'PKR' ? 'USD' : 'PKR', pkrToUsd)}</p>
+   622→   622→                )}
+   623→   623→              </div>
+   624→   624→              <Separator />
+   625→   625→              <div className="space-y-2.5">
+   626→   626→                {project.buyNowPrice !== undefined && project.buyNowPrice !== null && (
+   627→   627→                  <div className="flex justify-between text-sm">
+   628→   628→                    <span className="text-muted-foreground">Buy Now Price</span>
+   629→   629→                    <span className="font-medium">{formatPrice(project.buyNowPrice)}</span>
+   630→   630→                  </div>
+   631→   631→                )}
+   632→   632→                {project.reservePrice !== undefined && project.reservePrice !== null && (
+   633→   633→                  <div className="flex justify-between text-sm">
+   634→   634→                    <span className="text-muted-foreground">Reserve Price</span>
+   635→   635→                    <span className="font-medium">{formatPrice(project.reservePrice)}</span>
+   636→   636→                  </div>
+   637→   637→                )}
+   638→   638→                {project.minimumOffer !== undefined && project.minimumOffer !== null && (
+   639→   639→                  <div className="flex justify-between text-sm">
+   640→   640→                    <span className="text-muted-foreground">Min Offer</span>
+   641→   641→                    <span className="font-medium">{formatPrice(project.minimumOffer)}</span>
+   642→   642→                  </div>
+   643→   643→                )}
+   644→   644→                {project.auctionEnabled && (
+   645→   645→                  <Badge variant="outline" className="w-full justify-center py-1.5 text-xs gap-1.5">
+   646→   646→                    <Gavel className="size-3" />
+   647→   647→                    Auction Enabled
+   648→   648→                  </Badge>
+   649→   649→                )}
+   650→   650→              </div>
+   651→   651→            </CardContent>
+   652→   652→          </Card>
+   653→   653→
+   654→   654→          {/* AI Valuation Card */}
+   655→   655→          {project.aiValuation && (
+   656→   656→            <motion.div
+   657→   657→              initial={{ opacity: 0, y: 10 }}
+   658→   658→              animate={{ opacity: 1, y: 0 }}
+   659→   659→              transition={{ delay: 0.2 }}
+   660→   660→            >
+   661→   661→              <Card className="border-violet-200 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/20">
+   662→   662→                <CardHeader className="pb-3">
+   663→   663→                  <CardTitle className="text-base flex items-center gap-2 text-violet-700 dark:text-violet-400">
+   664→   664→                    <Sparkles className="size-4" />
+   665→   665→                    AI Valuation
+   666→   666→                  </CardTitle>
+   667→   667→                </CardHeader>
+   668→   668→                <CardContent className="space-y-2.5">
+   669→   669→                  <div className="text-center py-1">
+   670→   670→                    <p className="text-xs text-muted-foreground mb-1">Estimated Value</p>
+   671→   671→                    <p className="text-2xl font-bold text-violet-700 dark:text-violet-400">
+   672→   672→                      {formatPrice(project.aiValuation)}
+   673→   673→                    </p>
+   674→   674→                  </div>
+   675→   675→                  <Separator />
+   676→   676→                  <div className="space-y-2">
+   677→   677→                    {project.investorPrice !== undefined && project.investorPrice !== null && (
+   678→   678→                      <div className="flex justify-between text-sm">
+   679→   679→                        <span className="text-muted-foreground">Investor Price</span>
+   680→   680→                        <span className="font-medium">{formatPrice(project.investorPrice)}</span>
+   681→   681→                      </div>
+   682→   682→                    )}
+   683→   683→                    {project.wholesalePrice !== undefined && project.wholesalePrice !== null && (
+   684→   684→                      <div className="flex justify-between text-sm">
+   685→   685→                        <span className="text-muted-foreground">Wholesale Price</span>
+   686→   686→                        <span className="font-medium">{formatPrice(project.wholesalePrice)}</span>
+   687→   687→                      </div>
+   688→   688→                    )}
+   689→   689→                    {project.acquisitionPrice !== undefined && project.acquisitionPrice !== null && (
+   690→   690→                      <div className="flex justify-between text-sm">
+   691→   691→                        <span className="text-muted-foreground">Acquisition Price</span>
+   692→   692→                        <span className="font-medium">{formatPrice(project.acquisitionPrice)}</span>
+   693→   693→                      </div>
+   694→   694→                    )}
+   695→   695→                  </div>
+   696→   696→                  {project.valuationDetails && (
+   697→   697→                    <>
+   698→   698→                      <Separator />
+   699→   699→                      <p className="text-xs text-muted-foreground leading-relaxed">
+   700→   700→                        {project.valuationDetails}
+   701→   701→                      </p>
+   702→   702→                    </>
+   703→   703→                  )}
+   704→   704→                </CardContent>
+   705→   705→              </Card>
+   706→   706→            </motion.div>
+   707→   707→          )}
+   708→   708→
+   709→   709→          {/* Seller Card */}
+   710→   710→          {project.seller && (
+   711→   711→            <Card>
+   712→   712→              <CardHeader className="pb-3">
+   713→   713→                <CardTitle className="text-base flex items-center gap-2">
+   714→   714→                  <Building2 className="size-4" />
+   715→   715→                  Seller
+   716→   716→                </CardTitle>
+   717→   717→              </CardHeader>
+   718→   718→              <CardContent>
+   719→   719→                <div className="flex items-center gap-3">
+   720→   720→                  <div className="size-10 rounded-full bg-muted flex items-center justify-center text-sm font-semibold shrink-0">
+   721→   721→                    {project.seller.name.charAt(0).toUpperCase()}
+   722→   722→                  </div>
+   723→   723→                  <div className="min-w-0">
+   724→   724→                    <div className="flex items-center gap-1.5">
+   725→   725→                      <p className="text-sm font-semibold truncate">{project.seller.name}</p>
+   726→   726→                      {project.seller.verified && (
+   727→   727→                        <CheckCircle2 className="size-3.5 text-green-500 shrink-0" />
+   728→   728→                      )}
+   729→   729→                    </div>
+   730→   730→                    {project.seller.company && (
+   731→   731→                      <p className="text-xs text-muted-foreground truncate">{project.seller.company}</p>
+   732→   732→                    )}
+   733→   733→                    {project.seller.country && (
+   734→   734→                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+   735→   735→                        <MapPin className="size-3" />
+   736→   736→                        {project.seller.country}
+   737→   737→                      </p>
+   738→   738→                    )}
+   739→   739→                  </div>
+   740→   740→                </div>
+   741→   741→              </CardContent>
+   742→   742→            </Card>
+   743→   743→          )}
+   744→   744→
+   745→   745→          {/* Preview Storefront */}
+   746→   746→          <Button
+   747→   747→            variant="outline"
+   748→   748→            className="w-full gap-2 border-primary/30 hover:bg-primary/5"
+   749→   749→            size="sm"
+   750→   750→            onClick={() => setCurrentView('storefront')}
+   751→   751→          >
+   752→   752→            <Store className="size-4 text-primary" />
+   753→   753→            Preview Storefront
+   754→   754→          </Button>
+   755→   755→
+   756→   756→          {/* Quick Actions */}
+   757→   757→          {!isOwner && (
+   758→   758→            <Card>
+   759→   759→              <CardContent className="p-4 space-y-2.5">
+   760→   760→                <Button className="w-full gap-2" size="sm">
+   761→   761→                  <Gavel className="size-4" />
+   762→   762→                  Make an Offer
+   763→   763→                </Button>
+   764→   764→                <Button variant="outline" className="w-full gap-2" size="sm">
+   765→   765→                  <Heart className="size-4" />
+   766→   766→                  Add to Favorites
+   767→   767→                </Button>
+   768→   768→                <Button variant="ghost" className="w-full gap-2" size="sm">
+   769→   769→                  <MessageSquare className="size-4" />
+   770→   770→                  Contact Seller
+   771→   771→                </Button>
+   772→   772→              </CardContent>
+   773→   773→            </Card>
+   774→   774→          )}
+   775→   775→
+   776→   776→          {/* Recent Offers */}
+   777→   777→          {offers.length > 0 && (
+   778→   778→            <Card>
+   779→   779→              <CardHeader className="pb-3">
+   780→   780→                <CardTitle className="text-base flex items-center gap-2">
+   781→   781→                  <Eye className="size-4" />
+   782→   782→                  Recent Offers ({offers.length})
+   783→   783→                </CardTitle>
+   784→   784→              </CardHeader>
+   785→   785→              <CardContent>
+   786→   786→                <div className="space-y-2.5 max-h-60 overflow-y-auto">
+   787→   787→                  {offers.slice(0, 5).map((offer) => (
+   788→   788→                    <div
+   789→   789→                      key={offer.id}
+   790→   790→                      className="flex items-center justify-between p-2.5 rounded-lg bg-muted/50"
+   791→   791→                    >
+   792→   792→                      <div className="flex items-center gap-2 min-w-0">
+   793→   793→                        <div className="size-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium shrink-0">
+   794→   794→                          {offer.buyer?.name?.charAt(0).toUpperCase() || '?'}
+   795→   795→                        </div>
+   796→   796→                        <div className="min-w-0">
+   797→   797→                          <p className="text-xs font-medium truncate">
+   798→   798→                            {offer.buyer?.name || 'Anonymous'}
+   799→   799→                          </p>
+   800→   800→                          <p className="text-[10px] text-muted-foreground">
+   801→   801→                            {formatDate(offer.createdAt)}
+   802→   802→                          </p>
+   803→   803→                        </div>
+   804→   804→                      </div>
+   805→   805→                      <div className="text-right shrink-0 ml-2">
+   806→   806→                        <p className="text-xs font-semibold">{formatPrice(offer.amount)}</p>
+   807→   807→                        <Badge
+   808→   808→                          variant={
+   809→   809→                            offer.status === 'accepted'
+   810→   810→                              ? 'default'
+   811→   811→                              : offer.status === 'rejected'
+   812→   812→                                ? 'destructive'
+   813→   813→                                : 'secondary'
+   814→   814→                          }
+   815→   815→                          className="text-[9px] px-1 py-0"
+   816→   816→                        >
+   817→   817→                          {offer.status}
+   818→   818→                        </Badge>
+   819→   819→                      </div>
+   820→   820→                    </div>
+   821→   821→                  ))}
+   822→   822→                </div>
+   823→   823→              </CardContent>
+   824→   824→            </Card>
+   825→   825→          )}
+   826→   826→
+   827→   827→          {/* Posted Date */}
+   828→   828→          <p className="text-xs text-center text-muted-foreground">
+   829→   829→            Listed on {formatDate(project.createdAt)}
+   830→   830→          </p>
+   831→   831→        </div>
+   832→   832→      </div>
+   833→   833→    </motion.div>
+   834→   834→  );
+   835→   835→}
