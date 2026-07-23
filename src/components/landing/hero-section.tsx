@@ -46,15 +46,15 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="f5-hero relative overflow-hidden">
-      {/* Subtle purple glow blobs */}
+    <section className="relative bg-white overflow-hidden">
+      {/* Subtle decorative gradient blobs (very faint) */}
       <div
-        className="pointer-events-none absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full opacity-20 blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, transparent 70%)' }}
+        className="pointer-events-none absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full opacity-[0.04]"
+        style={{ background: 'radial-gradient(circle, #8A2BE2 0%, transparent 70%)' }}
       />
       <div
-        className="pointer-events-none absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full opacity-15 blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%)' }}
+        className="pointer-events-none absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full opacity-[0.04]"
+        style={{ background: 'radial-gradient(circle, #EC4899 0%, transparent 70%)' }}
       />
 
       {/* Content */}
@@ -80,8 +80,8 @@ export default function HeroSection() {
           {/* Heading */}
           <motion.h1
             variants={itemVariants}
-            className="max-w-4xl text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-4xl md:text-5xl lg:text-6xl"
-            style={{ color: '#FFFFFF' }}
+            className="max-w-4xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl"
+            style={{ color: '#333333' }}
           >
             <span className="gradient-text">Buy, Sell &amp; Invest</span> in Businesses Worldwide
           </motion.h1>
@@ -90,7 +90,7 @@ export default function HeroSection() {
           <motion.p
             variants={itemVariants}
             className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl"
-            style={{ color: '#A1A1AA' }}
+            style={{ color: '#6B7280' }}
           >
             The global enterprise marketplace for SaaS, Real Estate, Startups,
             E-commerce, AI Solutions, and 50+ business categories
@@ -130,15 +130,15 @@ export default function HeroSection() {
                   className="flex flex-col items-center gap-1"
                 >
                   <div className="flex items-center gap-2">
-                    <Icon className="size-4" style={{ color: '#C084FC' }} />
+                    <Icon className="size-4" style={{ color: '#8A2BE2' }} />
                     <span
                       className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl"
-                      style={{ color: '#FFFFFF' }}
+                      style={{ color: '#333333' }}
                     >
                       {stat.value}
                     </span>
                   </div>
-                  <span className="text-xs sm:text-sm" style={{ color: '#A1A1AA' }}>
+                  <span className="text-xs sm:text-sm" style={{ color: '#6B7280' }}>
                     {stat.label}
                   </span>
                 </div>

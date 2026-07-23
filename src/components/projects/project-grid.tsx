@@ -32,38 +32,38 @@ interface ProjectGridProps {
 /* ---------- Helpers ---------- */
 
 const CATEGORY_GRADIENTS: Record<string, string> = {
-  'SaaS': 'from-[#8A2BE2]/20 to-[#A855F7]/10',
-  'AI Solutions': 'from-[#A855F7]/20 to-[#EC4899]/10',
-  'E-commerce': 'from-[#EC4899]/15 to-[#8A2BE2]/10',
-  'Real Estate': 'from-[#34D399]/15 to-[#06B6D4]/10',
-  'Mobile Apps': 'from-[#8A2BE2]/15 to-[#EC4899]/10',
-  'Startups': 'from-[#34D399]/15 to-[#A855F7]/10',
-  'FinTech': 'from-[#8A2BE2]/20 to-[#34D399]/10',
-  'HealthTech': 'from-[#EF4444]/15 to-[#EC4899]/10',
-  'EdTech': 'from-[#F59E0B]/15 to-[#8A2BE2]/10',
-  'Cybersecurity': 'from-[#A1A1AA]/15 to-[#666666]/10',
-  'CRM/ERP': 'from-[#A855F7]/15 to-[#8A2BE2]/10',
-  'Retail': 'from-[#EC4899]/15 to-[#A855F7]/10',
-  'Wholesale': 'from-[#34D399]/15 to-[#8A2BE2]/10',
-  'Investments': 'from-[#8A2BE2]/15 to-[#F59E0B]/10',
-  'Domains': 'from-[#C084FC]/15 to-[#8A2BE2]/10',
-  'Digital Products': 'from-[#EC4899]/15 to-[#C084FC]/10',
-  'Manufacturing': 'from-[#34D399]/15 to-[#8A2BE2]/10',
-  'Websites': 'from-[#8A2BE2]/15 to-[#C084FC]/10',
+  'SaaS': 'from-[#8A2BE2]/15 to-[#A855F7]/15',
+  'AI Solutions': 'from-[#A855F7]/15 to-[#EC4899]/15',
+  'E-commerce': 'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+  'Real Estate': 'from-[#EC4899]/15 to-[#FF6B9D]/15',
+  'Mobile Apps': 'from-[#8A2BE2]/15 to-[#4DABF7]/15',
+  'Startups': 'from-[#A855F7]/15 to-[#8A2BE2]/15',
+  'FinTech': 'from-[#4DABF7]/15 to-[#A855F7]/15',
+  'HealthTech': 'from-[#EC4899]/15 to-[#8A2BE2]/15',
+  'EdTech': 'from-[#FF6B9D]/15 to-[#4DABF7]/15',
+  'Cybersecurity': 'from-[#8A2BE2]/15 to-[#EC4899]/15',
+  'CRM/ERP': 'from-[#A855F7]/15 to-[#4DABF7]/15',
+  'Retail': 'from-[#EC4899]/15 to-[#A855F7]/15',
+  'Wholesale': 'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+  'Investments': 'from-[#8A2BE2]/15 to-[#FF6B9D]/15',
+  'Domains': 'from-[#A855F7]/15 to-[#EC4899]/15',
+  'Digital Products': 'from-[#EC4899]/15 to-[#A855F7]/15',
+  'Manufacturing': 'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+  'Websites': 'from-[#8A2BE2]/15 to-[#4DABF7]/15',
 };
 
 function getCategoryGradient(category: string): string {
   if (CATEGORY_GRADIENTS[category]) return CATEGORY_GRADIENTS[category];
-  // Deterministic hash-based gradient for unknown categories (purple/pink tones)
+  // Deterministic hash-based gradient for unknown categories (violet/pink/blue tones)
   const hash = category.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const gradients = [
-    'from-[#8A2BE2]/15 to-[#A855F7]/10',
-    'from-[#A855F7]/15 to-[#EC4899]/10',
-    'from-[#C084FC]/15 to-[#8A2BE2]/10',
-    'from-[#EC4899]/15 to-[#C084FC]/10',
-    'from-[#8A2BE2]/15 to-[#C084FC]/15',
+    'from-[#8A2BE2]/15 to-[#A855F7]/15',
+    'from-[#A855F7]/15 to-[#EC4899]/15',
+    'from-[#4DABF7]/15 to-[#8A2BE2]/15',
+    'from-[#EC4899]/15 to-[#FF6B9D]/15',
+    'from-[#8A2BE2]/15 to-[#4DABF7]/15',
     'from-[#A855F7]/15 to-[#8A2BE2]/15',
-    'from-[#C084FC]/15 to-[#A855F7]/15',
+    'from-[#4DABF7]/15 to-[#A855F7]/15',
   ];
   return gradients[hash % gradients.length];
 }
@@ -89,7 +89,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 function SkeletonCard() {
   return (
-    <Card className="overflow-hidden border border-[#222222] rounded-2xl" style={{ backgroundColor: '#111111' }}>
+    <Card className="overflow-hidden border border-[#F0F0F0] rounded-lg shadow-sm">
       <Skeleton className="h-40 w-full" />
       <CardContent className="p-4 space-y-3">
         <Skeleton className="h-5 w-3/4" />
@@ -121,7 +121,7 @@ function EmptyState() {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center py-20 px-4 text-center"
     >
-      <div className="w-24 h-24 rounded-full bg-[#2A1A3E] flex items-center justify-center mb-6">
+      <div className="w-24 h-24 rounded-full bg-[#F3E8FF] flex items-center justify-center mb-6">
         <PackageOpen className="size-10 text-[#8A2BE2]" />
       </div>
       <h3 className="text-lg font-semibold mb-2">No projects found</h3>
@@ -170,12 +170,12 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.06, ease: 'easeOut' }}
     >
-      <Card className="overflow-hidden border border-[#222222] rounded-2xl hover:border-[#333333] hover:-translate-y-0.5 transition-all duration-300 group" style={{ backgroundColor: '#111111' }}>
+      <Card className="overflow-hidden border border-[#F0F0F0] rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
         {/* Thumbnail */}
         <div
           className={`relative h-40 bg-gradient-to-br ${gradient} flex items-center justify-center`}
         >
-          <CategoryIconDisplay iconName={iconKey} className="size-12 text-[#8A2BE2]/30" />
+          <CategoryIconDisplay iconName={iconKey} className="size-12 text-foreground/40" />
 
           {project.featured && (
             <div className="absolute top-3 left-3">
@@ -203,11 +203,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
           {/* Badges Row */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-[#333333]">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-[#F0F0F0]">
               {getCategoryName(project.category)}
             </Badge>
             {project.country && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 border-[#333333]">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 border-[#F0F0F0]">
                 <MapPin className="size-2.5" />
                 {project.country.length > 12 ? project.country.slice(0, 12) + '…' : project.country}
               </Badge>
@@ -233,7 +233,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 {formatROI(project.expectedROI)}
               </p>
             </div>
-            <div className="rounded-md px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(138,43,226,0.1)' }}>
+            <div className="rounded-md px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(138,43,226,0.05)' }}>
               <p className="text-[10px] text-muted-foreground leading-tight">Price</p>
               <p className="text-xs font-bold mt-0.5 text-[#8A2BE2]">
                 {formatPrice(project.suggestedSellingPrice)}
@@ -245,7 +245,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           {project.seller && (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <div className="size-5 rounded-full bg-[#2A1A3E] flex items-center justify-center text-[10px] font-medium text-[#C084FC]">
+                <div className="size-5 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[10px] font-medium text-[#8A2BE2]">
                   {project.seller.name.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-xs text-muted-foreground truncate max-w-[120px]">
@@ -280,11 +280,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             <button
               onClick={handleAddToCart}
               disabled={!hasPrice || adding}
-              className="p-2 rounded-lg border border-[#333333] transition-all duration-200 shrink-0"
+              className="p-2 rounded-lg border border-[#F0F0F0] transition-all duration-200 shrink-0"
               style={{
-                backgroundColor: addedToCart ? 'rgba(138,43,226,0.15)' : '#111111',
-                borderColor: addedToCart ? '#8A2BE2' : '#333333',
-                color: addedToCart ? '#C084FC' : !hasPrice ? '#666666' : '#C084FC',
+                backgroundColor: addedToCart ? 'rgba(138,43,226,0.1)' : '#fff',
+                borderColor: addedToCart ? '#8A2BE2' : '#F0F0F0',
+                color: addedToCart ? '#8A2BE2' : !hasPrice ? '#D1D5DB' : '#8A2BE2',
                 cursor: hasPrice ? 'pointer' : 'not-allowed',
               }}
               title={hasPrice ? 'Add to Cart' : 'No price set'}
@@ -332,7 +332,7 @@ export default function ProjectGrid({ projects, isLoading = false }: ProjectGrid
     <>
       {/* Cumulative Portfolio Banner */}
       {totalPKR > 0 && (
-        <div className="mb-6 rounded-xl border border-[#222222] bg-gradient-to-r from-[#8A2BE2]/10 via-[#A855F7]/5 to-[#C084FC]/5 p-4 sm:p-5">
+        <div className="mb-6 rounded-lg border border-[#F0F0F0] bg-gradient-to-r from-[#8A2BE2]/5 via-[#EC4899]/5 to-[#4DABF7]/5 p-4 sm:p-5 shadow-sm">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Cumulative Portfolio Value</p>
