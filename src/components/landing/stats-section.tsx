@@ -54,7 +54,7 @@ export default function StatsSection() {
                     <Icon className="size-6" style={{ color: '#8A2BE2' }} />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold tracking-tight text-[#333333] sm:text-3xl">
+                    <p className="text-2xl font-bold tracking-tight text-[#FFFFFF] sm:text-3xl">
                       {stat.value}
                     </p>
                     <p className="mt-1 text-sm text-muted-foreground">

@@ -56,14 +56,14 @@ const stepVariants = {
 
 export default function HowItWorksSection() {
   return (
-    <section className="bg-[#F9FAFB] py-16 sm:py-20">
+    <section className="py-16 sm:py-20" style={{ backgroundColor: '#0A0A0A' }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="mb-12 text-center sm:mb-16">
-          <h2 className="f5-section-heading text-2xl font-semibold tracking-tight text-[#333333] sm:text-3xl lg:text-4xl">
+          <h2 className="f5-section-heading text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
             How It Works
           </h2>
-          <p className="mt-3 text-[#6B7280] sm:text-lg">
+          <p className="mt-3 text-[#A1A1AA] sm:text-lg">
             Get started in four simple steps
           </p>
         </div>
@@ -107,10 +107,10 @@ export default function HowItWorksSection() {
 
                       {/* Text */}
                       <div>
-                        <h3 className="text-base font-semibold text-[#333333]">
+                        <h3 className="text-base font-semibold text-[#FFFFFF]">
                           {step.title}
                         </h3>
-                        <p className="mt-1.5 text-sm leading-relaxed text-[#6B7280]">
+                        <p className="mt-1.5 text-sm leading-relaxed text-[#A1A1AA]">
                           {step.description}
                         </p>
                       </div>
@@ -119,7 +119,7 @@ export default function HowItWorksSection() {
 
                   {/* Arrow between steps on mobile (vertical) */}
                   <div className="absolute -bottom-8 left-1/2 z-10 flex -translate-x-1/2 items-center justify-center md:hidden">
-                    <div className="flex size-6 items-center justify-center rounded-full bg-white shadow-sm">
+                    <div className="flex size-6 items-center justify-center rounded-full bg-[#111111] border border-[#222222]">
                       <svg
                         className="size-3 text-[#8A2BE2]"
                         fill="none"
@@ -138,7 +138,7 @@ export default function HowItWorksSection() {
 
                   {/* Arrow between steps on desktop (horizontal) */}
                   <div className="absolute -right-3 top-1/2 z-10 hidden -translate-y-1/2 md:flex">
-                    <div className="flex size-6 items-center justify-center rounded-full bg-white shadow-sm">
+                    <div className="flex size-6 items-center justify-center rounded-full bg-[#111111] border border-[#222222]">
                       <svg
                         className="size-3 text-[#8A2BE2]"
                         fill="none"

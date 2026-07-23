@@ -59,20 +59,20 @@ function getCategoryIconName(category: string): string {
 function getCategoryGradient(category: string): string {
   const name = getCategoryName(category);
   const map: Record<string, string> = {
-    'SaaS': 'from-emerald-500/30 to-teal-600/30',
-    'AI Solutions': 'from-violet-500/30 to-fuchsia-600/30',
-    'E-commerce': 'from-orange-500/30 to-amber-600/30',
-    'Real Estate': 'from-cyan-500/30 to-sky-600/30',
-    'Mobile Apps': 'from-pink-500/30 to-rose-600/30',
-    'Startups': 'from-lime-500/30 to-green-600/30',
-    'FinTech': 'from-emerald-600/30 to-green-700/30',
-    'HealthTech': 'from-red-400/30 to-pink-500/30',
-    'EdTech': 'from-yellow-500/30 to-orange-500/30',
-    'Cybersecurity': 'from-slate-500/30 to-zinc-600/30',
-    'Domains': 'from-purple-400/30 to-violet-500/30',
-    'Websites': 'from-sky-400/30 to-cyan-500/30',
+    'SaaS': 'from-[#8A2BE2]/30 to-[#A855F7]/20',
+    'AI Solutions': 'from-[#A855F7]/30 to-[#EC4899]/20',
+    'E-commerce': 'from-[#EC4899]/25 to-[#F59E0B]/15',
+    'Real Estate': 'from-[#34D399]/25 to-[#06B6D4]/15',
+    'Mobile Apps': 'from-[#EC4899]/25 to-[#A855F7]/20',
+    'Startups': 'from-[#34D399]/25 to-[#A855F7]/20',
+    'FinTech': 'from-[#8A2BE2]/30 to-[#34D399]/15',
+    'HealthTech': 'from-[#EF4444]/25 to-[#EC4899]/20',
+    'EdTech': 'from-[#F59E0B]/25 to-[#EF4444]/15',
+    'Cybersecurity': 'from-[#A1A1AA]/20 to-[#666666]/15',
+    'Domains': 'from-[#C084FC]/25 to-[#8A2BE2]/20',
+    'Websites': 'from-[#A855F7]/25 to-[#C084FC]/20',
   };
-  return map[name] || 'from-stone-500/30 to-neutral-600/30';
+  return map[name] || 'from-[#8A2BE2]/20 to-[#A855F7]/15';
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -658,9 +658,9 @@ export default function ProjectDetail() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="border-violet-200 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/50 to-fuchsia-50/50 dark:from-violet-950/20 dark:to-fuchsia-950/20">
+              <Card className="border-[#8A2BE2]/30 bg-gradient-to-br from-[#8A2BE2]/10 to-[#A855F7]/5">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2 text-violet-700 dark:text-violet-400">
+                  <CardTitle className="text-base flex items-center gap-2 text-[#C084FC]">
                     <Sparkles className="size-4" />
                     AI Valuation
                   </CardTitle>
@@ -668,7 +668,7 @@ export default function ProjectDetail() {
                 <CardContent className="space-y-2.5">
                   <div className="text-center py-1">
                     <p className="text-xs text-muted-foreground mb-1">Estimated Value</p>
-                    <p className="text-2xl font-bold text-violet-700 dark:text-violet-400">
+                    <p className="text-2xl font-bold text-[#C084FC]">
                       {formatPrice(project.aiValuation)}
                     </p>
                   </div>

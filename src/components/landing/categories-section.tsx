@@ -42,7 +42,7 @@ export default function CategoriesSection() {
   };
 
   return (
-    <section className="f5-light-section py-16 sm:py-20">
+    <section className="f5-light-section py-16 sm:py-20" style={{ backgroundColor: '#0A0A0A' }}>
       {/* Decorative gradient blob — top-right */}
       <div className="f5-light-blob" />
 
@@ -79,10 +79,10 @@ export default function CategoriesSection() {
                       {Icon && <Icon className="size-5" />}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-[#333333]">
+                      <p className="truncate text-sm font-semibold text-[#FFFFFF]">
                         {cat.name}
                       </p>
-                      <p className="text-xs text-[#6B7280]">
+                      <p className="text-xs text-[#A1A1AA]">
                         {cat._count?.projects ?? '—'} projects
                       </p>
                     </div>

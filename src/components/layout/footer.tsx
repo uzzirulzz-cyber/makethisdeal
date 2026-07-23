@@ -50,10 +50,10 @@ export function Footer() {
                 MTD
               </div>
               <span className="text-lg font-bold tracking-tight text-white">
-                Make<span style={{ color: '#A855F7' }}>This</span>Deal
+                Make<span style={{ color: '#C084FC' }}>This</span>Deal
               </span>
             </div>
-            <p className="text-sm mb-5 max-w-xs" style={{ color: '#A8B2D1' }}>
+            <p className="text-sm mb-5 max-w-xs" style={{ color: '#A1A1AA' }}>
               The global enterprise marketplace where businesses connect, invest, and grow together.
             </p>
 
@@ -62,19 +62,19 @@ export function Footer() {
               <a
                 href="mailto:playbeatdigital@proton.me"
                 className="flex items-center gap-2.5 text-sm transition-colors group"
-                style={{ color: '#A8B2D1' }}
+                style={{ color: '#A1A1AA' }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = '#A855F7';
+                  (e.currentTarget as HTMLElement).style.color = '#C084FC';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                  (e.currentTarget as HTMLElement).style.color = '#A1A1AA';
                 }}
               >
                 <div
                   className="h-8 w-8 rounded-full flex items-center justify-center transition-colors"
-                  style={{ backgroundColor: 'rgba(138, 43, 226, 0.2)' }}
+                  style={{ backgroundColor: 'rgba(138, 43, 226, 0.15)' }}
                 >
-                  <Mail className="h-4 w-4" style={{ color: '#A855F7' }} />
+                  <Mail className="h-4 w-4" style={{ color: '#C084FC' }} />
                 </div>
                 <span className="truncate">playbeatdigital@proton.me</span>
               </a>
@@ -83,17 +83,17 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 text-sm transition-colors group"
-                style={{ color: '#A8B2D1' }}
+                style={{ color: '#A1A1AA' }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLElement).style.color = '#34D399';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                  (e.currentTarget as HTMLElement).style.color = '#A1A1AA';
                 }}
               >
                 <div
                   className="h-8 w-8 rounded-full flex items-center justify-center transition-colors"
-                  style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
+                  style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}
                 >
                   <MessageCircle className="h-4 w-4" style={{ color: '#34D399' }} />
                 </div>
@@ -101,13 +101,13 @@ export function Footer() {
               </a>
               <div
                 className="flex items-center gap-2.5 text-sm"
-                style={{ color: '#A8B2D1' }}
+                style={{ color: '#A1A1AA' }}
               >
                 <div
                   className="h-8 w-8 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
                 >
-                  <MapPin className="h-4 w-4" style={{ color: '#6B7280' }} />
+                  <MapPin className="h-4 w-4" style={{ color: '#A1A1AA' }} />
                 </div>
                 <span>Karachi, Pakistan</span>
               </div>
@@ -119,14 +119,14 @@ export function Footer() {
                 <button
                   key={i}
                   className="h-9 w-9 rounded-lg flex items-center justify-center transition-all duration-200"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', color: '#A8B2D1' }}
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', color: '#A1A1AA' }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(168, 85, 247, 0.2)';
-                    (e.currentTarget as HTMLElement).style.color = '#A855F7';
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(138, 43, 226, 0.15)';
+                    (e.currentTarget as HTMLElement).style.color = '#C084FC';
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
-                    (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    (e.currentTarget as HTMLElement).style.color = '#A1A1AA';
                   }}
                 >
                   <Icon className="h-4 w-4" />
@@ -138,19 +138,19 @@ export function Footer() {
           {/* Link Columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4 className="font-semibold text-sm mb-4 text-white">{title}</h4>
+              <h4 className="font-semibold text-sm mb-4 text-white tracking-tight">{title}</h4>
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
                     <button
                       onClick={() => setCurrentView(link.action)}
                       className="text-sm transition-colors duration-200"
-                      style={{ color: '#A8B2D1' }}
+                      style={{ color: '#A1A1AA' }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.color = '#A855F7';
+                        (e.currentTarget as HTMLElement).style.color = '#C084FC';
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                        (e.currentTarget as HTMLElement).style.color = '#A1A1AA';
                       }}
                     >
                       {link.label}
@@ -165,21 +165,21 @@ export function Footer() {
         {/* Bottom bar */}
         <div
           className="mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
-          style={{ borderTop: '1px solid #1A2342' }}
+          style={{ borderTop: '1px solid #222222' }}
         >
-          <p className="text-sm" style={{ color: '#A8B2D1' }}>
+          <p className="text-sm" style={{ color: '#A1A1AA' }}>
             © {new Date().getFullYear()} MakeThisDeal. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <a
               href="mailto:playbeatdigital@proton.me"
               className="text-sm flex items-center gap-1.5 transition-colors duration-200"
-              style={{ color: '#A8B2D1' }}
+              style={{ color: '#A1A1AA' }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = '#A855F7';
+                (e.currentTarget as HTMLElement).style.color = '#C084FC';
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                (e.currentTarget as HTMLElement).style.color = '#A1A1AA';
               }}
             >
               <Mail className="h-3.5 w-3.5" />
@@ -202,7 +202,7 @@ export function Footer() {
               <span>WhatsApp</span>
             </a>
           </div>
-          <p className="text-sm flex items-center gap-1" style={{ color: '#A8B2D1' }}>
+          <p className="text-sm flex items-center gap-1" style={{ color: '#A1A1AA' }}>
             <Globe className="h-3.5 w-3.5" />
             Trusted by businesses in 120+ countries
           </p>

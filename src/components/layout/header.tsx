@@ -55,7 +55,7 @@ export function Header() {
               priority
             />
             <div className="hidden sm:block">
-              <span className="text-lg font-bold tracking-tight" style={{ color: '#333333' }}>
+              <span className="text-lg font-bold tracking-tight" style={{ color: '#FFFFFF' }}>
                 Make<span style={{ color: '#8A2BE2' }}>This</span>Deal
               </span>
             </div>
@@ -74,17 +74,17 @@ export function Header() {
                   className="gap-2 font-medium transition-all duration-200 rounded-lg"
                   style={{
                     backgroundColor: isActive ? '#8A2BE2' : 'transparent',
-                    color: isActive ? '#FFFFFF' : '#6B7280',
+                    color: isActive ? '#FFFFFF' : '#A1A1AA',
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.color = '#8A2BE2';
-                      (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(138, 43, 226, 0.08)';
+                      (e.currentTarget as HTMLElement).style.color = '#C084FC';
+                      (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(138, 43, 226, 0.1)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.color = '#6B7280';
+                      (e.currentTarget as HTMLElement).style.color = '#A1A1AA';
                       (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
                     }
                   }}
@@ -142,7 +142,7 @@ export function Header() {
             {/* Search bar on browse */}
             {currentView === 'browse' && (
               <div className="hidden lg:flex items-center relative">
-                <Search className="absolute left-3 h-4 w-4" style={{ color: '#6B7280' }} />
+                <Search className="absolute left-3 h-4 w-4" style={{ color: '#A1A1AA' }} />
                 <input
                   type="text"
                   placeholder="Search projects..."
@@ -150,9 +150,9 @@ export function Header() {
                   onChange={(e) => setSearchFilters({ query: e.target.value, page: 1 })}
                   className="h-9 w-64 rounded-lg pl-9 pr-4 text-sm transition-all focus:outline-none focus:ring-2"
                   style={{
-                    border: '1px solid #F0F0F0',
-                    backgroundColor: '#F9FAFB',
-                    color: '#333333',
+                    border: '1px solid #333333',
+                    backgroundColor: '#111111',
+                    color: '#FFFFFF',
                     // @ts-expect-error CSS custom property
                     '--tw-ring-color': 'rgba(138, 43, 226, 0.2)',
                   }}
@@ -161,7 +161,7 @@ export function Header() {
                     (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(138, 43, 226, 0.15)';
                   }}
                   onBlur={(e) => {
-                    (e.target as HTMLInputElement).style.borderColor = '#F0F0F0';
+                    (e.target as HTMLInputElement).style.borderColor = '#333333';
                     (e.target as HTMLInputElement).style.boxShadow = 'none';
                   }}
                 />
@@ -174,13 +174,13 @@ export function Header() {
                   variant="ghost"
                   size="sm"
                   className="relative gap-2 transition-colors"
-                  style={{ color: '#6B7280' }}
+                  style={{ color: '#A1A1AA' }}
                   onClick={() => setCurrentView('dashboard')}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = '#8A2BE2';
+                    (e.currentTarget as HTMLElement).style.color = '#C084FC';
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = '#6B7280';
+                    (e.currentTarget as HTMLElement).style.color = '#A1A1AA';
                   }}
                 >
                   <Heart className="h-4 w-4" />
@@ -225,7 +225,7 @@ export function Header() {
                   variant="ghost"
                   size="icon"
                   className="md:hidden"
-                  style={{ color: '#333333' }}
+                  style={{ color: '#FFFFFF' }}
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
@@ -233,7 +233,7 @@ export function Header() {
               <SheetContent
                 side="right"
                 className="w-80"
-                style={{ backgroundColor: '#FFFFFF', borderLeft: '1px solid #F0F0F0' }}
+                style={{ backgroundColor: '#111111', borderLeft: '1px solid #222222' }}
               >
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <div className="flex flex-col gap-6 mt-8">
@@ -248,7 +248,7 @@ export function Header() {
                       height={36}
                       className="object-contain"
                     />
-                    <span className="text-lg font-bold" style={{ color: '#333333' }}>
+                    <span className="text-lg font-bold" style={{ color: '#FFFFFF' }}>
                       Make<span style={{ color: '#8A2BE2' }}>This</span>Deal
                     </span>
                   </button>
@@ -260,20 +260,20 @@ export function Header() {
                           key={item.view}
                           className="flex items-center gap-3 h-12 px-3 rounded-lg text-sm font-medium transition-all duration-200"
                           style={{
-                            backgroundColor: isActive ? 'rgba(138, 43, 226, 0.1)' : 'transparent',
-                            color: isActive ? '#8A2BE2' : '#6B7280',
+                            backgroundColor: isActive ? 'rgba(138, 43, 226, 0.15)' : 'transparent',
+                            color: isActive ? '#C084FC' : '#A1A1AA',
                           }}
                           onClick={() => { setCurrentView(item.view); setMobileOpen(false); }}
                           onMouseEnter={(e) => {
                             if (!isActive) {
-                              (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(138, 43, 226, 0.06)';
-                              (e.currentTarget as HTMLElement).style.color = '#8A2BE2';
+                              (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(138, 43, 226, 0.08)';
+                              (e.currentTarget as HTMLElement).style.color = '#C084FC';
                             }
                           }}
                           onMouseLeave={(e) => {
                             if (!isActive) {
                               (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-                              (e.currentTarget as HTMLElement).style.color = '#6B7280';
+                              (e.currentTarget as HTMLElement).style.color = '#A1A1AA';
                             }
                           }}
                         >

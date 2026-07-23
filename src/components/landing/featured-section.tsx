@@ -31,12 +31,12 @@ const cardVariants = {
 };
 
 const GRADIENTS = [
-  'from-[#8A2BE2]/15 to-[#EC4899]/15',
-  'from-[#4DABF7]/15 to-[#8A2BE2]/15',
-  'from-[#A855F7]/15 to-[#EC4899]/15',
-  'from-[#EC4899]/15 to-[#FF6B9D]/15',
-  'from-[#4DABF7]/15 to-[#A855F7]/15',
-  'from-[#8A2BE2]/15 to-[#4DABF7]/15',
+  'from-[#8A2BE2]/20 to-[#A855F7]/10',
+  'from-[#A855F7]/20 to-[#EC4899]/10',
+  'from-[#C084FC]/15 to-[#8A2BE2]/10',
+  'from-[#EC4899]/15 to-[#C084FC]/10',
+  'from-[#8A2BE2]/15 to-[#C084FC]/15',
+  'from-[#A855F7]/15 to-[#8A2BE2]/15',
 ];
 
 function renderCategoryIcon(categorySlug: string, className: string) {
@@ -48,7 +48,7 @@ function renderCategoryIcon(categorySlug: string, className: string) {
 
 function ProjectCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-lg border border-[#F0F0F0] bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-[#222222] bg-[#111111]">
       <Skeleton className="h-40 w-full rounded-none" />
       <div className="space-y-3 p-4">
         <Skeleton className="h-4 w-16" />
@@ -85,7 +85,7 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
           {renderCategoryIcon(project.category, 'size-12 text-[#8A2BE2]/40 transition-transform group-hover:scale-110')}
           <Badge
             variant="secondary"
-            className="absolute left-3 top-3 bg-white/90 text-xs font-medium text-foreground backdrop-blur-sm"
+            className="absolute left-3 top-3 bg-black/60 text-xs font-medium text-white backdrop-blur-sm"
           >
             {getCategoryName(project.category)}
           </Badge>
@@ -104,13 +104,13 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
         <div className="p-4">
           {/* Project Name */}
-          <h3 className="truncate text-base font-semibold leading-snug text-[#333333] transition-colors group-hover:text-[#8A2BE2]">
+          <h3 className="truncate text-base font-semibold leading-snug text-[#FFFFFF] transition-colors group-hover:text-[#C084FC]">
             {project.name}
           </h3>
 
           {/* Country */}
           {project.country && (
-            <div className="mt-1.5 flex items-center gap-1 text-xs text-[#6B7280]">
+            <div className="mt-1.5 flex items-center gap-1 text-xs text-[#A1A1AA]">
               <MapPin className="size-3" />
               <span>{project.country}</span>
             </div>
@@ -118,11 +118,11 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
           {/* Key Metrics */}
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <span className="font-bold text-[#8A2BE2]">
+            <span className="font-bold text-[#C084FC]">
               {formatPrice(project.suggestedSellingPrice ?? project.companyValuation)}
             </span>
             {project.annualRevenue != null && project.annualRevenue > 0 && (
-              <span className="text-[#6B7280]">
+              <span className="text-[#A1A1AA]">
                 Rev: {formatPrice(project.annualRevenue)}
               </span>
             )}
@@ -136,15 +136,15 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
           {/* Seller */}
           {project.seller && (
-            <div className="mt-3 flex items-center gap-2 border-t border-[#F0F0F0] pt-3">
-              <div className="flex size-6 items-center justify-center rounded-full bg-[#8A2BE2]/10 text-xs font-bold text-[#8A2BE2]">
+            <div className="mt-3 flex items-center gap-2 border-t border-[#222222] pt-3">
+              <div className="flex size-6 items-center justify-center rounded-full bg-[#8A2BE2]/15 text-xs font-bold text-[#C084FC]">
                 {project.seller.name.charAt(0).toUpperCase()}
               </div>
-              <span className="truncate text-xs text-[#6B7280]">
+              <span className="truncate text-xs text-[#A1A1AA]">
                 {project.seller.name}
               </span>
               {project.seller.verified && (
-                <BadgeCheck className="size-3.5 text-[#8A2BE2]" />
+                <BadgeCheck className="size-3.5 text-[#C084FC]" />
               )}
             </div>
           )}
@@ -176,14 +176,14 @@ export default function FeaturedSection() {
   }, []);
 
   return (
-    <section className="bg-white py-16 sm:py-20">
+    <section className="py-16 sm:py-20" style={{ backgroundColor: '#000000' }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="mb-10 text-center sm:mb-12">
-          <h2 className="f5-section-heading text-2xl font-semibold tracking-tight text-[#333333] sm:text-3xl lg:text-4xl">
+          <h2 className="f5-section-heading text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
             Featured Opportunities
           </h2>
-          <p className="mt-3 text-[#6B7280] sm:text-lg">
+          <p className="mt-3 text-[#A1A1AA] sm:text-lg">
             Hand-picked projects from verified sellers
           </p>
         </div>
@@ -212,8 +212,8 @@ export default function FeaturedSection() {
             ))}
           </motion.div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#F0F0F0] py-16 text-center">
-            <p className="text-[#6B7280]">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#333333] py-16 text-center">
+            <p className="text-[#A1A1AA]">
               Featured projects are loading&hellip;
             </p>
           </div>

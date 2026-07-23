@@ -44,88 +44,88 @@
 }
 
 /* ============================
-   F5 STUDIO DESIGN SYSTEM
-   Dark Navy + Violet + Pink
+   PREMIUM DARK SAAS DESIGN SYSTEM
+   Framer-inspired: Pure Black + Purple Glow
    ============================ */
 
 :root {
   --radius: 0.5rem;
   /* Backgrounds */
-  --background: #FFFFFF;
-  --foreground: #333333;
+  --background: #000000;
+  --foreground: #FFFFFF;
   /* Cards */
-  --card: #FFFFFF;
-  --card-foreground: #333333;
+  --card: #111111;
+  --card-foreground: #FFFFFF;
   /* Popover */
-  --popover: #FFFFFF;
-  --popover-foreground: #333333;
-  /* Primary = Violet */
+  --popover: #111111;
+  --popover-foreground: #FFFFFF;
+  /* Primary = Purple */
   --primary: #8A2BE2;
   --primary-foreground: #FFFFFF;
   /* Secondary */
-  --secondary: #F5F3FF;
-  --secondary-foreground: #333333;
+  --secondary: #1A1A1A;
+  --secondary-foreground: #FFFFFF;
   /* Muted */
-  --muted: #F9FAFB;
-  --muted-foreground: #6B7280;
+  --muted: #1A1A1A;
+  --muted-foreground: #A1A1AA;
   /* Accent */
-  --accent: #F3E8FF;
-  --accent-foreground: #333333;
+  --accent: #2A1A3E;
+  --accent-foreground: #FFFFFF;
   /* Destructive */
   --destructive: #EF4444;
   /* Border & Input */
-  --border: #F0F0F0;
-  --input: #E5E7EB;
+  --border: #222222;
+  --input: #222222;
   --ring: #8A2BE2;
   /* Charts */
   --chart-1: #8A2BE2;
   --chart-2: #EC4899;
-  --chart-3: #4DABF7;
-  --chart-4: #A855F7;
-  --chart-5: #FF6B9D;
+  --chart-3: #A855F7;
+  --chart-4: #34D399;
+  --chart-5: #F59E0B;
   /* Sidebar */
-  --sidebar: #F9FAFB;
-  --sidebar-foreground: #333333;
+  --sidebar: #0A0A0A;
+  --sidebar-foreground: #FFFFFF;
   --sidebar-primary: #8A2BE2;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F3E8FF;
-  --sidebar-accent-foreground: #333333;
-  --sidebar-border: #F0F0F0;
+  --sidebar-accent: #2A1A3E;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #222222;
   --sidebar-ring: #8A2BE2;
 }
 
 .dark {
-  --background: #0A1128;
-  --foreground: #E2E8F0;
-  --card: #0F1A36;
-  --card-foreground: #E2E8F0;
-  --popover: #0F1A36;
-  --popover-foreground: #E2E8F0;
-  --primary: #A855F7;
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --card: #111111;
+  --card-foreground: #FFFFFF;
+  --popover: #111111;
+  --popover-foreground: #FFFFFF;
+  --primary: #8A2BE2;
   --primary-foreground: #FFFFFF;
-  --secondary: #1A2342;
-  --secondary-foreground: #E2E8F0;
-  --muted: #1A2342;
-  --muted-foreground: #94A3B8;
-  --accent: #1E1B4B;
-  --accent-foreground: #E2E8F0;
+  --secondary: #1A1A1A;
+  --secondary-foreground: #FFFFFF;
+  --muted: #1A1A1A;
+  --muted-foreground: #A1A1AA;
+  --accent: #2A1A3E;
+  --accent-foreground: #FFFFFF;
   --destructive: #F87171;
-  --border: #1A2342;
-  --input: #1A2342;
-  --ring: #A855F7;
-  --chart-1: #A855F7;
+  --border: #222222;
+  --input: #222222;
+  --ring: #8A2BE2;
+  --chart-1: #8A2BE2;
   --chart-2: #EC4899;
-  --chart-3: #4DABF7;
-  --chart-4: #8A2BE2;
-  --chart-5: #FF6B9D;
-  --sidebar: #0A1128;
-  --sidebar-foreground: #E2E8F0;
-  --sidebar-primary: #A855F7;
+  --chart-3: #A855F7;
+  --chart-4: #34D399;
+  --chart-5: #F59E0B;
+  --sidebar: #0A0A0A;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #8A2BE2;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1E1B4B;
-  --sidebar-accent-foreground: #E2E8F0;
-  --sidebar-border: #1A2342;
-  --sidebar-ring: #A855F7;
+  --sidebar-accent: #2A1A3E;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #222222;
+  --sidebar-ring: #8A2BE2;
 }
 
 @layer base {
@@ -148,103 +148,104 @@
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #8A2BE2;
+  background: #333333;
   border-radius: 3px;
-  opacity: 0.4;
+  opacity: 0.6;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #7A1FE0;
+  background: #8A2BE2;
 }
 
 /* ============================
-   F5 THEME UTILITY CLASSES
+   PREMIUM DARK THEME UTILITY CLASSES
+   Framer-inspired: Clean, Bold, Dark
    ============================ */
 
-/* Dark navy section backgrounds */
+/* Dark section backgrounds */
 .f5-dark-section {
-  background-color: #0A1128;
+  background-color: #0A0A0A;
   color: #FFFFFF;
 }
 .f5-dark-section * {
   color: inherit;
 }
 
-/* Light section with subtle gradient blob */
+/* Section with subtle background (was light, now dark) */
 .f5-light-section {
-  background-color: #FFFFFF;
-  color: #333333;
+  background-color: #0A0A0A;
+  color: #FFFFFF;
   position: relative;
   overflow: hidden;
 }
 
-/* Gradient text: violet to pink */
+/* Gradient text: violet to pink — purple glow effect */
 .gradient-text {
-  background: linear-gradient(135deg, #8A2BE2 0%, #EC4899 100%);
+  background: linear-gradient(135deg, #8A2BE2 0%, #C084FC 40%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Gradient text: blue to pink */
+/* Gradient text: purple to rose */
 .gradient-text-blue {
-  background: linear-gradient(135deg, #4DABF7 0%, #EC4899 100%);
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* F5 Card: white, subtle border, 8px radius, light shadow */
+/* Premium Dark Card: #111 bg, subtle 1px border, 16px radius, no heavy shadow */
 .f5-card {
-  background: #FFFFFF;
-  border: 1px solid #F0F0F0;
-  border-radius: 8px;
+  background: #111111;
+  border: 1px solid #222222;
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  transition: border-color 0.3s ease, transform 0.2s ease;
+  color: #FFFFFF;
 }
 .f5-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  border-color: #333333;
+  transform: translateY(-1px);
 }
 
-/* F5 Dark Card */
+/* F5 Dark Card (same as f5-card in dark theme) */
 .f5-card-dark {
-  background: #0F1A36;
-  border: 1px solid #1A2342;
-  border-radius: 8px;
+  background: #111111;
+  border: 1px solid #222222;
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  transition: border-color 0.3s ease, transform 0.2s ease;
   color: #FFFFFF;
 }
 .f5-card-dark:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  transform: translateY(-2px);
+  border-color: #333333;
+  transform: translateY(-1px);
 }
 
-/* F5 Primary Button */
+/* Primary Button: pill-shaped purple */
 .f5-btn-primary {
   background-color: #8A2BE2;
   color: #FFFFFF;
   border: none;
-  border-radius: 4px;
+  border-radius: 9999px;
   padding: 12px 24px;
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 .f5-btn-primary:hover {
   background-color: #7A1FE0;
   transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
 }
 
-/* F5 Secondary (outline) Button */
+/* Secondary (outline) Button: ghost style */
 .f5-btn-secondary {
   background: transparent;
-  color: #8A2BE2;
-  border: 1px solid #8A2BE2;
-  border-radius: 4px;
+  color: #FFFFFF;
+  border: 1px solid #333333;
+  border-radius: 9999px;
   padding: 12px 24px;
   font-weight: 600;
   font-size: 0.875rem;
@@ -252,16 +253,17 @@
   transition: all 0.2s ease;
 }
 .f5-btn-secondary:hover {
-  background-color: #8A2BE2;
-  color: #FFFFFF;
+  border-color: #8A2BE2;
+  color: #8A2BE2;
+  background-color: rgba(138, 43, 226, 0.05);
 }
 
-/* White button (for dark backgrounds) */
+/* White button (for dark backgrounds): pill-shaped */
 .f5-btn-white {
   background-color: #FFFFFF;
-  color: #0A1128;
+  color: #000000;
   border: none;
-  border-radius: 4px;
+  border-radius: 9999px;
   padding: 12px 24px;
   font-weight: 600;
   font-size: 0.875rem;
@@ -269,19 +271,19 @@
   transition: all 0.2s ease;
 }
 .f5-btn-white:hover {
-  background-color: #F3F4F6;
+  background-color: #E4E4E7;
   transform: translateY(-1px);
 }
 
-/* F5 Hero Section */
+/* Hero Section: pure black with purple glow orbs */
 .f5-hero {
-  background: linear-gradient(135deg, #0A1128 0%, #1E1B4B 50%, #2D1B69 100%);
+  background: #000000;
   position: relative;
   overflow: hidden;
   color: #FFFFFF;
 }
 
-/* Decorative blurred gradient orbs */
+/* Decorative blurred gradient orbs — purple glow */
 .f5-hero::before {
   content: '';
   position: absolute;
@@ -290,7 +292,7 @@
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 107, 157, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(138, 43, 226, 0.15) 0%, transparent 70%);
   filter: blur(80px);
   pointer-events: none;
 }
@@ -302,20 +304,20 @@
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(77, 171, 247, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
   filter: blur(80px);
   pointer-events: none;
 }
 
-/* Section divider: violet gradient line */
+/* Section divider: purple glow line */
 .f5-divider {
-  height: 2px;
-  background: linear-gradient(90deg, #8A2BE2 0%, #EC4899 50%, #4DABF7 100%);
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #8A2BE2 50%, transparent 100%);
   border: none;
-  opacity: 0.3;
+  opacity: 0.4;
 }
 
-/* Light gradient blob (for light sections, top-right) */
+/* Gradient blob for dark sections (purple tint) */
 .f5-light-blob {
   position: absolute;
   top: 0;
@@ -323,12 +325,12 @@
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 202, 212, 0.4) 0%, rgba(189, 224, 254, 0.4) 100%);
+  background: radial-gradient(circle, rgba(138, 43, 226, 0.08) 0%, transparent 70%);
   filter: blur(60px);
   pointer-events: none;
 }
 
-/* Icon container (violet/pink tinted circle) */
+/* Icon container (purple tinted circle) */
 .f5-icon-box {
   width: 48px;
   height: 48px;
@@ -344,36 +346,37 @@
   background: rgba(138, 43, 226, 0.2);
 }
 
-/* F5 Navbar */
+/* Navbar: dark glassmorphism */
 .f5-navbar {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid #F0F0F0;
-  color: #333333;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #222222;
+  color: #FFFFFF;
 }
 
-/* F5 Footer */
+/* Footer: dark */
 .f5-footer {
-  background-color: #0A1128;
+  background-color: #0A0A0A;
   color: #FFFFFF;
-  border-top: 1px solid #1A2342;
+  border-top: 1px solid #222222;
 }
 
 /* Glassmorphism for nav (scroll state) */
 .f5-glass {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #222222;
 }
 
-/* Section heading style */
+/* Section heading style: large bold, white */
 .f5-section-heading {
   font-size: 2rem;
-  font-weight: 600;
-  line-height: 1.2;
-  color: #333333;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
 }
 @media (min-width: 640px) {
   .f5-section-heading {
@@ -386,9 +389,9 @@
   }
 }
 
-/* CTA dark section with gradient */
+/* CTA section: dark with purple glow */
 .f5-cta-section {
-  background: linear-gradient(135deg, #0A1128 0%, #1E1B4B 100%);
+  background: #000000;
   position: relative;
   overflow: hidden;
   color: #FFFFFF;
@@ -397,7 +400,7 @@
 /* Thin line-style icon color */
 .f5-icon-violet { color: #A855F7; }
 .f5-icon-pink { color: #EC4899; }
-.f5-icon-blue { color: #4DABF7; }
+.f5-icon-blue { color: #A855F7; }
 
 /* Badge / Tag */
 .f5-badge {
@@ -408,13 +411,13 @@
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-  background: rgba(138, 43, 226, 0.1);
-  color: #8A2BE2;
+  background: rgba(138, 43, 226, 0.15);
+  color: #C084FC;
 }
 
 /* Dot pattern overlay for hero */
 .f5-dot-pattern {
-  background-image: radial-gradient(circle, rgba(138, 43, 226, 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(138, 43, 226, 0.08) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 

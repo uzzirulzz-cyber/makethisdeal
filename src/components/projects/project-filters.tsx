@@ -105,7 +105,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
           placeholder="Search projects..."
           value={localFilters.query || ''}
           onChange={(e) => updateFilter('query', e.target.value)}
-          className="pl-9 w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+          className="pl-9 w-full border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
         />
       </div>
 
@@ -146,7 +146,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.category || ''}
               onValueChange={(v) => updateFilter('category', v)}
             >
-              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
+              <SelectTrigger className="w-full border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -178,7 +178,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.country || ''}
               onValueChange={(v) => updateFilter('country', v)}
             >
-              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
+              <SelectTrigger className="w-full border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
                 <SelectValue placeholder="All Countries" />
               </SelectTrigger>
               <SelectContent>
@@ -221,7 +221,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('priceMin', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -238,7 +238,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('priceMax', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -258,7 +258,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('revenueMin', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -275,7 +275,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('revenueMax', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
                     />
                   </div>
                 </div>
@@ -314,7 +314,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.businessStage || ''}
               onValueChange={(v) => updateFilter('businessStage', v)}
             >
-              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
+              <SelectTrigger className="w-full border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
                 <SelectValue placeholder="All Stages" />
               </SelectTrigger>
               <SelectContent>
@@ -346,7 +346,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.sortBy || 'newest'}
               onValueChange={(v) => updateFilter('sortBy', v)}
             >
-              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
+              <SelectTrigger className="w-full border-[#333333] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -394,10 +394,10 @@ export default function ProjectFilters({ onApply }: ProjectFiltersProps) {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block w-72 shrink-0">
         <div className="sticky top-24">
-          <div className="bg-white border border-[#F0F0F0] rounded-lg p-4 shadow-sm">
+          <div className="bg-[#111111] border border-[#222222] rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-4">
               <SlidersHorizontal className="size-4 text-muted-foreground" />
-              <h3 className="font-semibold text-sm text-[#333333]">Filters</h3>
+              <h3 className="font-semibold text-sm text-[#FFFFFF]">Filters</h3>
             </div>
             <FilterContent onApply={onApply} />
           </div>
@@ -413,9 +413,9 @@ export default function ProjectFilters({ onApply }: ProjectFiltersProps) {
               Filters
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80 overflow-y-auto bg-white">
+          <SheetContent side="left" className="w-80 overflow-y-auto bg-[#111111]" style={{ borderRight: '1px solid #222222' }}>
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-2 text-[#333333]">
+              <SheetTitle className="flex items-center gap-2 text-[#FFFFFF]">
                 <SlidersHorizontal className="size-4" />
                 Filters
               </SheetTitle>

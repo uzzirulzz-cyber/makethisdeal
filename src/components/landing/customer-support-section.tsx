@@ -94,7 +94,7 @@ export default function CustomerSupportSection() {
   };
 
   return (
-    <section className="f5-light-section relative py-20 sm:py-28 bg-white overflow-hidden">
+    <section className="f5-light-section relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: '#000000' }}>
       {/* Background decorations */}
       <div className="f5-light-blob" />
 
@@ -199,7 +199,7 @@ export default function CustomerSupportSection() {
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Your name"
                         className="h-10 w-full rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8A2BE2]/20 focus:border-[#8A2BE2] transition-all"
-                        style={{ border: '1px solid #F0F0F0', backgroundColor: '#FFFFFF', color: '#333333' }}
+                        style={{ border: '1px solid #333333', backgroundColor: '#111111', color: '#FFFFFF' }}
                         required
                       />
                     </div>

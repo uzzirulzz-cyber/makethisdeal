@@ -29,7 +29,7 @@ export default function CtaSection() {
           <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
             Ready to <span className="gradient-text">Make a Deal?</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg" style={{ color: '#A8B2D1' }}>
+          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg" style={{ color: '#A1A1AA' }}>
             Join thousands of businesses and investors on the world&apos;s most
             comprehensive enterprise marketplace
           </p>
@@ -43,7 +43,7 @@ export default function CtaSection() {
               Get Started Free
             </button>
             <button
-              className="inline-flex h-12 items-center gap-2 px-8 text-base font-semibold sm:h-14 sm:px-10 sm:text-lg border border-white/30 text-white rounded bg-transparent hover:bg-white hover:text-[#0A1128] transition-all duration-200"
+              className="inline-flex h-12 items-center gap-2 px-8 text-base font-semibold sm:h-14 sm:px-10 sm:text-lg border border-[#333333] text-white rounded-full bg-transparent hover:border-[#C084FC] hover:text-[#C084FC] transition-all duration-200"
               onClick={() => setCurrentView('landing')}
             >
               <Phone className="size-5" />
