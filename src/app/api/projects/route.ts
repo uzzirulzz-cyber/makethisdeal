@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+const RATE = 278;
+const usd = (m: number) => (m * 1_000_000) / RATE;
+
 let _autoSeeded = false;
 async function ensureSeeded() {
   if (_autoSeeded) return;
   _autoSeeded = true;
   const count = await db.project.count();
   if (count > 0) return;
-  // Inline seed — same logic as /api/seed
-  const RATE = 278;
-  const usd = (m: number) => (m * 1_000_000) / RATE;
+  console.log('[ensureSeeded] Seeding products with USD prices...');
+  // Ensure categories exist (FK constraint)
+  const catNames: Record<string, string> = { 'domains': 'Domains', 'fintech': 'FinTech', 'digital-products': 'Digital Products', 'websites': 'Websites', 'ai-solutions': 'AI Solutions' };
+  for (const [slug, name] of Object.entries(catNames)) {
+    await db.category.upsert({ where: { slug }, update: {}, create: { name, slug } });
+  }
   const seller = await db.user.upsert({
     where: { email: 'playbeatdigital@proton.me' },
     update: {},
@@ -41,12 +47,12 @@ async function ensureSeeded() {
   for (const p of items) {
     await db.project.create({ data: { ...p, status: 'active', visibility: 'public', country: 'Pakistan' } });
   }
-  console.log(`Auto-seeded ${items.length} products with USD prices`);
+  console.log(`[ensureSeeded] Done - ${items.length} products seeded`);
 }
 
 export async function GET(request: NextRequest) {
   try {
-    await ensureSeeded();
+    try { await ensureSeeded(); } catch (_seedErr) { /* non-blocking */ }
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
@@ -115,12 +121,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       projects,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -130,29 +131,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    // Ensure the category exists in DB (FK constraint)
     if (body.category) {
       await db.category.upsert({
         where: { slug: body.category },
         update: {},
-        create: {
-          name: body.categoryName || body.category,
-          slug: body.category,
-          icon: body.categoryIcon || undefined,
-          description: body.categoryDescription || undefined,
-        },
+        create: { name: body.categoryName || body.category, slug: body.category, icon: body.categoryIcon || undefined, description: body.categoryDescription || undefined },
       });
     }
     const project = await db.project.create({
-      data: {
-        ...body,
-        status: 'active',
-        visibility: 'public',
-        featured: false,
-      },
-      include: {
-        seller: { select: { id: true, name: true, company: true, country: true, avatar: true, verified: true } },
-      },
+      data: { ...body, status: 'active', visibility: 'public', featured: false },
+      include: { seller: { select: { id: true, name: true, company: true, country: true, avatar: true, verified: true } } },
     });
     return NextResponse.json(project, { status: 201 });
   } catch (error: any) {
