@@ -100,12 +100,12 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
     <div className="space-y-1">
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#A0A0B0]" />
         <Input
           placeholder="Search projects..."
           value={localFilters.query || ''}
           onChange={(e) => updateFilter('query', e.target.value)}
-          className="pl-9 w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+          className="pl-9 w-full border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl"
         />
       </div>
 
@@ -118,12 +118,12 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-2 mb-3"
         >
-          <Badge className="text-xs bg-[rgba(138,43,226,0.1)] text-[#8A2BE2] border-0">
+          <Badge className="text-xs bg-[#4F46E5]/10 text-[#4F46E5] border-0 rounded-full">
             {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active
           </Badge>
           <button
             onClick={handleReset}
-            className="text-xs text-muted-foreground hover:text-[#8A2BE2] transition-colors"
+            className="text-xs text-[#6E6E80] hover:text-[#4F46E5] transition-colors"
           >
             Clear all
           </button>
@@ -133,10 +133,10 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
       <div className="space-y-1 max-h-[calc(100vh-320px)] overflow-y-auto pr-1 custom-scrollbar">
         {/* Category Filter */}
         <Collapsible open={openSections.category} onOpenChange={() => toggleSection('category')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#0D0C22] hover:text-[#4F46E5] transition-colors">
             <span>Category</span>
             <ChevronDown
-              className={`size-4 text-muted-foreground transition-transform ${
+              className={`size-4 text-[#A0A0B0] transition-transform ${
                 openSections.category ? 'rotate-180' : ''
               }`}
             />
@@ -146,7 +146,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.category || ''}
               onValueChange={(v) => updateFilter('category', v)}
             >
-              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
+              <SelectTrigger className="w-full border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -165,10 +165,10 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
         {/* Country Filter */}
         <Collapsible open={openSections.location} onOpenChange={() => toggleSection('location')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#0D0C22] hover:text-[#4F46E5] transition-colors">
             <span>Location</span>
             <ChevronDown
-              className={`size-4 text-muted-foreground transition-transform ${
+              className={`size-4 text-[#A0A0B0] transition-transform ${
                 openSections.location ? 'rotate-180' : ''
               }`}
             />
@@ -178,7 +178,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.country || ''}
               onValueChange={(v) => updateFilter('country', v)}
             >
-              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
+              <SelectTrigger className="w-full border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl">
                 <SelectValue placeholder="All Countries" />
               </SelectTrigger>
               <SelectContent>
@@ -197,10 +197,10 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
         {/* Price Range */}
         <Collapsible open={openSections.pricing} onOpenChange={() => toggleSection('pricing')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#0D0C22] hover:text-[#4F46E5] transition-colors">
             <span>Price Range</span>
             <ChevronDown
-              className={`size-4 text-muted-foreground transition-transform ${
+              className={`size-4 text-[#A0A0B0] transition-transform ${
                 openSections.pricing ? 'rotate-180' : ''
               }`}
             />
@@ -209,9 +209,9 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
             <div className="space-y-3 pt-1">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Min Price</Label>
+                  <Label className="text-xs text-[#A0A0B0]">Min Price</Label>
                   <div className="relative">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#A0A0B0]">
                       {filterLabel}
                     </span>
                     <Input
@@ -221,14 +221,14 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('priceMin', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Max Price</Label>
+                  <Label className="text-xs text-[#A0A0B0]">Max Price</Label>
                   <div className="relative">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#A0A0B0]">
                       {filterLabel}
                     </span>
                     <Input
@@ -238,7 +238,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('priceMax', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl"
                     />
                   </div>
                 </div>
@@ -246,9 +246,9 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Min Revenue</Label>
+                  <Label className="text-xs text-[#A0A0B0]">Min Revenue</Label>
                   <div className="relative">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#A0A0B0]">
                       {filterLabel}
                     </span>
                     <Input
@@ -258,14 +258,14 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('revenueMin', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Max Revenue</Label>
+                  <Label className="text-xs text-[#A0A0B0]">Max Revenue</Label>
                   <div className="relative">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#A0A0B0]">
                       {filterLabel}
                     </span>
                     <Input
@@ -275,14 +275,14 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                       onChange={(e) =>
                         updateFilter('revenueMax', e.target.value ? Number(e.target.value) : undefined)
                       }
-                      className="pl-8 h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                      className="pl-8 h-8 text-sm border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl"
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <Label className="text-xs text-muted-foreground">Min ROI (%)</Label>
+                <Label className="text-xs text-[#A0A0B0]">Min ROI (%)</Label>
                 <Input
                   type="number"
                   placeholder="e.g. 50"
@@ -290,7 +290,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
                   onChange={(e) =>
                     updateFilter('roiMin', e.target.value ? Number(e.target.value) : undefined)
                   }
-                  className="h-8 text-sm border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]"
+                  className="h-8 text-sm border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl"
                 />
               </div>
             </div>
@@ -301,10 +301,10 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
         {/* Business Stage */}
         <Collapsible open={openSections.business} onOpenChange={() => toggleSection('business')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#0D0C22] hover:text-[#4F46E5] transition-colors">
             <span>Business Stage</span>
             <ChevronDown
-              className={`size-4 text-muted-foreground transition-transform ${
+              className={`size-4 text-[#A0A0B0] transition-transform ${
                 openSections.business ? 'rotate-180' : ''
               }`}
             />
@@ -314,7 +314,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.businessStage || ''}
               onValueChange={(v) => updateFilter('businessStage', v)}
             >
-              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
+              <SelectTrigger className="w-full border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl">
                 <SelectValue placeholder="All Stages" />
               </SelectTrigger>
               <SelectContent>
@@ -333,10 +333,10 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
 
         {/* Sort By */}
         <Collapsible open={openSections.sort} onOpenChange={() => toggleSection('sort')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#0D0C22] hover:text-[#4F46E5] transition-colors">
             <span>Sort By</span>
             <ChevronDown
-              className={`size-4 text-muted-foreground transition-transform ${
+              className={`size-4 text-[#A0A0B0] transition-transform ${
                 openSections.sort ? 'rotate-180' : ''
               }`}
             />
@@ -346,7 +346,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
               value={localFilters.sortBy || 'newest'}
               onValueChange={(v) => updateFilter('sortBy', v)}
             >
-              <SelectTrigger className="w-full border-[#F0F0F0] focus:ring-[#8A2BE2]/30 focus:border-[#8A2BE2]">
+              <SelectTrigger className="w-full border-[#E5E7EB] focus:ring-[#4F46E5]/30 focus:border-[#4F46E5] rounded-xl">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -367,7 +367,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
       <div className="flex gap-2">
         <Button
           onClick={applyFilters}
-          className="flex-1 bg-[#8A2BE2] hover:bg-[#7A1FE0] text-white border-0"
+          className="flex-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white border-0 rounded-full"
           size="sm"
         >
           Apply Filters
@@ -376,7 +376,7 @@ function FilterContent({ onApply, onMobileClose }: { onApply?: () => void; onMob
           onClick={handleReset}
           variant="outline"
           size="sm"
-          className="gap-1.5 border-[#8A2BE2] text-[#8A2BE2] hover:bg-[#8A2BE2] hover:text-white"
+          className="gap-1.5 border-[#0D0C22] text-[#0D0C22] hover:bg-[#F8F9FA] rounded-full"
         >
           <RotateCcw className="size-3.5" />
           Reset
@@ -394,10 +394,10 @@ export default function ProjectFilters({ onApply }: ProjectFiltersProps) {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block w-72 shrink-0">
         <div className="sticky top-24">
-          <div className="bg-white border border-[#F0F0F0] rounded-lg p-4 shadow-sm">
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <SlidersHorizontal className="size-4 text-muted-foreground" />
-              <h3 className="font-semibold text-sm text-[#333333]">Filters</h3>
+              <SlidersHorizontal className="size-4 text-[#6E6E80]" />
+              <h3 className="font-semibold text-sm text-[#0D0C22]">Filters</h3>
             </div>
             <FilterContent onApply={onApply} />
           </div>
@@ -408,14 +408,14 @@ export default function ProjectFilters({ onApply }: ProjectFiltersProps) {
       <div className="lg:hidden">
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2 border-[#8A2BE2] text-[#8A2BE2] hover:bg-[#8A2BE2] hover:text-white">
+            <Button variant="outline" size="sm" className="gap-2 border-[#4F46E5] text-[#4F46E5] hover:bg-[#4F46E5] hover:text-white rounded-full">
               <Filter className="size-4" />
               Filters
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-80 overflow-y-auto bg-white">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-2 text-[#333333]">
+              <SheetTitle className="flex items-center gap-2 text-[#0D0C22]">
                 <SlidersHorizontal className="size-4" />
                 Filters
               </SheetTitle>

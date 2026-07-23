@@ -50,7 +50,7 @@ export default function CategoriesSection() {
         {/* Section Heading */}
         <div className="mb-10 text-center sm:mb-12">
           <h2 className="f5-section-heading">Browse by Category</h2>
-          <p className="mt-3 text-muted-foreground sm:text-lg">
+          <p className="mt-3 text-[#A0A0B0] sm:text-lg">
             Explore projects across every industry
           </p>
         </div>
@@ -68,21 +68,21 @@ export default function CategoriesSection() {
             return (
               <motion.div key={cat.id} variants={cardVariants}>
                 <div
-                  className="f5-card group cursor-pointer py-4 text-center"
+                  className="bg-[#F3F4F6] rounded-2xl p-5 group cursor-pointer text-center hover:bg-[#4F46E5]/5 hover:border-[#4F46E5]/20 transition-all duration-300 border border-transparent hover:shadow-md"
                   onClick={() => handleCategoryClick(cat.slug)}
                 >
                   <div className="flex flex-col items-center gap-2.5">
                     <div
-                      className="f5-icon-box"
-                      style={{ width: 44, height: 44, borderRadius: 12 }}
+                      className="flex items-center justify-center rounded-xl"
+                      style={{ width: 44, height: 44, backgroundColor: 'rgba(79, 70, 229, 0.1)' }}
                     >
-                      {Icon && <Icon className="size-5" />}
+                      {Icon && <Icon className="size-5 text-[#4F46E5]" />}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-[#333333]">
+                      <p className="truncate text-sm font-semibold text-[#0D0C22]">
                         {cat.name}
                       </p>
-                      <p className="text-xs text-[#6B7280]">
+                      <p className="text-xs text-[#A0A0B0]">
                         {cat._count?.projects ?? '—'} projects
                       </p>
                     </div>

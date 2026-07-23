@@ -31,12 +31,12 @@ const cardVariants = {
 };
 
 const GRADIENTS = [
-  'from-[#8A2BE2]/15 to-[#EC4899]/15',
-  'from-[#4DABF7]/15 to-[#8A2BE2]/15',
-  'from-[#A855F7]/15 to-[#EC4899]/15',
-  'from-[#EC4899]/15 to-[#FF6B9D]/15',
-  'from-[#4DABF7]/15 to-[#A855F7]/15',
-  'from-[#8A2BE2]/15 to-[#4DABF7]/15',
+  'from-[#4F46E5]/10 to-[#EC4899]/10',
+  'from-[#6366F1]/10 to-[#4F46E5]/10',
+  'from-[#4F46E5]/10 to-[#EC4899]/10',
+  'from-[#EC4899]/10 to-[#F472B6]/10',
+  'from-[#6366F1]/10 to-[#4F46E5]/10',
+  'from-[#4F46E5]/10 to-[#6366F1]/10',
 ];
 
 function renderCategoryIcon(categorySlug: string, className: string) {
@@ -48,10 +48,10 @@ function renderCategoryIcon(categorySlug: string, className: string) {
 
 function ProjectCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-lg border border-[#F0F0F0] bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
       <Skeleton className="h-40 w-full rounded-none" />
-      <div className="space-y-3 p-4">
-        <Skeleton className="h-4 w-16" />
+      <div className="space-y-3 p-5">
+        <Skeleton className="h-4 w-16 rounded-full" />
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
         <div className="flex gap-4">
@@ -75,42 +75,42 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
   return (
     <motion.div variants={cardVariants}>
       <div
-        className="f5-card group cursor-pointer overflow-hidden"
+        className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm group cursor-pointer overflow-hidden hover:border-[#4F46E5]/30 hover:shadow-md transition-all duration-300"
         onClick={() => goToProject(project.id)}
       >
         {/* Thumbnail placeholder */}
         <div
           className={`relative flex h-40 items-center justify-center bg-gradient-to-br ${gradient}`}
         >
-          {renderCategoryIcon(project.category, 'size-12 text-[#8A2BE2]/40 transition-transform group-hover:scale-110')}
+          {renderCategoryIcon(project.category, 'size-12 text-[#4F46E5]/40 transition-transform group-hover:scale-110')}
           <Badge
             variant="secondary"
-            className="absolute left-3 top-3 bg-white/90 text-xs font-medium text-foreground backdrop-blur-sm"
+            className="absolute left-3 top-3 bg-[#F3F4F6] text-xs rounded-full px-3 py-1 font-medium text-[#6E6E80] backdrop-blur-sm border-0"
           >
             {getCategoryName(project.category)}
           </Badge>
           {project.featured && (
-            <Badge className="absolute right-3 top-3 gap-1 border-0 bg-amber-500 text-xs text-white">
+            <Badge className="absolute right-3 top-3 gap-1 border-0 bg-[#F59E0B] text-xs rounded-full px-3 py-1 text-white">
               <Star className="size-3" />
               Featured
             </Badge>
           )}
           {project.status === 'active' && !project.featured && (
-            <Badge className="absolute right-3 top-3 border-0 bg-emerald-500 text-xs text-white">
+            <Badge className="absolute right-3 top-3 border-0 bg-[#10B981] text-xs rounded-full px-3 py-1 text-white">
               Active
             </Badge>
           )}
         </div>
 
-        <div className="p-4">
+        <div className="p-5">
           {/* Project Name */}
-          <h3 className="truncate text-base font-semibold leading-snug text-[#333333] transition-colors group-hover:text-[#8A2BE2]">
+          <h3 className="truncate text-base font-semibold leading-snug text-[#0D0C22] transition-colors group-hover:text-[#4F46E5]">
             {project.name}
           </h3>
 
           {/* Country */}
           {project.country && (
-            <div className="mt-1.5 flex items-center gap-1 text-xs text-[#6B7280]">
+            <div className="mt-1.5 flex items-center gap-1 text-xs text-[#A0A0B0]">
               <MapPin className="size-3" />
               <span>{project.country}</span>
             </div>
@@ -118,16 +118,16 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
           {/* Key Metrics */}
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <span className="font-bold text-[#8A2BE2]">
+            <span className="font-bold text-[#4F46E5]">
               {formatPrice(project.suggestedSellingPrice ?? project.companyValuation)}
             </span>
             {project.annualRevenue != null && project.annualRevenue > 0 && (
-              <span className="text-[#6B7280]">
+              <span className="text-[#6E6E80]">
                 Rev: {formatPrice(project.annualRevenue)}
               </span>
             )}
             {project.expectedROI != null && project.expectedROI > 0 && (
-              <span className="flex items-center gap-1 text-emerald-600">
+              <span className="flex items-center gap-1 text-[#10B981]">
                 <TrendingUp className="size-3" />
                 {project.expectedROI}%
               </span>
@@ -136,15 +136,15 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
           {/* Seller */}
           {project.seller && (
-            <div className="mt-3 flex items-center gap-2 border-t border-[#F0F0F0] pt-3">
-              <div className="flex size-6 items-center justify-center rounded-full bg-[#8A2BE2]/10 text-xs font-bold text-[#8A2BE2]">
+            <div className="mt-3 flex items-center gap-2 border-t border-[#F3F4F6] pt-3">
+              <div className="flex size-6 items-center justify-center rounded-full bg-[#4F46E5]/10 text-xs font-bold text-[#4F46E5]">
                 {project.seller.name.charAt(0).toUpperCase()}
               </div>
-              <span className="truncate text-xs text-[#6B7280]">
+              <span className="truncate text-xs text-[#6E6E80]">
                 {project.seller.name}
               </span>
               {project.seller.verified && (
-                <BadgeCheck className="size-3.5 text-[#8A2BE2]" />
+                <BadgeCheck className="size-3.5 text-[#4F46E5]" />
               )}
             </div>
           )}
@@ -180,17 +180,17 @@ export default function FeaturedSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="mb-10 text-center sm:mb-12">
-          <h2 className="f5-section-heading text-2xl font-semibold tracking-tight text-[#333333] sm:text-3xl lg:text-4xl">
+          <h2 className="f5-section-heading text-2xl font-bold tracking-tight text-[#0D0C22] sm:text-3xl lg:text-4xl">
             Featured Opportunities
           </h2>
-          <p className="mt-3 text-[#6B7280] sm:text-lg">
+          <p className="mt-3 text-[#6E6E80] sm:text-lg">
             Hand-picked projects from verified sellers
           </p>
         </div>
 
         {/* Content */}
         {loading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <ProjectCardSkeleton key={i} />
             ))}
@@ -201,7 +201,7 @@ export default function FeaturedSection() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6"
+            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
           >
             {projects.map((project, i) => (
               <FeaturedProjectCard
@@ -212,8 +212,8 @@ export default function FeaturedSection() {
             ))}
           </motion.div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#F0F0F0] py-16 text-center">
-            <p className="text-[#6B7280]">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#E5E7EB] py-16 text-center">
+            <p className="text-[#6E6E80]">
               Featured projects are loading&hellip;
             </p>
           </div>

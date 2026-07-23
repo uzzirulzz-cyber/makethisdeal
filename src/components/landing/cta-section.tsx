@@ -8,11 +8,11 @@ export default function CtaSection() {
   const setCurrentView = useAppStore((s) => s.setCurrentView);
 
   return (
-    <section className="f5-cta-section py-16 sm:py-20 overflow-hidden">
+    <section className="bg-[#0D0C22] py-16 sm:py-20 overflow-hidden relative">
       {/* Decorative blobs */}
       <div
         className="pointer-events-none absolute top-0 right-0 h-[400px] w-[400px] rounded-full opacity-20 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #8A2BE2 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #4F46E5 0%, transparent 70%)' }}
       />
       <div
         className="pointer-events-none absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full opacity-20 blur-3xl"
@@ -29,7 +29,7 @@ export default function CtaSection() {
           <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
             Ready to <span className="gradient-text">Make a Deal?</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg" style={{ color: '#A8B2D1' }}>
+          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-white/60">
             Join thousands of businesses and investors on the world&apos;s most
             comprehensive enterprise marketplace
           </p>
@@ -43,7 +43,7 @@ export default function CtaSection() {
               Get Started Free
             </button>
             <button
-              className="inline-flex h-12 items-center gap-2 px-8 text-base font-semibold sm:h-14 sm:px-10 sm:text-lg border border-white/30 text-white rounded bg-transparent hover:bg-white hover:text-[#0A1128] transition-all duration-200"
+              className="inline-flex h-12 items-center gap-2 px-8 text-base font-semibold sm:h-14 sm:px-10 sm:text-lg border border-white/30 text-white rounded-full bg-transparent hover:bg-white hover:text-[#0D0C22] transition-all duration-200"
               onClick={() => setCurrentView('landing')}
             >
               <Phone className="size-5" />

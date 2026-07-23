@@ -45,15 +45,15 @@ export function Footer() {
             <div className="flex items-center gap-2.5 mb-4">
               <div
                 className="flex h-9 w-9 items-center justify-center rounded-lg font-bold text-sm text-white"
-                style={{ backgroundColor: '#8A2BE2' }}
+                style={{ backgroundColor: '#4F46E5' }}
               >
                 MTD
               </div>
               <span className="text-lg font-bold tracking-tight text-white">
-                Make<span style={{ color: '#A855F7' }}>This</span>Deal
+                Make<span className="text-[#A5B4FC]">This</span>Deal
               </span>
             </div>
-            <p className="text-sm mb-5 max-w-xs" style={{ color: '#A8B2D1' }}>
+            <p className="text-sm mb-5 max-w-xs text-white/70">
               The global enterprise marketplace where businesses connect, invest, and grow together.
             </p>
 
@@ -61,20 +61,18 @@ export function Footer() {
             <div className="space-y-3 mb-5">
               <a
                 href="mailto:playbeatdigital@proton.me"
-                className="flex items-center gap-2.5 text-sm transition-colors group"
-                style={{ color: '#A8B2D1' }}
+                className="flex items-center gap-2.5 text-sm transition-colors group text-white/70"
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = '#A855F7';
+                  (e.currentTarget as HTMLElement).style.color = '#A5B4FC';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                  (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)';
                 }}
               >
                 <div
-                  className="h-8 w-8 rounded-full flex items-center justify-center transition-colors"
-                  style={{ backgroundColor: 'rgba(138, 43, 226, 0.2)' }}
+                  className="h-8 w-8 rounded-full flex items-center justify-center transition-colors bg-white/10"
                 >
-                  <Mail className="h-4 w-4" style={{ color: '#A855F7' }} />
+                  <Mail className="h-4 w-4 text-[#A5B4FC]" />
                 </div>
                 <span className="truncate">playbeatdigital@proton.me</span>
               </a>
@@ -82,32 +80,28 @@ export function Footer() {
                 href="https://wa.me/923318333368"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 text-sm transition-colors group"
-                style={{ color: '#A8B2D1' }}
+                className="flex items-center gap-2.5 text-sm transition-colors group text-white/70"
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLElement).style.color = '#34D399';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
+                  (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)';
                 }}
               >
                 <div
-                  className="h-8 w-8 rounded-full flex items-center justify-center transition-colors"
-                  style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)' }}
+                  className="h-8 w-8 rounded-full flex items-center justify-center transition-colors bg-white/10"
                 >
-                  <MessageCircle className="h-4 w-4" style={{ color: '#34D399' }} />
+                  <MessageCircle className="h-4 w-4 text-[#34D399]" />
                 </div>
                 <span>+92 331 8333368</span>
               </a>
               <div
-                className="flex items-center gap-2.5 text-sm"
-                style={{ color: '#A8B2D1' }}
+                className="flex items-center gap-2.5 text-sm text-white/70"
               >
                 <div
-                  className="h-8 w-8 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                  className="h-8 w-8 rounded-full flex items-center justify-center bg-white/10"
                 >
-                  <MapPin className="h-4 w-4" style={{ color: '#6B7280' }} />
+                  <MapPin className="h-4 w-4 text-white/60" />
                 </div>
                 <span>Karachi, Pakistan</span>
               </div>
@@ -118,16 +112,7 @@ export function Footer() {
               {[Twitter, Linkedin, Github, Youtube].map((Icon, i) => (
                 <button
                   key={i}
-                  className="h-9 w-9 rounded-lg flex items-center justify-center transition-all duration-200"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', color: '#A8B2D1' }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(168, 85, 247, 0.2)';
-                    (e.currentTarget as HTMLElement).style.color = '#A855F7';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
-                    (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
-                  }}
+                  className="h-9 w-9 rounded-lg flex items-center justify-center transition-all duration-200 bg-white/10 text-white/70 hover:bg-white/20"
                 >
                   <Icon className="h-4 w-4" />
                 </button>
@@ -144,14 +129,7 @@ export function Footer() {
                   <li key={link.label}>
                     <button
                       onClick={() => setCurrentView(link.action)}
-                      className="text-sm transition-colors duration-200"
-                      style={{ color: '#A8B2D1' }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.color = '#A855F7';
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
-                      }}
+                      className="text-sm transition-colors duration-200 text-white/70 hover:text-[#A5B4FC]"
                     >
                       {link.label}
                     </button>
@@ -164,23 +142,15 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div
-          className="mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
-          style={{ borderTop: '1px solid #1A2342' }}
+          className="mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10"
         >
-          <p className="text-sm" style={{ color: '#A8B2D1' }}>
+          <p className="text-sm text-white/70">
             © {new Date().getFullYear()} MakeThisDeal. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <a
               href="mailto:playbeatdigital@proton.me"
-              className="text-sm flex items-center gap-1.5 transition-colors duration-200"
-              style={{ color: '#A8B2D1' }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = '#A855F7';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = '#A8B2D1';
-              }}
+              className="text-sm flex items-center gap-1.5 transition-colors duration-200 text-white/70 hover:text-[#A5B4FC]"
             >
               <Mail className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">playbeatdigital@proton.me</span>
@@ -189,20 +159,13 @@ export function Footer() {
               href="https://wa.me/923318333368"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm flex items-center gap-1.5 transition-colors duration-200"
-              style={{ color: '#34D399' }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = '#6EE7B7';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = '#34D399';
-              }}
+              className="text-sm flex items-center gap-1.5 transition-colors duration-200 text-[#34D399] hover:text-[#6EE7B7]"
             >
               <MessageCircle className="h-3.5 w-3.5" />
               <span>WhatsApp</span>
             </a>
           </div>
-          <p className="text-sm flex items-center gap-1" style={{ color: '#A8B2D1' }}>
+          <p className="text-sm flex items-center gap-1 text-white/70">
             <Globe className="h-3.5 w-3.5" />
             Trusted by businesses in 120+ countries
           </p>

@@ -25,12 +25,12 @@ const cardVariants = {
 
 export default function StatsSection() {
   return (
-    <section className="py-16 sm:py-20">
+    <section className="bg-[#F8F9FA] py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Section Heading */}
         <div className="mb-10 text-center sm:mb-12">
           <h2 className="f5-section-heading">Platform Highlights</h2>
-          <p className="mt-3 text-muted-foreground sm:text-lg">
+          <p className="mt-3 text-[#A0A0B0] sm:text-lg">
             Key metrics that define our marketplace
           </p>
         </div>
@@ -46,18 +46,17 @@ export default function StatsSection() {
             const Icon = stat.icon;
             return (
               <motion.div key={stat.label} variants={cardVariants}>
-                <div className="f5-card flex flex-col items-center py-6 text-center">
+                <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col items-center py-6 text-center p-5 hover:shadow-md transition-shadow">
                   <div
-                    className="mb-3 flex size-12 items-center justify-center rounded-xl"
-                    style={{ background: 'rgba(138, 43, 226, 0.1)' }}
+                    className="mb-3 flex size-12 items-center justify-center rounded-xl bg-[#4F46E5]/10"
                   >
-                    <Icon className="size-6" style={{ color: '#8A2BE2' }} />
+                    <Icon className="size-6 text-[#4F46E5]" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold tracking-tight text-[#333333] sm:text-3xl">
+                    <p className="text-2xl font-bold tracking-tight text-[#0D0C22] sm:text-3xl">
                       {stat.value}
                     </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-1 text-sm text-[#A0A0B0]">
                       {stat.label}
                     </p>
                   </div>

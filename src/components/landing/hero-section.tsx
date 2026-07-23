@@ -46,19 +46,19 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative bg-white overflow-hidden">
-      {/* Subtle decorative gradient blobs (very faint) */}
+    <section className="relative bg-white overflow-hidden py-16 sm:py-24 lg:py-32">
+      {/* Subtle decorative gradient orbs (very faint) */}
       <div
-        className="pointer-events-none absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full opacity-[0.04]"
-        style={{ background: 'radial-gradient(circle, #8A2BE2 0%, transparent 70%)' }}
+        className="pointer-events-none absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full opacity-[0.05]"
+        style={{ background: 'radial-gradient(circle, #4F46E5 0%, transparent 70%)' }}
       />
       <div
-        className="pointer-events-none absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full opacity-[0.04]"
+        className="pointer-events-none absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full opacity-[0.05]"
         style={{ background: 'radial-gradient(circle, #EC4899 0%, transparent 70%)' }}
       />
 
       {/* Content */}
-      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -80,8 +80,7 @@ export default function HeroSection() {
           {/* Heading */}
           <motion.h1
             variants={itemVariants}
-            className="max-w-4xl text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl"
-            style={{ color: '#333333' }}
+            className="max-w-4xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl text-[#0D0C22]"
           >
             <span className="gradient-text">Buy, Sell &amp; Invest</span> in Businesses Worldwide
           </motion.h1>
@@ -89,8 +88,7 @@ export default function HeroSection() {
           {/* Subheading */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl"
-            style={{ color: '#6B7280' }}
+            className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl text-[#6E6E80]"
           >
             The global enterprise marketplace for SaaS, Real Estate, Startups,
             E-commerce, AI Solutions, and 50+ business categories
@@ -130,15 +128,14 @@ export default function HeroSection() {
                   className="flex flex-col items-center gap-1"
                 >
                   <div className="flex items-center gap-2">
-                    <Icon className="size-4" style={{ color: '#8A2BE2' }} />
+                    <Icon className="size-4 text-[#4F46E5]" />
                     <span
-                      className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl"
-                      style={{ color: '#333333' }}
+                      className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl text-[#0D0C22]"
                     >
                       {stat.value}
                     </span>
                   </div>
-                  <span className="text-xs sm:text-sm" style={{ color: '#6B7280' }}>
+                  <span className="text-xs sm:text-sm text-[#A0A0B0]">
                     {stat.label}
                   </span>
                 </div>
