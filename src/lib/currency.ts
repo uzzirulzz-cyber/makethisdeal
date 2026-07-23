@@ -1,65 +1,50 @@
 export type CurrencyMode = 'PKR' | 'USD';
 
-export interface CurrencyState {
-  mode: CurrencyMode;
-  pkrToUsd: number;       // 1 PKR = X USD (e.g. 0.0036)
-  usdToPkr: number;       // 1 USD = X PKR (e.g. 278)
-  rateLoading: boolean;
-  setMode: (mode: CurrencyMode) => void;
-  toggleMode: () => void;
-  setRate: (pkrToUsd: number, usdToPkr: number) => void;
-  setRateLoading: (loading: boolean) => void;
-}
-
-/* ---------- Region detection ---------- */
-
-const PAKISTAN_TIMEZONES = [
-  'Asia/Karachi',
-  'Asia/Kolkata', // covers some Pakistan border areas
-];
+/* ─── Values in DB are now stored in USD ─── */
+const USD_TO_PKR = 278;
 
 export function detectRegion(): CurrencyMode {
-  if (typeof window === 'undefined') return 'PKR';
+  if (typeof window === 'undefined') return 'USD';
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (PAKISTAN_TIMEZONES.includes(tz)) return 'PKR';
+    if (tz === 'Asia/Karachi') return 'PKR';
   } catch {
     // ignore
   }
   return 'USD';
 }
 
-/* ---------- Formatting ---------- */
-
-export function formatCompact(value: number | undefined, mode: CurrencyMode, pkrToUsd: number): string {
+/**
+ * Format a value (stored in USD) to display string.
+ * - USD mode: show as-is with $ prefix
+ * - PKR mode: convert to PKR then display
+ */
+export function formatCompact(value: number | undefined, mode: CurrencyMode, _rate: number): string {
   if (value === undefined || value === null) return '—';
 
-  if (mode === 'USD') {
-    const usd = value * pkrToUsd;
-    if (usd >= 1_000_000) return `US$ ${(usd / 1_000_000).toFixed(1)}M`;
-    if (usd >= 1_000) return `US$ ${(usd / 1_000).toFixed(1)}K`;
-    return `US$ ${Math.round(usd).toLocaleString()}`;
+  if (mode === 'PKR') {
+    const pkr = value * USD_TO_PKR;
+    if (pkr >= 1_000_000) return `PKR ${(pkr / 1_000_000).toFixed(1)}M`;
+    if (pkr >= 1_000) return `PKR ${(pkr / 1_000).toFixed(0)}K`;
+    return `PKR ${Math.round(pkr).toLocaleString()}`;
   }
 
-  // PKR mode
-  if (value >= 1_000_000_000) return `PKR ${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `PKR ${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `PKR ${(value / 1_000).toFixed(0)}K`;
-  return `PKR ${value.toLocaleString()}`;
+  // USD mode — value is already in USD
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
+  return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-/** Convert a PKR value to the active currency number (for calculations) */
-export function convertValue(pkrValue: number, mode: CurrencyMode, pkrToUsd: number): number {
-  if (mode === 'USD') return Math.round(pkrValue * pkrToUsd);
-  return pkrValue;
+/** Convert a USD-stored value to PKR number */
+export function convertValue(usdValue: number, mode: CurrencyMode, _rate: number): number {
+  if (mode === 'PKR') return Math.round(usdValue * USD_TO_PKR);
+  return usdValue;
 }
 
-/** Return the currency symbol for the active mode */
 export function currencySymbol(mode: CurrencyMode): string {
-  return mode === 'USD' ? 'US$' : 'PKR';
+  return mode === 'USD' ? '$' : 'PKR';
 }
 
-/** Format a filter input value: users always type in PKR, but the label changes */
 export function filterCurrencyLabel(mode: CurrencyMode): string {
   return mode === 'USD' ? 'US$' : 'PKR';
 }
