@@ -1,27 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
 
-/**
- * Payment Submit API — Database not available on Vercel serverless.
- * Accepts the submission for validation but cannot persist.
- */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { method, email, transactionRef } = body;
+    const { method, amountPkr, email, name, description, transactionRef, note, orderId } = body;
 
-    if (!method || !email || !transactionRef) {
+    if (!method || !amountPkr || !email) {
       return NextResponse.json(
-        { error: 'Missing required fields: method, email, transactionRef' },
+        { error: 'Missing required fields: method, amountPkr, email' },
         { status: 400 }
       );
     }
 
+    if (!transactionRef) {
+      return NextResponse.json(
+        { error: 'Missing transaction reference' },
+        { status: 400 }
+      );
+    }
+
+    const submission = await db.paymentSubmission.create({
+      data: {
+        method,
+        amountPkr,
+        email,
+        name: name || null,
+        description: description || null,
+        transactionRef,
+        note: note || null,
+        orderId: orderId || null,
+        status: 'pending',
+      },
+    });
+
+    if (orderId) {
+      await db.order.update({
+        where: { id: orderId },
+        data: {
+          paymentMethod: method,
+          paymentStatus: 'pending',
+          transactionRef,
+        },
+      });
+    }
+
     return NextResponse.json({
       success: true,
-      message: 'Payment proof received. The seller will verify and confirm your order shortly.',
-      submission: { status: 'pending', method },
+      submission: {
+        id: submission.id,
+        status: submission.status,
+        method: submission.method,
+        amountPkr: submission.amountPkr,
+      },
     });
-  } catch {
+  } catch (error) {
+    console.error('Payment submit error:', error);
     return NextResponse.json({ error: 'Failed to submit payment' }, { status: 500 });
   }
 }
