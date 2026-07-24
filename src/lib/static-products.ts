@@ -16,10 +16,10 @@ export const STATIC_CATEGORIES = [
   { id: 'cat_domains', name: 'Domains', slug: 'domains', icon: 'globe', description: 'Premium domain names for branding and business', parent: null, order: 1, _count: { projects: 4 } },
   { id: 'cat_fintech', name: 'FinTech', slug: 'fintech', icon: 'wallet', description: 'Crypto exchanges, trading platforms, and financial technology', parent: null, order: 2, _count: { projects: 4 } },
   { id: 'cat_digital', name: 'Digital Products', slug: 'digital-products', icon: 'package', description: 'Media platforms, content tools, and digital assets', parent: null, order: 3, _count: { projects: 1 } },
-  { id: 'cat_websites', name: 'Websites', slug: 'websites', icon: 'layout', description: 'Fully built web applications and SaaS platforms', parent: null, order: 4, _count: { projects: 2 } },
+  { id: 'cat_websites', name: 'Websites', slug: 'websites', icon: 'layout', description: 'Fully built web applications and SaaS platforms', parent: null, order: 4, _count: { projects: 3 } },
 ];
 
-/* ─── 11 Products with exact USD prices ─── */
+/* ─── 12 Products with exact USD prices ─── */
 export const STATIC_PRODUCTS: Project[] = [
   {
     id: 'proj_playbeat_live',
@@ -346,6 +346,37 @@ export const STATIC_PRODUCTS: Project[] = [
     _count: { offers: 1, favorites: 4 },
     createdAt: '2025-01-15T10:10:00.000Z',
     updatedAt: '2025-01-15T10:10:00.000Z',
+  },
+  {
+    id: 'proj_propertyatlas',
+    name: 'PropertyAtlas.lifestyle',
+    category: 'websites',
+    industry: 'Real Estate',
+    country: 'Pakistan',
+    status: 'active',
+    visibility: 'public',
+    featured: true,
+    overview: 'Luxury real estate lifestyle platform featuring premium property listings, rental management, off-plan developments, and mortgage calculator. Curated for high-end real estate with 2,400+ active listings across 42 cities.',
+    businessModel: 'Marketplace / SaaS',
+    targetMarket: 'Real estate agencies, luxury property buyers, developers',
+    technologyStack: 'Next.js, React',
+    tags: 'real-estate,property,luxury,marketplace',
+    websiteUrl: 'https://propertyatlas.lifestyle',
+    demoUrl: 'https://propertyatlas.lifestyle',
+    monthlyVisitors: 2000,
+    suggestedSellingPrice: 2300,
+    buyNowPrice: 2300,
+    investorPrice: 1955,
+    wholesalePrice: 1725,
+    acquisitionPrice: 2760,
+    minimumOffer: 1610,
+    sourceCodeAvailable: true,
+    auctionEnabled: false,
+    sellerId: SELLER.id,
+    seller: SELLER,
+    _count: { offers: 0, favorites: 0 },
+    createdAt: '2025-01-20T10:00:00.000Z',
+    updatedAt: '2025-01-20T10:00:00.000Z',
   },
 ];
 
