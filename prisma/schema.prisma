@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String     @id @default(cuid())
+  id            String     @id @default(cuid()) @map("_id")
   email         String     @unique
   name          String
   role          String     @default("buyer")
@@ -24,10 +24,12 @@ model User {
   offers        Offer[]
   favorites     Favorite[]
   orders        Order[]
+
+  @@map("users")
 }
 
 model Category {
-  id          String    @id @default(cuid())
+  id          String    @id @default(cuid()) @map("_id")
   name        String    @unique
   slug        String    @unique
   icon        String?
@@ -36,10 +38,12 @@ model Category {
   order       Int       @default(0)
   projects    Project[]
   createdAt   DateTime  @default(now())
+
+  @@map("categories")
 }
 
 model Project {
-  id                      String   @id @default(cuid())
+  id                      String   @id @default(cuid()) @map("_id")
   name                    String
   category                String
   categoryRel             Category? @relation(fields: [category], references: [slug])
@@ -117,12 +121,16 @@ model Project {
   cartItems               CartItem[]
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
+
+  @@index([category])
+  @@index([sellerId])
+  @@map("projects")
 }
 
 model Offer {
-  id          String   @id @default(cuid())
+  id          String   @id @default(cuid()) @map("_id")
   projectId   String
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project     Project  @relation(fields: [projectId], references: [id])
   buyerId     String
   buyer       User     @relation(fields: [buyerId], references: [id])
   amount      Float
@@ -130,33 +138,39 @@ model Offer {
   status      String   @default("pending")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([buyerId])
+  @@map("offers")
 }
 
 model Favorite {
-  id          String   @id @default(cuid())
+  id          String   @id @default(cuid()) @map("_id")
   projectId   String
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project     Project  @relation(fields: [projectId], references: [id])
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
 
   @@unique([projectId, userId])
+  @@index([userId])
+  @@map("favorites")
 }
 
-// ---- E-Commerce: Cart, Orders, Payments ----
-
 model Cart {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @map("_id")
   sessionId String   @unique
   items     CartItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("carts")
 }
 
 model CartItem {
-  id        String  @id @default(cuid())
+  id        String  @id @default(cuid()) @map("_id")
   cartId    String
-  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cart      Cart    @relation(fields: [cartId], references: [id])
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
   pricePkr  Float
@@ -164,64 +178,74 @@ model CartItem {
   createdAt DateTime @default(now())
 
   @@unique([cartId, projectId])
+  @@index([cartId])
+  @@map("cart_items")
 }
 
 model Order {
-  id              String               @id @default(cuid())
+  id              String               @id @default(cuid()) @map("_id")
   orderNumber     String               @unique
   buyerName       String
   buyerEmail      String
   buyerId         String?
   buyer           User?    @relation(fields: [buyerId], references: [id])
-  status          String               @default("pending") // pending, paid, confirmed, rejected, refunded
+  status          String               @default("pending")
   totalPkr        Float
   currencyMode    String               @default("PKR")
   exchangeRate    Float?
   totalDisplay    Float?
   paymentMethod   String?
-  paymentStatus   String               @default("pending") // pending, confirmed, rejected
+  paymentStatus   String               @default("pending")
   transactionRef  String?
   adminNote       String?
   items           OrderItem[]
   payments        PaymentSubmission[]
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
+
+  @@index([buyerId])
+  @@map("orders")
 }
 
 model OrderItem {
-  id          String  @id @default(cuid())
+  id          String  @id @default(cuid()) @map("_id")
   orderId     String
-  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order       Order   @relation(fields: [orderId], references: [id])
   projectId   String
   project     Project @relation(fields: [projectId], references: [id])
   projectName String
   pricePkr    Float
   createdAt   DateTime @default(now())
+
+  @@index([orderId])
+  @@index([projectId])
+  @@map("order_items")
 }
 
 model PaymentSubmission {
-  id              String   @id @default(cuid())
+  id              String   @id @default(cuid()) @map("_id")
   orderId         String?
   order           Order?  @relation(fields: [orderId], references: [id])
-  method          String   // bankalfalah, easypaisa, jazzcash, payrails
+  method          String
   amountPkr       Float
   email           String
   name            String?
   description     String?
   transactionRef  String?
   note            String?
-  status          String   @default("pending") // pending, confirmed, rejected
+  status          String   @default("pending")
   adminNote       String?
   verifiedBy      String?
   verifiedAt      DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([orderId])
+  @@map("payment_submissions")
 }
 
-// ---- Contact Form ----
-
 model ContactMessage {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @map("_id")
   name      String
   email     String
   subject   String?
@@ -230,4 +254,6 @@ model ContactMessage {
   status    String   @default("new")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("contact_messages")
 }
