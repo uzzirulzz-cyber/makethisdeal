@@ -1,0 +1,886 @@
+- generic
+  - banner
+    - image "PLAYBEAT logo"
+    - StaticText "PLAY"
+    - StaticText "BEA"
+    - StaticText "T"
+    - button "Switch currency" [expanded=false, ref=e3]
+      - StaticText "Rs"
+      - StaticText "PKR"
+    - button "Toggle theme" [ref=e4]
+    - button "Notifications" [expanded=false, ref=e5]
+    - button "Open cart" [ref=e6]
+    - button "Sign in" [expanded=false, ref=e7]
+      - StaticText "Sign in"
+    - button "Home" [ref=e8]
+    - button "Games" [ref=e9]
+    - button "Gift Cards" [ref=e10]
+    - button "Software" [ref=e11]
+    - button "AI Tools" [ref=e12]
+    - button "Subscriptions" [ref=e13]
+    - button "Best Value" [ref=e14]
+    - button "Trending" [ref=e15]
+    - textbox "Search game keys, AI tools, gift cards, software..." [ref=e16]
+    - StaticText "Press Enter to search"
+  - main
+    - generic
+      - generic
+        - StaticText "WORLDWIDE DIGITAL SUBSCRIPTIONS"
+      - heading "The gateway to digital heaven." [level=1, ref=e176]
+        - StaticText "The gateway to digital heaven."
+      - paragraph
+        - StaticText "Every streaming service, gaming pass, AI tool & cloud plan — from every platform, for every region. One store. Every service. No borders. Verified, region-unlocked, and live in seconds."
+      - button "EXPLORE SUBSCRIPTIONS" [ref=e177]
+      - button "BROWSE ALL PLANS" [ref=e178]
+      - StaticText "500+"
+      - StaticText "SUBSCRIPTIONS"
+      - StaticText "50+"
+      - StaticText "PLATFORMS"
+      - StaticText "Global"
+      - StaticText "ACCESS"
+      - StaticText "<60s"
+      - StaticText "DELIVERY"
+    - generic
+      - heading "🔥 Popular" [level=2, ref=e37]
+      - paragraph
+        - StaticText "Most loved by our customers"
+      - StaticText "8"
+      - StaticText " featured"
+      - generic [ref=e38] clickable [cursor:pointer, onclick]
+        - generic
+          - generic
+            - button "Add to favorites" [ref=e302]
+            - button "Share product" [ref=e303]
+          - StaticText "SUBSCRIPTION"
+        - StaticText "SUBSCRIPTIONS"
+        - StaticText "Independent"
+        - heading "HBO Max" [level=3, ref=e179]
+        - paragraph
+          - StaticText "HBO originals · Warner Bros · same-day movies."
+        - button "1 star" [disabled, ref=e180]
+        - button "2 stars" [disabled, ref=e181]
+        - button "3 stars" [disabled, ref=e182]
+        - button "4 stars" [disabled, ref=e183]
+        - button "5 stars" [disabled, ref=e184]
+        - StaticText "0.0"
+        - StaticText "("
+        - StaticText "0"
+        - StaticText ")"
+        - StaticText "1"
+        - StaticText " sold"
+        - StaticText "Digital"
+        - StaticText "0"
+        - StaticText "Rs 1,535"
+        - button "Buy HBO Max now" [ref=e185]
+          - StaticText "Buy Now"
+        - button "Add HBO Max to cart" [ref=e186]
+        - button "Quick view HBO Max" [ref=e187]
+        - StaticText "1"
+        - StaticText "SALES"
+        - StaticText "0.0"
+        - StaticText "RATING"
+        - StaticText "0"
+        - StaticText "REVIEWS"
+      - generic [ref=e39] clickable [cursor:pointer, onclick]
+        - generic
+          - generic
+            - button "Add to favorites" [ref=e304]
+            - button "Share product" [ref=e305]
+        - StaticText "SOFTWARE"
+        - StaticText "Independent"
+        - heading "NordVPN" [level=3, ref=e188]
+        - paragraph
+          - StaticText "5,000+ servers · military encryption · no logs."
+        - button "1 star" [disabled, ref=e189]
+        - button "2 stars" [disabled, ref=e190]
+        - button "3 stars" [disabled, ref=e191]
+        - button "4 stars" [disabled, ref=e192]
+        - button "5 stars" [disabled, ref=e193]
+        - StaticText "0.0"
+        - StaticText "("
+        - StaticText "0"
+        - StaticText ")"
+        - StaticText "1"
+        - StaticText " sold"
+        - StaticText "Digital"
+        - StaticText "0"
+        - StaticText "Rs 1,116"
+        - button "Buy NordVPN now" [ref=e194]
+          - StaticText "Buy Now"
+        - button "Add NordVPN to cart" [ref=e195]
+        - button "Quick view NordVPN" [ref=e196]
+        - StaticText "1"
+        - StaticText "SALES"
+        - StaticText "0.0"
+        - StaticText "RATING"
+        - StaticText "0"
+        - StaticText "REVIEWS"
+      - generic [ref=e40] clickable [cursor:pointer, onclick]
+        - generic
+          - generic
+            - button "Add to favorites" [ref=e306]
+            - button "Share product" [ref=e307]
+        - StaticText "SOFTWARE"
+        - StaticText "Independent"
+        - heading "McAfee Total Protection" [level=3, ref=e197]
+        - paragraph
+          - StaticText "5 devices · antivirus + identity + VPN."
+        - button "1 star" [disabled, ref=e198]
+        - button "2 stars" [disabled, ref=e199]
+        - button "3 stars" [disabled, ref=e200]
+        - button "4 stars" [disabled, ref=e201]
+        - button "5 stars" [disabled, ref=e202]
+        - StaticText "0.0"
+        - StaticText "("
+        - StaticText "0"
+        - StaticText ")"
+        - StaticText "0"
+        - StaticText " sold"
+        - StaticText "Digital"
+        - StaticText "0"
+        - StaticText "Rs 837"
+        - button "Buy McAfee Total Protection now" [ref=e203]
+          - StaticText "Buy Now"
+        - button "Add McAfee Total Protection to cart" [ref=e204]
+        - button "Quick view McAfee Total Protection" [ref=e205]
+        - StaticText "0"
+        - StaticText "SALES"
+        - StaticText "0.0"
+        - StaticText "RATING"
+        - StaticText "0"
+        - StaticText "REVIEWS"
+      - generic [ref=e41] clickable [cursor:pointer, onclick]
+        - generic
+          - generic
+            - button "Add to favorites" [ref=e308]
+            - button "Share product" [ref=e309]
+        - StaticText "SOFTWARE"
+        - StaticText "Independent"
+        - heading "Kaspersky Total Security" [level=3, ref=e206]
+        - paragraph
+          - StaticText "5 devices · antivirus + VPN + parental."
+        - button "1 star" [disabled, ref=e207]
+        - button "2 stars" [disabled, ref=e208]
+        - button "3 stars" [disabled, ref=e209]
+        - button "4 stars" [disabled, ref=e210]
+        - button "5 stars" [disabled, ref=e211]
+        - StaticText "0.0"
+        - StaticText "("
+        - StaticText "0"
+        - StaticText ")"
+        - StaticText "0"
+        - StaticText " sold"
+        - StaticText "Digital"
+        - StaticText "0"
+        - StaticText "Rs 1,116"
+        - button "Buy Kaspersky Total Security now" [ref=e212]
+          - StaticText "Buy Now"
+        - button "Add Kaspersky Total Security to cart" [ref=e213]
+        - button "Quick view Kaspersky Total Security" [ref=e214]
+        - StaticText "0"
+        - StaticText "SALES"
+        - StaticText "0.0"
+        - StaticText "RATING"
+        - StaticText "0"
+        - StaticText "REVIEWS"
+      - generic [ref=e42] clickable [cursor:pointer, onclick]
+        - generic
+          - generic
+            - button "Add to favorites" [ref=e310]
+            - button "Share product" [ref=e311]
+          - StaticText "SUBSCRIPTION"
+        - StaticText "SUBSCRIPTIONS"
+        - StaticText "Independent"
+        - heading "Paramount+" [level=3, ref=e215]
+        - paragraph
+          - StaticText "Movies · originals · live sports."
+        - button "1 star" [disabled, ref=e216]
+        - button "2 stars" [disabled, ref=e217]
+        - button "3 stars" [disabled, ref=e218]
+        - button "4 stars" [disabled, ref=e219]
+        - button "5 stars" [disabled, ref=e220]
+        - StaticText "0.0"
+        - StaticText "("
+        - StaticText "0"
+        - StaticText ")"
+        - StaticText "0"
+        - StaticText " sold"
+        - StaticText "Digital"
+        - StaticText "0"
+        - StaticText "Rs 502"
+        - button "Buy Paramount+ now" [ref=e221]
+          - StaticText "Buy Now"
+        - button "Add Paramount+ to cart" [ref=e222]
+        - button "Quick view Paramount+" [ref=e223]
+        - StaticText "0"
+        - StaticText "SALES"
+        - StaticText "0.0"
+        - StaticText "RATING"
+        - StaticText "0"
+        - StaticText "REVIEWS"
+      - generic [ref=e43] clickable [cursor:pointer, onclick]
+        - generic
+          - generic
+            - button "Add to favorites" [ref=e312]
+            - button "Share product" [ref=e313]
+        - StaticText "SOFTWARE"
+        - StaticText "Independent"
+        - heading "Adobe Creative Cloud" [level=3, ref=e224]
+        - paragraph
+          - StaticText "20+ creative apps · Photoshop · Premiere Pro."
+        - button "1 star" [disabled, ref=e225]
+        - button "2 stars" [disabled, ref=e226]
+        - button "3 stars" [disabled, ref=e227]
+        - button "4 stars" [disabled, ref=e228]
+        - button "5 stars" [disabled, ref=e229]
+        - StaticText "0.0"
+        - StaticText "("
+        - StaticText "0"
+        - StaticText ")"
+        - StaticText "0"
+        - StaticText " sold"
+        - StaticText "Digital"
+        - StaticText "0"
+        - StaticText "Rs 2,372"
+        - button "Buy Adobe Creative Cloud now" [ref=e230]
+          - StaticText "Buy Now"
+        - button "Add Adobe Creative Cloud to cart" [ref=e231]
+        - button "Quick view Adobe Creative Cloud" [ref=e232]
+        - StaticText "0"
+        - StaticText "SALES"
+        - StaticText "0.0"
+        - StaticText "RATING"
+        - StaticText "0"
+        - StaticText "REVIEWS"
+      - generic [ref=e44] clickable [cursor:pointer, onclick]
+        - generic
+          - generic
+            - button "Add to favorites" [ref=e314]
+            - button "Share product" [ref=e315]
+        - StaticText "SOFTWARE"
+        - StaticText "Independent"
+        - heading "Microsoft 365 Family" [level=3, ref=e233]
+        - paragraph
+          - StaticText "6 users · Office apps · 1TB each."
+        - button "1 star" [disabled, ref=e234]
+        - button "2 stars" [disabled, ref=e235]
+        - button "3 stars" [disabled, ref=e236]
+        - button "4 stars" [disabled, ref=e237]
+        - button "5 stars" [disabled, ref=e238]
+        - StaticText "0.0"
+        - StaticText "("
+        - StaticText "0"
+        - StaticText ")"
+        - StaticText "0"
+        - StaticText " sold"
+        - StaticText "Digital"
+        - StaticText "0"
+        - StaticText "Rs 2,790"
+        - button "Buy Microsoft 365 Family now" [ref=e239]
+          - StaticText "Buy Now"
+        - button "Add Microsoft 365 Family to cart" [ref=e240]
+        - button "Quick view Microsoft 365 Family" [ref=e241]
+        - StaticText "0"
+        - StaticText "SALES"
+        - StaticText "0.0"
+        - StaticText "RATING"
+        - StaticText "0"
+        - StaticText "REVIEWS"
+      - generic [ref=e45] clickable [cursor:pointer, onclick]
+        - generic
+          - generic
+            - button "Add to favorites" [ref=e316]
+            - button "Share product" [ref=e317]
+          - StaticText "SUBSCRIPTION"
+        - StaticText "SUBSCRIPTIONS"
+        - StaticText "Independent"
+        - heading "Apple TV+" [level=3, ref=e242]
+        - paragraph
+          - StaticText "Apple Originals · 4K HDR Dolby Vision."
+        - button "1 star" [disabled, ref=e243]
+        - button "2 stars" [disabled, ref=e244]
+        - button "3 stars" [disabled, ref=e245]
+        - button "4 stars" [disabled, ref=e246]
+        - button "5 stars" [disabled, ref=e247]
+        - StaticText "0.0"
+        - StaticText "("
+        - StaticText "0"
+        - StaticText ")"
+        - StaticText "0"
+        - StaticText " sold"
+        - StaticText "Digital"
+        - StaticText "0"
+        - StaticText "Rs 698"
+        - button "Buy Apple TV+ now" [ref=e248]
+          - StaticText "Buy Now"
+        - button "Add Apple TV+ to cart" [ref=e249]
+        - button "Quick view Apple TV+" [ref=e250]
+        - StaticText "0"
+        - StaticText "SALES"
+        - StaticText "0.0"
+        - StaticText "RATING"
+        - StaticText "0"
+        - StaticText "REVIEWS"
+    - generic
+      - StaticText "PREMIUM COLLECTION"
+      - heading "Premium digital products. Instant delivery." [level=2, ref=e251]
+        - StaticText "Premium digital products. Instant delivery."
+      - paragraph
+        - StaticText "From streaming subscriptions to AI tools and game keys — every product is verified, region-unlocked, and delivered to your inbox in under 60 seconds."
+      - button "BROWSE ALL PLANS" [ref=e259]
+    - generic
+      - heading "Browse by category" [level=2, ref=e252]
+      - paragraph
+        - StaticText "Tap a category to filter the grid below."
+    - button "All" [ref=e17]
+    - button "AI Tools 0" [ref=e18]
+      - StaticText "AI Tools"
+      - StaticText "0"
+    - button "IPTV & Memberships 0" [ref=e19]
+      - StaticText "IPTV & Memberships"
+      - StaticText "0"
+    - button "Independent 0" [ref=e20]
+      - StaticText "Independent"
+      - StaticText "0"
+    - button "Software 0" [ref=e21]
+      - StaticText "Software"
+      - StaticText "0"
+    - button "Subscriptions 0" [ref=e22]
+      - StaticText "Subscriptions"
+      - StaticText "0"
+    - LabelText
+      - StaticText "Keyword"
+    - textbox "Refine by keyword..." [ref=e46]
+    - LabelText
+      - StaticText "Type"
+    - combobox [expanded=false, ref=e47]: All types
+      - generic [ref=e253] clickable [onclick]
+        - StaticText "All types"
+    - LabelText
+      - StaticText "Sort"
+    - combobox [expanded=false, ref=e48]: Most popular
+      - generic [ref=e254] clickable [onclick]
+        - StaticText "Most popular"
+    - LabelText
+      - StaticText "Min Rs"
+    - spinbutton "0" [ref=e49]
+    - LabelText
+      - StaticText "Max Rs"
+    - spinbutton "∞" [ref=e50]
+    - switch "Featured only" [checked=false, ref=e51]
+    - LabelText
+      - StaticText "Featured only"
+    - button "Clear" [ref=e52]
+    - heading "All products20 results" [level=2, ref=e23]
+      - StaticText "All products20 results"
+    - generic [ref=e24] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e260]
+          - button "Share product" [ref=e261]
+        - StaticText "SUBSCRIPTION"
+      - StaticText "SUBSCRIPTIONS"
+      - StaticText "Independent"
+      - heading "HBO Max" [level=3, ref=e53]
+      - paragraph
+        - StaticText "HBO originals · Warner Bros · same-day movies."
+      - button "1 star" [disabled, ref=e54]
+      - button "2 stars" [disabled, ref=e55]
+      - button "3 stars" [disabled, ref=e56]
+      - button "4 stars" [disabled, ref=e57]
+      - button "5 stars" [disabled, ref=e58]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "1"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 1,535"
+      - button "Buy HBO Max now" [ref=e59]
+        - StaticText "Buy Now"
+      - button "Add HBO Max to cart" [ref=e60]
+      - button "Quick view HBO Max" [ref=e61]
+      - StaticText "1"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e25] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e262]
+          - button "Share product" [ref=e263]
+      - StaticText "SOFTWARE"
+      - StaticText "Independent"
+      - heading "NordVPN" [level=3, ref=e62]
+      - paragraph
+        - StaticText "5,000+ servers · military encryption · no logs."
+      - button "1 star" [disabled, ref=e63]
+      - button "2 stars" [disabled, ref=e64]
+      - button "3 stars" [disabled, ref=e65]
+      - button "4 stars" [disabled, ref=e66]
+      - button "5 stars" [disabled, ref=e67]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "1"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 1,116"
+      - button "Buy NordVPN now" [ref=e68]
+        - StaticText "Buy Now"
+      - button "Add NordVPN to cart" [ref=e69]
+      - button "Quick view NordVPN" [ref=e70]
+      - StaticText "1"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e26] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e264]
+          - button "Share product" [ref=e265]
+      - StaticText "SOFTWARE"
+      - StaticText "Independent"
+      - heading "McAfee Total Protection" [level=3, ref=e71]
+      - paragraph
+        - StaticText "5 devices · antivirus + identity + VPN."
+      - button "1 star" [disabled, ref=e72]
+      - button "2 stars" [disabled, ref=e73]
+      - button "3 stars" [disabled, ref=e74]
+      - button "4 stars" [disabled, ref=e75]
+      - button "5 stars" [disabled, ref=e76]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 837"
+      - button "Buy McAfee Total Protection now" [ref=e77]
+        - StaticText "Buy Now"
+      - button "Add McAfee Total Protection to cart" [ref=e78]
+      - button "Quick view McAfee Total Protection" [ref=e79]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e27] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e266]
+          - button "Share product" [ref=e267]
+      - StaticText "SOFTWARE"
+      - StaticText "Independent"
+      - heading "Kaspersky Total Security" [level=3, ref=e80]
+      - paragraph
+        - StaticText "5 devices · antivirus + VPN + parental."
+      - button "1 star" [disabled, ref=e81]
+      - button "2 stars" [disabled, ref=e82]
+      - button "3 stars" [disabled, ref=e83]
+      - button "4 stars" [disabled, ref=e84]
+      - button "5 stars" [disabled, ref=e85]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 1,116"
+      - button "Buy Kaspersky Total Security now" [ref=e86]
+        - StaticText "Buy Now"
+      - button "Add Kaspersky Total Security to cart" [ref=e87]
+      - button "Quick view Kaspersky Total Security" [ref=e88]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e28] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e268]
+          - button "Share product" [ref=e269]
+        - StaticText "SUBSCRIPTION"
+      - StaticText "SUBSCRIPTIONS"
+      - StaticText "Independent"
+      - heading "Paramount+" [level=3, ref=e89]
+      - paragraph
+        - StaticText "Movies · originals · live sports."
+      - button "1 star" [disabled, ref=e90]
+      - button "2 stars" [disabled, ref=e91]
+      - button "3 stars" [disabled, ref=e92]
+      - button "4 stars" [disabled, ref=e93]
+      - button "5 stars" [disabled, ref=e94]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 502"
+      - button "Buy Paramount+ now" [ref=e95]
+        - StaticText "Buy Now"
+      - button "Add Paramount+ to cart" [ref=e96]
+      - button "Quick view Paramount+" [ref=e97]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e29] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e270]
+          - button "Share product" [ref=e271]
+      - StaticText "SOFTWARE"
+      - StaticText "Independent"
+      - heading "Adobe Creative Cloud" [level=3, ref=e98]
+      - paragraph
+        - StaticText "20+ creative apps · Photoshop · Premiere Pro."
+      - button "1 star" [disabled, ref=e99]
+      - button "2 stars" [disabled, ref=e100]
+      - button "3 stars" [disabled, ref=e101]
+      - button "4 stars" [disabled, ref=e102]
+      - button "5 stars" [disabled, ref=e103]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 2,372"
+      - button "Buy Adobe Creative Cloud now" [ref=e104]
+        - StaticText "Buy Now"
+      - button "Add Adobe Creative Cloud to cart" [ref=e105]
+      - button "Quick view Adobe Creative Cloud" [ref=e106]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e30] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e272]
+          - button "Share product" [ref=e273]
+      - StaticText "SOFTWARE"
+      - StaticText "Independent"
+      - heading "Microsoft 365 Family" [level=3, ref=e107]
+      - paragraph
+        - StaticText "6 users · Office apps · 1TB each."
+      - button "1 star" [disabled, ref=e108]
+      - button "2 stars" [disabled, ref=e109]
+      - button "3 stars" [disabled, ref=e110]
+      - button "4 stars" [disabled, ref=e111]
+      - button "5 stars" [disabled, ref=e112]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 2,790"
+      - button "Buy Microsoft 365 Family now" [ref=e113]
+        - StaticText "Buy Now"
+      - button "Add Microsoft 365 Family to cart" [ref=e114]
+      - button "Quick view Microsoft 365 Family" [ref=e115]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e31] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e274]
+          - button "Share product" [ref=e275]
+        - StaticText "SUBSCRIPTION"
+      - StaticText "SUBSCRIPTIONS"
+      - StaticText "Independent"
+      - heading "Apple TV+" [level=3, ref=e116]
+      - paragraph
+        - StaticText "Apple Originals · 4K HDR Dolby Vision."
+      - button "1 star" [disabled, ref=e117]
+      - button "2 stars" [disabled, ref=e118]
+      - button "3 stars" [disabled, ref=e119]
+      - button "4 stars" [disabled, ref=e120]
+      - button "5 stars" [disabled, ref=e121]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 698"
+      - button "Buy Apple TV+ now" [ref=e122]
+        - StaticText "Buy Now"
+      - button "Add Apple TV+ to cart" [ref=e123]
+      - button "Quick view Apple TV+" [ref=e124]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e32] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e276]
+          - button "Share product" [ref=e277]
+        - StaticText "SUBSCRIPTION"
+      - StaticText "SUBSCRIPTIONS"
+      - StaticText "Independent"
+      - heading "YouTube Premium" [level=3, ref=e125]
+      - paragraph
+        - StaticText "Ad-free · background play · YouTube Music."
+      - button "1 star" [disabled, ref=e126]
+      - button "2 stars" [disabled, ref=e127]
+      - button "3 stars" [disabled, ref=e128]
+      - button "4 stars" [disabled, ref=e129]
+      - button "5 stars" [disabled, ref=e130]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 614"
+      - button "Buy YouTube Premium now" [ref=e131]
+        - StaticText "Buy Now"
+      - button "Add YouTube Premium to cart" [ref=e132]
+      - button "Quick view YouTube Premium" [ref=e133]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e33] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e278]
+          - button "Share product" [ref=e279]
+      - StaticText "SOFTWARE"
+      - StaticText "Independent"
+      - heading "ExpressVPN" [level=3, ref=e134]
+      - paragraph
+        - StaticText "3,000+ servers · 94 countries · split tunneling."
+      - button "1 star" [disabled, ref=e135]
+      - button "2 stars" [disabled, ref=e136]
+      - button "3 stars" [disabled, ref=e137]
+      - button "4 stars" [disabled, ref=e138]
+      - button "5 stars" [disabled, ref=e139]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 1,256"
+      - button "Buy ExpressVPN now" [ref=e140]
+        - StaticText "Buy Now"
+      - button "Add ExpressVPN to cart" [ref=e141]
+      - button "Quick view ExpressVPN" [ref=e142]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e34] clickable [cursor:pointer, onclick]
+      - generic
+        - StaticText "FEATURED"
+        - generic
+          - button "Add to favorites" [ref=e280]
+          - button "Share product" [ref=e281]
+      - StaticText "IPTV & MEMBERSHIPS"
+      - StaticText "Independent"
+      - heading "GEO IPTV" [level=3, ref=e143]
+      - paragraph
+        - StaticText "500+ live channels — sports, movies, news, entertainment."
+      - button "1 star" [disabled, ref=e144]
+      - button "2 stars" [disabled, ref=e145]
+      - button "3 stars" [disabled, ref=e146]
+      - button "4 stars" [disabled, ref=e147]
+      - button "5 stars" [disabled, ref=e148]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 499"
+      - button "Buy GEO IPTV now" [ref=e149]
+        - StaticText "Buy Now"
+      - button "Add GEO IPTV to cart" [ref=e150]
+      - button "Quick view GEO IPTV" [ref=e151]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - generic [ref=e35] clickable [cursor:pointer, onclick]
+      - generic
+        - generic
+          - button "Add to favorites" [ref=e282]
+          - button "Share product" [ref=e283]
+      - StaticText "SOFTWARE"
+      - StaticText "Independent"
+      - heading "Norton 360 Deluxe" [level=3, ref=e152]
+      - paragraph
+        - StaticText "5 devices · antivirus + VPN + 50GB backup."
+      - button "1 star" [disabled, ref=e153]
+      - button "2 stars" [disabled, ref=e154]
+      - button "3 stars" [disabled, ref=e155]
+      - button "4 stars" [disabled, ref=e156]
+      - button "5 stars" [disabled, ref=e157]
+      - StaticText "0.0"
+      - StaticText "("
+      - StaticText "0"
+      - StaticText ")"
+      - StaticText "0"
+      - StaticText " sold"
+      - StaticText "Digital"
+      - StaticText "0"
+      - StaticText "Rs 977"
+      - button "Buy Norton 360 Deluxe now" [ref=e158]
+        - StaticText "Buy Now"
+      - button "Add Norton 360 Deluxe to cart" [ref=e159]
+      - button "Quick view Norton 360 Deluxe" [ref=e160]
+      - StaticText "0"
+      - StaticText "SALES"
+      - StaticText "0.0"
+      - StaticText "RATING"
+      - StaticText "0"
+      - StaticText "REVIEWS"
+    - navigation "pagination" [ref=e36]
+      - list
+        - listitem [level=1]
+          - link "Go to previous page" [disabled, ref=e284]
+            - StaticText "Previous"
+        - listitem [level=1]
+          - link "1" [ref=e285]
+        - listitem [level=1]
+          - link "2" [ref=e286]
+        - listitem [level=1]
+          - link "Go to next page" [ref=e287]
+            - StaticText "Next"
+    - generic
+      - StaticText "JOIN THE MOVEMENT"
+      - heading "Trusted by 12,000+ customers worldwide." [level=2, ref=e255]
+        - StaticText "Trusted by 12,000+ customers worldwide."
+      - paragraph
+        - StaticText "From Islamabad to Istanbul, New York to Nairobi — playbeat.digital powers digital commerce across 50+ platforms and every region. Secure checkout, instant delivery, 24/7 support."
+      - button "EXPLORE SUBSCRIPTIONS" [ref=e256]
+  - contentinfo
+    - generic
+      - image "PLAYBEAT logo"
+      - StaticText "PLAY"
+      - StaticText "BEA"
+      - StaticText "T"
+      - StaticText ".digital"
+      - paragraph
+        - StaticText "Pakistan's premier digital marketplace for game keys, software licenses, AI tools, and gift cards. Instant delivery. Trusted by thousands."
+      - form
+        - textbox "Newsletter email" [ref=e257]
+        - button "Subscribe" [ref=e258]
+      - link "WhatsApp: 0332 102 9333" [ref=e161]
+      - link "info@playbeat.digital (General)" [ref=e162]
+      - link "support@playbeat.digital (Support)" [ref=e163]
+      - link "director@playbeat.digital (Director)" [ref=e164]
+      - StaticText "Pakistan"
+      - StaticText "24/7 Instant Delivery"
+      - heading "Quick Links" [level=4, ref=e165]
+      - list
+        - listitem [level=1]
+          - button "Home" [ref=e288]
+        - listitem [level=1]
+          - button "Games" [ref=e289]
+        - listitem [level=1]
+          - button "Gift Cards" [ref=e290]
+        - listitem [level=1]
+          - button "Software" [ref=e291]
+        - listitem [level=1]
+          - button "AI Tools" [ref=e292]
+        - listitem [level=1]
+          - button "Subscriptions" [ref=e293]
+        - listitem [level=1]
+          - button "Best Value" [ref=e294]
+        - listitem [level=1]
+          - button "Trending" [ref=e295]
+      - heading "Categories" [level=4, ref=e166]
+      - list
+        - listitem [level=1]
+          - button "Games" [ref=e296]
+        - listitem [level=1]
+          - button "Gift Cards" [ref=e297]
+        - listitem [level=1]
+          - button "Software" [ref=e298]
+        - listitem [level=1]
+          - button "AI Tools" [ref=e299]
+        - listitem [level=1]
+          - button "Subscriptions" [ref=e300]
+        - listitem [level=1]
+          - button "Top-Up" [ref=e301]
+      - heading "Download Our App" [level=4, ref=e167]
+      - paragraph
+        - StaticText "Install on your phone for instant access & live updates."
+      - button "Download Now" [ref=e168]
+      - StaticText "Secure Checkout"
+      - paragraph
+        - StaticText "All payments processed by Lemon Squeezy. PCI-DSS compliant."
+      - paragraph
+        - StaticText "WE ACCEPT"
+      - StaticText "Bank Alfalah"
+      - StaticText "Easypaisa"
+      - StaticText "PayPal"
+      - StaticText "Bitcoin (BTC)"
+      - StaticText "Ethereum (ETH)"
+      - StaticText "Tether (USDT)"
+      - StaticText "USD Coin (USDC)"
+      - paragraph
+        - StaticText "© 2026 PlayBeat.Digital. All rights reserved."
+      - link "Privacy" [ref=e169]
+      - link "Terms" [ref=e170]
+      - link "Refund Policy" [ref=e171]
+      - link "ADMIN" [ref=e172]
+      - link "GitHub" [ref=e173]
+      - link "Twitter / X" [ref=e174]
+      - link "Contact us" [ref=e175]
+  - region "Notifications (F8)" [ref=e1]
+    - list
+  - region "Notifications alt+T" [ref=e2]
+  - alert
