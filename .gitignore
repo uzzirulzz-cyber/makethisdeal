@@ -50,6 +50,8 @@ test
 prompt
 
 server.log
-# Skills directory
-/skills/tool-results/
+# Skills & tool results
+/skills/
+tool-results/
+/download/
 *.png
